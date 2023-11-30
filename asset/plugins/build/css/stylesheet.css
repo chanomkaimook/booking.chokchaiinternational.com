@@ -1,0 +1,29 @@
+.tool-btn button {
+  background-color: #a7b6c8;
+}
+.tool-btn button:hover {
+  background-color: #ffbf00;
+  color: #fff;
+}
+
+.btn-primarysoft {
+  background-color: #a7b6c8 !important;
+}
+.btn-primarysoft:hover {
+  background-color: #ffbf00 !important;
+  color: #fff !important;
+}
+
+.dataTables_wrapper .dt-buttons button {
+  background-color: #a7b6c8;
+  border-color: #fff;
+}
+.dataTables_wrapper .dt-buttons button:hover {
+  background-color: #ffbf00;
+}
+
+.form-group .card-text {
+  color: #4489e4;
+}
+
+/*# sourceMappingURL=stylesheet.css.map */

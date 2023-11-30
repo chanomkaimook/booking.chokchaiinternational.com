@@ -1,0 +1,58 @@
+// @use 'button';
+@use "datatable";
+
+//
+// # Color Settings
+//
+
+// color theme
+$color-1: #034ea2;
+$color-2: #ffbf00;
+$color-3: #a7b6c8;
+$color-white: #fff;
+$color-info: #4489e4;
+
+// color type
+$color-tool-main: $color-3;
+$color-tool-main-hover: $color-2;
+
+.tool-btn {
+  button {
+    // @extend %button-tool;
+    background-color: $color-tool-main;
+  }
+  button:hover {
+    background-color: $color-tool-main-hover;
+    color:$color-white
+  }
+}
+
+.btn-primarysoft {
+  background-color: $color-tool-main !important;
+  &:hover {
+    background-color: $color-tool-main-hover !important;
+    color:$color-white !important
+  }
+}
+
+//
+// # Datatable
+//
+.dataTables_wrapper {
+  .dt-buttons {
+    button {
+      background-color: $color-tool-main;
+      border-color: #fff;
+    }
+    button:hover {
+      background-color: $color-tool-main-hover;
+    }
+  }
+}
+
+//
+// # form
+//
+.form-group .card-text {
+  color:$color-info;
+}

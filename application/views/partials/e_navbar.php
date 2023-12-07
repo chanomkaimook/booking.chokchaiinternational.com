@@ -54,7 +54,7 @@
          <!-- Topbar Start -->
          <div class="navbar-custom">
              <ul class="list-unstyled topnav-menu float-right mb-0">
-                 <li class="dropdown notification-list dropdown d-lg-inline-block ml-2">
+                 <!-- <li class="dropdown notification-list dropdown d-lg-inline-block ml-2">
                      <a class="nav-link dropdown-toggle mr-0 waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                          <?php if ($_COOKIE['langadmin'] == 'english') { ?>
                              <img src="<?= base_url() ?>/asset/images/flags/1x1/us.svg" alt="lang-image" height="20">
@@ -63,18 +63,18 @@
                          <?php } ?>
                      </a>
                      <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
-                         <!-- item-->
+
                          <a onclick="setCookieLanguage('langadmin','thai',365);" data-lang="thailand" class="dropdown-item notify-item">
                              <img src="<?= base_url() ?>/asset/images/flags/1x1/th.svg" alt="lang-image" class="mr-1" height="20"> <span class="align-middle text-capitalize">thailand</span>
                          </a>
 
-                         <!-- item-->
+
                          <a onclick="setCookieLanguage('langadmin','english',365);" data-lang="english" class="dropdown-item notify-item">
                              <img src="<?= base_url() ?>/asset/images/flags/1x1/us.svg" alt="lang-image" class="mr-1" height="20"> <span class="align-middle text-capitalize">united states</span>
                          </a>
 
                      </div>
-                 </li>
+                 </li> -->
 
                  <li class="dropdown notification-list d-none">
                      <a class="nav-link dropdown-toggle  waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">

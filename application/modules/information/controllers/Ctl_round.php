@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 // require APPPATH . '/libraries/API_Controller.php';
 
-class Ctl_page extends MY_Controller
+class Ctl_round extends MY_Controller
 {
 
     private $model;
@@ -12,8 +12,8 @@ class Ctl_page extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $modelname = 'mdl_page';
-        $this->load->model(array('page/mdl_page'));
+        $modelname = 'mdl_information';
+        $this->load->model(array('mdl_information'));
 
         $this->middleware(
             array(
@@ -31,32 +31,14 @@ class Ctl_page extends MY_Controller
 
         // setting
         $this->model = $this->$modelname;
-        $this->title = 'Title';
+        $this->title = 'จัดการข้อมูลรอบการเข้าชม';
     }
 
     public function index()
     {
         $this->template->set_layout('lay_datatable');
         $this->template->title($this->title);
-        /* $this->template->set_partial(
-            'headlink',
-            'partials/link/page',
-            array(
-                'data'  => array(
-                    '<link href="' . base_url('') . 'asset/libs/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />',
-                )
-            )
-        );
-        $this->template->set_partial(
-            'footerscript',
-            'partials/script/page',
-            array(
-                'data'  => array(
-                    '<script src="' . base_url('') . 'asset/js/pages/scrollbar.init.js"></script>',
-                )
-            )
-        ); */
-        $this->template->build('pages/index');
+        $this->template->build('round/index');
     }
     
     /**
@@ -96,20 +78,20 @@ class Ctl_page extends MY_Controller
                     $user_active =  whois($row->USER_STARTS);
                 }
 
-                $dom_workstatus = workstatus($row->WORKSTATUS, 'status');
                 $dom_status = status_offview($row->STATUS_OFFVIEW);
 
                 $sub_data = [];
 
                 $sub_data['ID'] = $row->ID;
-                $sub_data['CODE'] = textShow($row->CODE);
-                $sub_data['NAME'] = textLang($row->NAME,$row->NAME_US,false);
+                $sub_data['NAME'] = textNull($row->NAME);
 
-                $sub_data['WORKSTATUS'] = array(
-                    "display"   => $dom_workstatus,
-                    "data"      =>  array(
-                        'id'    => $row->WORKSTATUS,
-                    ),
+                $sub_data['TIME_START'] = array(
+                    "display"   => toTime($row->TIME_START,'H:i'),
+                    "data"      => $row->TIME_START,
+                );
+                $sub_data['TIME_END'] = array(
+                    "display"   => toTime($row->TIME_END,'H:i'),
+                    "data"      => $row->TIME_END,
                 );
 
                 $sub_data['STATUS'] = array(

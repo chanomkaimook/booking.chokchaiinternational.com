@@ -46,6 +46,27 @@
                         </ul>
                     </li> -->
 
+                    <!-- Base data information -->
+                    <?php
+                        $menu_path_base = array(
+                            "main_menu" => array(),
+                            "sub_menu"  => array()
+                        );
+
+                    ?>
+                    <li class="">
+                        <a href="javascript: void(0);">
+                            <i class="fe-database"></i>
+                            <span> ข้อมูลพื้นฐาน </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul class="nav-second-level" aria-expanded="false">
+                            <li class=""><a href="<?= site_url('information/ctl_round'); ?>" data-show="รอบจองหหห">รอบเข้าชม</a></li>
+                            <!-- <li class="<?= check_permit_menu($menu_path_base['sub_menu'][1]) ?>"><a href="<?= site_url('bill/ctl_bill'); ?>" data-show="document bills">ใบขอรับบริการ</a></li> -->
+                            <!-- <li class="<?= check_permit_menu($menu_path_base['sub_menu'][2]) ?>"><a href="<?= site_url('bill/ctl_workorder'); ?>" data-show="work orders">Work Order</a></li> -->
+                        </ul>
+                    </li>
+
                     <!-- Profile -->
                     <li>
                         <a href="#">

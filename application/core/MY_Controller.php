@@ -146,24 +146,13 @@ class MY_Controller extends CI_Controller
 			}
 
 			$this->load->library('permit');
-			/* echo "<pre>";
-			print_r($this->permit->get_dataPermitSet($this->session->userdata($this->userlogin)));
-			echo "</pre>";
-			echo "BEFORE<pre>";
-			print_r($data_need);
-
-			echo "===========================abc";
-			print_r($data_access);
-			echo "===========================def";
-			print_r($data_except);
-			echo "</pre>"; */
+			
 			//
 			// check permit to except
 			if ($data_except && count($data_except)) {
 
 				if (is_numeric(array_search($this->_method, array_keys($data_except)))) {
 					if (is_array($data_except[$this->_method]) && count($data_except[$this->_method])) {
-						// $array = $data_except[$this->_method];
 
 						//
 						// unset data array access for except
@@ -180,21 +169,11 @@ class MY_Controller extends CI_Controller
 
 						//
 						// except value to null
-						// unset($data_need);
-						// unset($data_access);
 						$data_need = [];
 						$data_access = [];
 					}
 				}
 			}
-			/* echo "<br>AFTER<pre>";
-			print_r($data_need);
-
-			echo "===========================abc";
-			print_r($data_access);
-			echo "===========================def";
-			print_r($data_except);
-			echo "</pre>"; */
 
 			if (!$data_access[$this->_method] && !count($data_need)) {
 				$result = true;
@@ -250,12 +229,6 @@ class MY_Controller extends CI_Controller
 			// pass auto
 			$result = true;
 		}
-		/* if ($result == false) {
-			echo $this->_method . "= error permit";
-		} else {
-			echo $this->_method . "= success";
-		}
-		die; */
 
 		if ($result == false) {
 			redirect(site_url('error_permit'));

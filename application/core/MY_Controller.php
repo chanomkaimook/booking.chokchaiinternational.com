@@ -145,8 +145,8 @@ class MY_Controller extends CI_Controller
 				$data_except = $dataset['except'];
 			}
 
-			/* $this->load->library('permit');
-			echo "<pre>";
+			$this->load->library('permit');
+			/* echo "<pre>";
 			print_r($this->permit->get_dataPermitSet($this->session->userdata($this->userlogin)));
 			echo "</pre>";
 			echo "BEFORE<pre>";
@@ -180,8 +180,10 @@ class MY_Controller extends CI_Controller
 
 						//
 						// except value to null
-						unset($data_need);
-						unset($data_access);
+						// unset($data_need);
+						// unset($data_access);
+						$data_need = [];
+						$data_access = [];
 					}
 				}
 			}
@@ -194,7 +196,7 @@ class MY_Controller extends CI_Controller
 			print_r($data_except);
 			echo "</pre>"; */
 
-			if (!isset($data_access[$this->_method])) {
+			if (!$data_access[$this->_method] && !count($data_need)) {
 				$result = true;
 			} else {
 				$dataarray = $this->permit->get_dataPermitSet($this->session->userdata($this->userlogin));
@@ -206,6 +208,7 @@ class MY_Controller extends CI_Controller
 			if ($data_need && count($data_need) && $result == false) {
 				//
 				// check permit to need
+				
 				foreach ($data_need as $row_need) {
 					if (can($row_need,$dataarray) === false) {
 						$result = false;
@@ -239,6 +242,7 @@ class MY_Controller extends CI_Controller
 					}
 				}
 			}
+			// die;
 		} else {
 
 			//

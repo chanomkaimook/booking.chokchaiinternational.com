@@ -58,7 +58,7 @@ function check_role($role_name = null, int $staff_id = null, array $dataarray = 
   if (check_admin()) {
     $result = true;
   } else {
-    $result = method_find_checkarray($role_name, $staff_id, $nameselect,$dataarray);
+    $result = method_find_checkarray($role_name, $staff_id, $nameselect, $dataarray);
   }
 
   return $result;
@@ -85,7 +85,7 @@ function check_permit($permit_value = null, int $staff_id = null, array $dataarr
   if (check_admin()) {
     $result = true;
   } else {
-    $result = method_find_checkarray($permit_value, $staff_id, $nameselect,$dataarray);
+    $result = method_find_checkarray($permit_value, $staff_id, $nameselect, $dataarray);
   }
 
   return $result;
@@ -145,7 +145,7 @@ function check_data($url_value = null, int $staff_id = null, string $nameselect 
   if (check_admin()) {
     $result = true;
   } else {
-    $result = method_find_checkarray($url_value, $staff_id, $nameselect,$dataarray);
+    $result = method_find_checkarray($url_value, $staff_id, $nameselect, $dataarray);
   }
 
   return $result;
@@ -171,21 +171,35 @@ function method_find_checkarray($name = null, int $staff_id = null, string $key_
   }
 
   if ($staff_id && $key_array_name) {
-    
+
     $ci->load->library('Permit');
 
-    if($dataarray){
+    if ($dataarray) {
       $data_permit = $dataarray;
-    }else{
+    } else {
       $data_permit = $ci->permit->get_dataPermitSet($staff_id);
     }
     $array_permitset = $data_permit[$key_array_name];
+
+    // array permit id list
+    $array_permitset_id = $data_permit['permit_id_list'];
+    $text_permit_id = "";
+    if ($array_permitset_id) {
+      $text_permit_id = implode(",", $array_permitset_id);
+    }
 
     if (is_array($name)) {
       // loop
       foreach ($name as $value) {
         if ($result != true) {
           if (is_numeric(array_search($value, $array_permitset))) {
+            $result = true;
+          }
+
+          //
+          // check permit in role
+          //
+          if ($query = query_permit($value, $text_permit_id)) {
             $result = true;
           }
         }
@@ -195,7 +209,41 @@ function method_find_checkarray($name = null, int $staff_id = null, string $key_
         if (is_numeric(array_search($name, $array_permitset))) {
           $result = true;
         }
+
+        //
+        // check permit in role
+        //
+        if ($query = query_permit($name, $text_permit_id)) {
+          $result = true;
+        }
       }
+    }
+  }
+
+  return $result;
+}
+
+/**
+ * query for find permit from role
+ *
+ * @param string $code = role code
+ * @param string $text = permit id in($text)
+ * @return void
+ */
+function query_permit(string $code = null, string $text = null)
+{
+  $result = [];
+  if ($code && $text) {
+    $ci = &get_instance();
+
+    $sql = $ci->db->from('roles_control')
+      ->join('roles', 'roles.id=roles_control.roles_id', 'left')
+      ->where('roles.code', $code)
+      ->where('roles_control.permit_id in(' . $text . ')', null, false)
+      ->get();
+    $num = $sql->num_rows();
+    if ($num) {
+      $result = $sql->result();
     }
   }
 
@@ -291,20 +339,28 @@ function check_admin(int $staff_id = null)
  * @param array|null $dataarray = if setting this value will not get get_dataPermitSet
  * @return boolean
  */
-function can($name = null, array $dataarray = null) {
+function can($name = null, array $dataarray = null)
+{
+  $ci = &get_instance();
+
   $result = false;
+
+  if (!$dataarray) {
+    $staff_id = userlogin();
+    $dataarray = $ci->permit->get_dataPermitSet($staff_id);
+  }
 
   if (is_array($name)) {
     // loop
     foreach ($name as $value) {
       if ($result != true) {
-        if (method_can($value,$dataarray)) {
+        if (method_can($value, $dataarray)) {
           $result = true;
         }
       }
     }
   } else {
-    if (method_can($name,$dataarray)) {
+    if (method_can($name, $dataarray)) {
       $result = true;
     }
   }
@@ -332,11 +388,11 @@ function method_can(string $name = null, array $dataarray = null)
       // value = permit
       //
 
-      if (check_permit($name,null,$dataarray)) {
+      if (check_permit($name, null, $dataarray)) {
         $result = true;
       }
     } else {
-      
+
       //
       // value = menu
       //
@@ -347,13 +403,12 @@ function method_can(string $name = null, array $dataarray = null)
       $value = (string) $value[0];
 
       if (!$result) {
-        if (check_role($value,null,$dataarray)) {
+        if (check_role($value, null, $dataarray)) {
           $result = true;
         }
       }
-
     }
-  }else{
+  } else {
     $result = true;
   }
 
@@ -385,6 +440,50 @@ function userlogin()
   }
 
   return $result;
+}
+
+/**
+ * check menu permit for group menu
+ *
+ * @param array|null $array = role name || permit name 
+ * @return void
+ */
+function check_permit_groupmenu($array = null)
+{
+
+  if (is_array($array)) {
+
+    $ci = &get_instance();
+
+    $ci->load->library('Permit');
+    
+    $result = false;
+
+    $staff_id = userlogin();
+    $dataarray = $ci->permit->get_dataPermitSet($staff_id);
+
+    // loop
+    foreach ($array as $key => $array_in) {
+
+      if ($array_in && count($array_in)) {
+        foreach ($array_in as $value) {
+          if ($result != true) {
+            if (method_can($value, $dataarray)) {
+              $result = true;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  $css_name = '';
+
+  if (!$result) {
+    $css_name = 'd-none';
+  }
+
+  return $css_name;
 }
 
 /**
@@ -495,7 +594,7 @@ function my_permit(int $staff_id = null)
   $ci = &get_instance();
   $ci->load->database();
   # code...
-  
+
   if (!$staff_id) {
     $staff_id = userlogin();
   }

@@ -198,16 +198,10 @@ class Ctl_roles extends MY_Controller
             $permit_all = [];
             foreach ($explode as $row_id) {
                 $array_permit = $this->roles->get_dataRolesJS($row_id, null, "result_array");
-                // $array_permit_inchild = $this->roles->get_dataRolesChildJS($row_id, null, "result_array");
-                
-                if(count($permit_all) == 0){
-                    // $permit_all = array_merge($array_permit, $array_permit_inchild);
 
+                if(count($permit_all) == 0){
                     $permit_all = $array_permit;
                 }else{
-                    // $pre_permit_all = array_merge($array_permit, $array_permit_inchild);
-                    // $permit_all = array_merge($permit_all, $pre_permit_all);
-
                     $pre_permit_all = $array_permit;
                     $permit_all = array_merge($permit_all, $pre_permit_all);
                 }

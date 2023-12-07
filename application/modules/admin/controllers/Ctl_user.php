@@ -19,6 +19,19 @@ class Ctl_user extends MY_Controller
         // $this->load->model('mdl_register');
         // $this->load->model('mdl_staff');
 
+        $this->middleware(
+            array(
+                'access'    => [
+                    // 'index'     => ['bill','quotation'],
+                    // 'view'      => ['bill.view','bill.insert']
+                ],
+                'need'       => ['administrator'],
+                'except'    => [
+                    'get_user'      => [],
+                ]
+            )
+        );
+
         $this->load->library('Permit');
 
         // set language
@@ -160,11 +173,6 @@ class Ctl_user extends MY_Controller
         $user_permit = $this->permit->get_dataPermitSet($user_login);
         // $data_role_focus = $this->mdl_role_focus->get_data();
 
-        // print_r($data);
-        // print_r($user_permit);
-        // echo "=============";
-        // die;
-
         $item_id = $user_permit['roles_id_list'];
 
         $array_permit = $this->roles->get_dataRolesJS($item_id, null, "result_array");
@@ -176,23 +184,20 @@ class Ctl_user extends MY_Controller
 
         // permit id
         $array_permit_only = $this->roles->get_dataPermitOnly($user_login, null, "result_array");
-        // print_r($array_permit_only);
+
         if ($array_permit_only) {
             foreach ($array_permit_only as $index => $column) {
                 $key_name = $column['MENUS_CODE'];
                 $permit_all[$key_name][] = $array_permit_only[$index];
             }
         }
-        // print_r($permit_all);
-        $data->PERMIT = $permit_all;
-        $data->PERMIT_HTML = html_roles_jstree($permit_all);
-        $data->ROLES = $array_roles_child;
-        $data->PERMIT_NOROLE = $array_permit_only;
-        /* $result = array(
-            'data'      => $data,
-            'permit'    => $user_permit,
-            'data_role_focus' => $data_role_focus
-        ); */
+
+        if($data){
+            $data->PERMIT = $permit_all;
+            $data->PERMIT_HTML = html_roles_jstree($permit_all);
+            $data->ROLES = $array_roles_child;
+            $data->PERMIT_NOROLE = $array_permit_only;
+        }
 
         $result = $data;
         echo json_encode($result);

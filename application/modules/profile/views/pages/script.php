@@ -41,10 +41,9 @@
     let modal_view_name = '#modal_view'
     let modal_body_view = '.modal .modal-body-view'
     let modal_body_form = '.modal .modal-body-form'
-    
+
 
     $(document).ready(function() {
-
         //  =========================
         //  =========================
         //  Event
@@ -69,9 +68,6 @@
 
             if (item_id) {
                 func = async_update_data(item_id, data)
-            } else {
-                func = async_insert_data(data)
-
             }
 
             func
@@ -130,33 +126,6 @@
         })
 
         //  *
-        //  * CRUD
-        //  * click button add
-        //  * 
-        //  * call function open form for add data
-        //  *
-        $(d).on('click', form_button_btn_add, function(e) {
-            e.preventDefault()
-
-            add_data()
-
-            $(form_name).find(form_hidden_id).val('')
-        })
-
-        //  *
-        //  * CRUD
-        //  * click button delete
-        //  * 
-        //  * call function form delete
-        //  *
-        $(d).on('click', form_button_btn_del, function(e) {
-            e.preventDefault()
-
-            let id = $(this).attr('data-id')
-            delete_data(id)
-        })
-
-        //  *
         //  * Modal
         //  * Modal Hide
         //  * 
@@ -189,7 +158,7 @@
     //  =========================
     //  =========================
     //  Function
-    //  adjust code default here
+    //  Todo adjust code default here
     //  =========================
     //  =========================
 
@@ -201,29 +170,86 @@
     //  * @data = array[key=>[column=>value]]
     //  *
     function modalActive(data = [], action = 'view') {
-        if (data.length) {
-            let header = data[0].CODE
-            $(modal).find('.modal_text_header').html(header)
+        if (data) {
+            if (action != 'add' && data.NAME) {
+                let header = data.NAME
+                $(modal).find('.modal_text_header').html(header)
+            }
+
+            switch (action) {
+                case 'view':
+                    $('.form-group')
+                        .find('.name_th').text(data.NAME).end()
+                        .find('.name_us').text(data.NAME_US).end()
+                        .find('.lastname_th').text(data.LASTNAME).end()
+                        .find('.lastname_us').text(data.LASTNAME_US).end()
+                        .find('.username').text(data.USERNAME).end()
+                        .find('.jstree-grid-container').html(data.PERMIT_HTML).end()
+
+                    // create role
+                    create_html_select2()
+
+                    create_roles()
+
+                    async function create_roles() {
+                        let data_array_html = ""
+                        await new Promise((resolve, reject) => {
+                            resolve(
+                                data.ROLES.map(function(item) {
+                                    data_array_html += create_html_roles(textCapitalize(item.ROLES_CODE))
+                                })
+                            )
+                        })
+                        await new Promise((resolve, reject) => {
+                            $('.form-group').find('.user_role').html(data_array_html)
+                        })
+                    }
+
+                    break
+                case 'edit':
+                    $(modal_body_form)
+                        .find('[name=label_1]').val(data[0].WORKSTATUS).end()
+
+                    break
+                default:
+                    break
+            }
+
+            $(modal_view_name).modal()
+
+            modalLayout(action)
         }
 
-        switch (action) {
-            case 'view':
-                $(modal_body_view)
-                    .find('.label_1').text(data[0].NAME).end()
+    }
 
-                break
-            case 'edit':
-                $(modal_body_form)
-                    .find('[name=label_1]').val(data[0].WORKSTATUS).end()
+    function create_html_select2() {
+        let url_role = new URL('admin/ctl_roles/get_dataRole', domain)
+        fetch(url_role)
+            .then(res => res.json())
+            .then(resp => {
+                let data_array = ""
+                let item_value
+                let item_id
 
-                break
-            default:
-                break
+                resp.map(function(item) {
+                    item_value = textCapitalize(item.CODE)
+                    item_id = item.ID
+                    data_array += `<option value="${item_id}">${item_value}</option>`
+                })
+                $('[data-toggle=select2]')
+                    .html(data_array).select2()
+
+            })
+    }
+
+    function create_html_roles(text = null) {
+        let html = ""
+
+        if (text) {
+            html += `<div class="btn btn-primary">${text}</div>`
         }
 
-        $(modal_view_name).modal()
-
-        modalLayout(action)
+        return html
     }
 
     //  *
@@ -265,36 +291,6 @@
 
     //  *
     //  * Form
-    //  * view
-    //  * 
-    //  * get data
-    //  * #async_get_data() = script_crud.php
-    //  *
-    function view_data(item_id = 0) {
-        // item_id = 0
-        async_get_data(item_id)
-            .then((resp) => {
-                modalActive(resp, 'view')
-            })
-            .then(() => {
-                modalLoading_clear()
-            })
-    }
-
-    //  *
-    //  * Form
-    //  * add
-    //  * 
-    //  * open form add data
-
-    //  *
-    function add_data() {
-        modalActive([], 'add')
-        modalLoading_clear()
-    }
-
-    //  *
-    //  * Form
     //  * edit
     //  * 
     //  * open form edit data
@@ -312,66 +308,18 @@
     }
 
     //  *
-    //  * Form
-    //  * delete
-    //  * 
-    //  * confirm to delete data
-    //  * #swal_setConfirmInput() = e_navbar.php
-    //  *
-    function delete_data(item_id) {
-        Swal.fire(
-                swal_setConfirmInput()
-                // swal_setConfirm()
-            )
-            .then((result) => {
-                if (!result.dismiss) {
-                    let remark = result.value
-                    confirm_delete(item_id, remark)
-                }
-            })
-
-    }
-
-    //  *
-    //  * Form
-    //  * delete
-    //  * 
-    //  * delete data
-    //  * #async_delete_data() = script_crud.php
-    //  *
-    function confirm_delete(item_id = null, remark = null) {
-
-        if (item_id) {
-            async_delete_data(item_id, remark)
-                .then((data) => {
-
-                    if (data.error == 0) {
-                        swalalert()
-                    } else {
-                        swalalert('error', resp.txt, {
-                            auto: false
-                        })
-                    }
-
-                    dataReload(false)
-                })
-        }
-
-    }
-
-    //  *
     //  * DataTable
     //  * reload
     //  * 
     //  @param bool $reload = reload datatable
     //  * refresh data on datatable
     //  *
-    function dataReload(reload=true) {
+    function dataReload(reload = true) {
         modalHide()
 
-        if(reload == false){
+        if (reload == false) {
             $(datatable_name).DataTable().ajax.reload(false)
-        }else{
+        } else {
             $(datatable_name).DataTable().ajax.reload()
         }
     }

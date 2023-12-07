@@ -29,14 +29,23 @@ class Ctl_page extends MY_Controller
             )
         );
 
+        // set language
+        $this->lang->load('user', $this->langs);
+        $this->lang->load('roles', $this->langs);
+
         // setting
         $this->model = $this->$modelname;
-        $this->title = 'Title';
+        $this->title = $this->lang->line('__menu_profile');
     }
 
     public function index()
     {
-        $this->template->set_layout('lay_datatable');
+        // permit variable
+        $this->load->library('roles');
+        $array_permit = $this->roles->get_dataJS();
+        $data['permit'] = $array_permit;
+
+        $this->template->set_layout('lay_main');
         $this->template->title($this->title);
         /* $this->template->set_partial(
             'headlink',
@@ -56,7 +65,7 @@ class Ctl_page extends MY_Controller
                 )
             )
         ); */
-        $this->template->build('pages/index');
+        $this->template->build('pages/index',$data);
     }
     
     /**

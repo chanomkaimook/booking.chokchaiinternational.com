@@ -1,5 +1,5 @@
 <!-- App favicon -->
-<link rel="icon" type="image/png" sizes="16x16"  href="<?= base_url('') ?>asset/images/favicon-16x16.ico">
+<link rel="icon" type="image/png" sizes="32x32"  href="<?= base_url('') ?>asset/images/favicon-32x32.png">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="theme-color" content="#ffffff">
 

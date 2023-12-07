@@ -50,8 +50,6 @@
          </style>
 
          <input type="hidden" id="hidden_user_id" value="<?= $this->session->userdata('user_code'); ?>">
-         <input type="hidden" id="hidden_user_rolelevel" value="<?= $this->session->userdata('role_level'); ?>">
-
 
          <!-- Topbar Start -->
          <div class="navbar-custom">
@@ -192,7 +190,7 @@
                          </div>
 
                          <!-- item-->
-                         <a href="<?= site_url('profile/ctl_profile/') ?>" class="dropdown-item notify-item">
+                         <a href="<?= site_url('profile/ctl_page/') ?>" class="dropdown-item notify-item">
                              <i class="fe-user"></i>
                              <span>Profile</span>
                          </a>

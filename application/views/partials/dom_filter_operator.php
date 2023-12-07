@@ -7,7 +7,7 @@
             # 
             # sql provide for helpdesk permit
             $text_sql = '';
-            if (check_helpdesk()) {
+            /* if (check_helpdesk()) {
                 $this->load->model('mdl_role_focus');
 
                 $myself = $this->session->userdata('user_code');
@@ -28,7 +28,7 @@
                         $text_sql = 'staff.id in(' . $text_in . ')';
                     }
                 }
-            }
+            } */
 
             $sql = $this->db->select('staff.id,concat(employee.name," ",employee.lastname) as staff_name')
                 ->from('staff')

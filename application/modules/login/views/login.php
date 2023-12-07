@@ -9,7 +9,7 @@
     <meta content="Coderthemes" name="author" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <!-- App favicon -->
-    <link rel="icon" type="image/png" sizes="16x16"  href="<?= base_url('') ?>asset/images/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32"  href="<?= base_url('') ?>asset/images/favicon-32x32.png">
     
 
     <link href="<?= base_url('') ?>asset/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />

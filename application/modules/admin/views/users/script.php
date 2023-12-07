@@ -382,89 +382,90 @@
     //  * @data = array[key=>[column=>value]]
     //  *
     function modalActive(data = [], action = 'view') {
+        if (data) {
+            if (action != 'add' && data.NAME) {
+                let header = data.NAME
+                $(modal).find('.modal_text_header').html(header)
+            }
 
-        if (action != 'add' && data.NAME) {
-            let header = data.NAME
-            $(modal).find('.modal_text_header').html(header)
-        }
-
-        switch (action) {
-            case 'view':
-                $(modal_body_view)
-                    .find('.name_th').text(data.NAME).end()
-                    .find('.name_us').text(data.NAME_US).end()
-                    .find('.lastname_th').text(data.LASTNAME).end()
-                    .find('.lastname_us').text(data.LASTNAME_US).end()
-                    .find('.username').text(data.USERNAME).end()
-                    .find('.jstree-grid-container').html(data.PERMIT_HTML).end()
+            switch (action) {
+                case 'view':
+                    $(modal_body_view)
+                        .find('.name_th').text(data.NAME).end()
+                        .find('.name_us').text(data.NAME_US).end()
+                        .find('.lastname_th').text(data.LASTNAME).end()
+                        .find('.lastname_us').text(data.LASTNAME_US).end()
+                        .find('.username').text(data.USERNAME).end()
+                        .find('.jstree-grid-container').html(data.PERMIT_HTML).end()
 
 
-                // create role
-                create_html_select2()
+                    // create role
+                    create_html_select2()
 
-                test()
+                    test()
 
-                async function test() {
-                    let data_array_html = ""
-                    await new Promise((resolve, reject) => {
-                        resolve(
-                            data.ROLES.map(function(item) {
-                                data_array_html += create_html_roles(textCapitalize(item.ROLES_CODE))
-                            })
-                        )
+                    async function test() {
+                        let data_array_html = ""
+                        await new Promise((resolve, reject) => {
+                            resolve(
+                                data.ROLES.map(function(item) {
+                                    data_array_html += create_html_roles(textCapitalize(item.ROLES_CODE))
+                                })
+                            )
 
-                    })
-                    await new Promise((resolve, reject) => {
-                        $(modal_body_view).find('.user_role').html(data_array_html)
-                    })
-                }
+                        })
+                        await new Promise((resolve, reject) => {
+                            $(modal_body_view).find('.user_role').html(data_array_html)
+                        })
+                    }
 
-                // $('[data-plugin=jstree]').jstree()
-                break
-            case 'edit':
-                $(modal_body_form)
-                    .find('[name=name_th]').val(data.NAME).end()
-                    .find('[name=name_us]').val(data.NAME_US).end()
-                    .find('[name=lastname_th]').val(data.LASTNAME).end()
-                    .find('[name=lastname_us]').val(data.LASTNAME_US).end()
-                    .find('[name=input_username]').val(data.USERNAME)
-                    .attr('disabled', 'disabled').end()
-                    .find('[name=input_password]').attr('disabled', 'disabled').end()
-
-                //
-                // create role
-                let roles_id_child
-                if (data.ROLES.length) {
-                    roles_id_child = data.ROLES.map(function(item) {
-                        return item.ROLES_ID
-                    })
-
+                    // $('[data-plugin=jstree]').jstree()
+                    break
+                case 'edit':
                     $(modal_body_form)
-                        .find('#user_role').val(roles_id_child).triggerHandler('change')
-
-                    // set default value
-                    role_child_select = $(modal_body_form).find('#user_role').val()
+                        .find('[name=name_th]').val(data.NAME).end()
+                        .find('[name=name_us]').val(data.NAME_US).end()
+                        .find('[name=lastname_th]').val(data.LASTNAME).end()
+                        .find('[name=lastname_us]').val(data.LASTNAME_US).end()
+                        .find('[name=input_username]').val(data.USERNAME)
+                        .attr('disabled', 'disabled').end()
+                        .find('[name=input_password]').attr('disabled', 'disabled').end()
 
                     //
-                    // create permit
-                    create_html_checkjstree(data.PERMIT, 1)
+                    // create role
+                    let roles_id_child
+                    if (data.ROLES.length) {
+                        roles_id_child = data.ROLES.map(function(item) {
+                            return item.ROLES_ID
+                        })
 
-                } else {
-                    create_html_checkjstree(data.PERMIT)
-                }
+                        $(modal_body_form)
+                            .find('#user_role').val(roles_id_child).triggerHandler('change')
 
-                if (data.PERMIT_NOROLE.length) {
-                    create_permit_norole(data.PERMIT_NOROLE)
-                }
+                        // set default value
+                        role_child_select = $(modal_body_form).find('#user_role').val()
 
-                break
-            default:
-                break
+                        //
+                        // create permit
+                        create_html_checkjstree(data.PERMIT, 1)
+
+                    } else {
+                        create_html_checkjstree(data.PERMIT)
+                    }
+
+                    if (data.PERMIT_NOROLE.length) {
+                        create_permit_norole(data.PERMIT_NOROLE)
+                    }
+
+                    break
+                default:
+                    break
+            }
+
+            $(modal_roles).modal()
+
+            modalLayout(action)
         }
-
-        $(modal_roles).modal()
-
-        modalLayout(action)
     }
 
     function create_permit_norole(data = null) {

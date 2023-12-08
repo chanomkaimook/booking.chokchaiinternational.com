@@ -130,6 +130,35 @@ class Mdl_page extends CI_Model
         return $result;
     }
 
+    /**
+     * Check duplicate
+     *
+     * @param array|null $arraywhere = array where query
+     * @param string|null $valueshow = value for show when error
+     * @param string|null $table = table name for check
+     * @return void
+     */
+    function check_dup($arraywhere, string $valueshow = null, string $table = null)
+    {
+        $result = false;
+
+        if ($arraywhere && $valueshow) {
+
+            if (!$table) {
+                $table = $this->table;
+            }
+
+            if (check_dup($arraywhere, $table)) {
+                $result = array(
+                    'error' => 1,
+                    'txt'   => $valueshow . ' ซ้ำในระบบ ',
+                );
+            }
+        }
+
+        return $result;
+    }
+
     //  *
     //  * CRUD
     //  * insert
@@ -146,6 +175,14 @@ class Mdl_page extends CI_Model
 
         $request = $_POST;
         if ($return = $this->check_value_valid($request)) {
+            return $return;
+        }
+
+        $array_chk_dup = array(
+            'name' => $request['item_name'],
+            'status' => 1
+        );
+        if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
             return $return;
         }
 
@@ -195,6 +232,20 @@ class Mdl_page extends CI_Model
             $ex = explode('-', $this->input->post('item_begin_date'));
             $begin_date = $ex[2] . "-" . $ex[1] . "-" . $ex[0];
         } */
+
+        $request = $_POST;
+        if ($return = $this->check_value_valid($request)) {
+            return $return;
+        }
+        
+        $array_chk_dup = array(
+            'name' => $request['item_name'],
+            'status' => 1,
+            'id !=' => $item_id,
+        );
+        if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+            return $return;
+        }
 
         $data = array(
             'code'  => textNull($this->input->post('label_2')),

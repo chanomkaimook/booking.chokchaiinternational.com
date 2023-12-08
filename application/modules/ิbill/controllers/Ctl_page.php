@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 // require APPPATH . '/libraries/API_Controller.php';
 
-class Ctl_round extends MY_Controller
+class Ctl_page extends MY_Controller
 {
 
     private $model;
@@ -12,8 +12,8 @@ class Ctl_round extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $modelname = 'mdl_round';
-        $this->load->model(array('information/mdl_round','mdl_round_time'));
+        $modelname = 'mdl_page';
+        $this->load->model(array('page/mdl_page'));
 
         $this->middleware(
             array(
@@ -31,17 +31,32 @@ class Ctl_round extends MY_Controller
 
         // setting
         $this->model = $this->$modelname;
-        $this->title = 'จัดการข้อมูลรอบการเข้าชม';
+        $this->title = 'Title';
     }
 
     public function index()
     {
-        $optional['order_by'] = array('id'=>'asc');
-        $data['time'] = $this->mdl_round_time->get_data(null,$optional);
-
         $this->template->set_layout('lay_datatable');
         $this->template->title($this->title);
-        $this->template->build('round/index',$data);
+        /* $this->template->set_partial(
+            'headlink',
+            'partials/link/page',
+            array(
+                'data'  => array(
+                    '<link href="' . base_url('') . 'asset/libs/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />',
+                )
+            )
+        );
+        $this->template->set_partial(
+            'footerscript',
+            'partials/script/page',
+            array(
+                'data'  => array(
+                    '<script src="' . base_url('') . 'asset/js/pages/scrollbar.init.js"></script>',
+                )
+            )
+        ); */
+        $this->template->build('pages/index');
     }
     
     /**
@@ -81,20 +96,20 @@ class Ctl_round extends MY_Controller
                     $user_active =  whois($row->USER_STARTS);
                 }
 
+                $dom_workstatus = workstatus($row->WORKSTATUS, 'status');
                 $dom_status = status_offview($row->STATUS_OFFVIEW);
 
                 $sub_data = [];
 
                 $sub_data['ID'] = $row->ID;
-                $sub_data['NAME'] = textNull($row->NAME);
+                $sub_data['CODE'] = textShow($row->CODE);
+                $sub_data['NAME'] = textLang($row->NAME,$row->NAME_US,false);
 
-                $sub_data['TIME_START'] = array(
-                    "display"   => toTime($row->TIME_START,'H:i'),
-                    "data"      => $row->TIME_START,
-                );
-                $sub_data['TIME_END'] = array(
-                    "display"   => toTime($row->TIME_END,'H:i'),
-                    "data"      => $row->TIME_END,
+                $sub_data['WORKSTATUS'] = array(
+                    "display"   => $dom_workstatus,
+                    "data"      =>  array(
+                        'id'    => $row->WORKSTATUS,
+                    ),
                 );
 
                 $sub_data['STATUS'] = array(
@@ -141,17 +156,6 @@ class Ctl_round extends MY_Controller
         $item_id = $request['id'];
         $data = $this->model->get_data($item_id);
 
-        if($data){
-            if(is_array($data)){
-                $data['TIME_END'] = toTime($data['TIME_END']);
-                $data['TIME_START'] = toTime($data['TIME_START']);
-                $data['STATUS_TEXT'] = status_offview($data['STATUS_OFFVIEW']);
-            }else{
-                $data->TIME_END = toTime($data->TIME_END);
-                $data->TIME_START = toTime($data->TIME_START);
-                $data->STATUS_TEXT = status_offview($data->STATUS_OFFVIEW);
-            }
-        }
         $result = $data;
         echo json_encode($result);
     }

@@ -242,7 +242,7 @@
 
              // default language
              let setlang = 'thai'
-             if (getCookie("langadmin") != setlang) {
+             if (getCookie("langadmin") && getCookie("langadmin") != setlang) {
                  setlang = getCookie("langadmin")
              }
 

@@ -41,7 +41,7 @@
     let modal_view_name = '#modal_view'
     let modal_body_view = '.modal .modal-body-view'
     let modal_body_form = '.modal .modal-body-form'
-    
+
 
     $(document).ready(function() {
 
@@ -201,29 +201,31 @@
     //  * @data = array[key=>[column=>value]]
     //  *
     function modalActive(data = [], action = 'view') {
-        if (data.length) {
-            let header = data[0].CODE
-            $(modal).find('.modal_text_header').html(header)
+        if (data) {
+            if (action != 'add' && data.NAME) {
+                let header = data.NAME
+                $(modal).find('.modal_text_header').html(header)
+            }
+
+            switch (action) {
+                case 'view':
+                    $(modal_body_view)
+                        .find('.label_1').text(data.NAME).end()
+
+                    break
+                case 'edit':
+                    $(modal_body_form)
+                        .find('[name=label_1]').val(data.WORKSTATUS).end()
+
+                    break
+                default:
+                    break
+            }
+
+            $(modal_view_name).modal()
+
+            modalLayout(action)
         }
-
-        switch (action) {
-            case 'view':
-                $(modal_body_view)
-                    .find('.label_1').text(data[0].NAME).end()
-
-                break
-            case 'edit':
-                $(modal_body_form)
-                    .find('[name=label_1]').val(data[0].WORKSTATUS).end()
-
-                break
-            default:
-                break
-        }
-
-        $(modal_view_name).modal()
-
-        modalLayout(action)
     }
 
     //  *
@@ -325,7 +327,7 @@
             )
             .then((result) => {
                 if (!result.dismiss) {
-                    let remark = result.value
+                    let remark = result.value.trim
                     confirm_delete(item_id, remark)
                 }
             })
@@ -366,12 +368,12 @@
     //  @param bool $reload = reload datatable
     //  * refresh data on datatable
     //  *
-    function dataReload(reload=true) {
+    function dataReload(reload = true) {
         modalHide()
 
-        if(reload == false){
-            $(datatable_name).DataTable().ajax.reload(false)
-        }else{
+        if (reload == false) {
+            $(datatable_name).DataTable().ajax.reload(null,false)
+        } else {
             $(datatable_name).DataTable().ajax.reload()
         }
     }

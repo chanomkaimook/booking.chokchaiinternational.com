@@ -65,6 +65,15 @@
             let item_id = $(modal).find(form_hidden_id).val()
 
             let data = $(form_name).serializeArray()
+            data.push({
+                'name': 'time_start_text',
+                'value': $('[name=time_start] option:selected').attr('data-value')
+            })
+            data.push({
+                'name': 'time_end_text',
+                'value': $('[name=time_end] option:selected').attr('data-value')
+            })
+
             let func
 
             if (item_id) {
@@ -88,7 +97,7 @@
                             timer: swal_autoClose,
                         }).then((result) => {
 
-                            dataReload()
+                            dataReload(false)
 
                         })
                     }
@@ -210,12 +219,54 @@
             switch (action) {
                 case 'view':
                     $(modal_body_view)
-                        .find('.label_1').text(data.NAME).end()
+                        .find('.name').text(data.NAME).end()
+                        .find('.time_start').text(data.TIME_START).end()
+                        .find('.time_end').text(data.TIME_END).end()
+                        .find('.status_text').html(data.STATUS_TEXT).end()
 
                     break
                 case 'edit':
+
+                    let s
+                    let e
+                    if (data.TIME_START) {
+                        s = $(modal_body_form).find('[name=time_start] option[data-value="' + data.TIME_START + '"]').val()
+                    }
+                    if (data.TIME_END) {
+                        e = $(modal_body_form).find('[name=time_end] option[data-value="' + data.TIME_END + '"]').val()
+                    }
+
                     $(modal_body_form)
-                        .find('[name=label_1]').val(data.WORKSTATUS).end()
+                        .find('[name=item_name]').val(data.NAME).end()
+                        .find('[name=time_start] option[data-value="' + data.TIME_START + '"]').prop('selected', true).end()
+                        .find('[name=time_end] option[data-value="' + data.TIME_END + '"]').prop('selected', true).end()
+                        .find('[name=status_offview]').val(data.STATUS_OFFVIEW).end()
+
+                    // 
+                    // set time end
+                    // 
+                    if (data.TIME_START && s) {
+                        $(modal_body_form).find('[name=time_end] option').each(function(index, item) {
+                            if (parseInt(item.value) <= parseInt(s)) {
+                                $(item).addClass('d-none')
+                            } else {
+                                $(item).removeClass('d-none')
+                            }
+                        })
+                    }
+
+                    // 
+                    // set time start
+                    // 
+                    if (data.TIME_END && e) {
+                        $(modal_body_form).find('[name=time_start] option').each(function(index, item) {
+                            if (parseInt(item.value) > parseInt(e)) {
+                                $(item).addClass('d-none')
+                            } else {
+                                $(item).removeClass('d-none')
+                            }
+                        })
+                    }
 
                     break
                 default:
@@ -322,8 +373,8 @@
     //  *
     function delete_data(item_id) {
         Swal.fire(
-                swal_setConfirmInput()
-                // swal_setConfirm()
+                // swal_setConfirmInput()
+                swal_setConfirm()
             )
             .then((result) => {
                 if (!result.dismiss) {
@@ -390,6 +441,9 @@
         form.forEach((item, key) => {
             document.getElementsByTagName('form')[key].reset();
         })
+        $(modal).find('.modal_text_header').html('')
+        $(modal_body_form).find('[name=time_start] option').removeClass('d-none')
+        $(modal_body_form).find('[name=time_end] option').removeClass('d-none')
     }
 
     //  *

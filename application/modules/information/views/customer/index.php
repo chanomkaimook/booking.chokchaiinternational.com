@@ -17,14 +17,17 @@
             </div>
 
         </div>
+        <style>
+            .truncate {
+                 max-width: 200px;
+             }
+        </style>
         <div class="">
             <div class="card-box">
                 <table id="datatable" class="table table-hover m-0 table-actions-bar dt-responsive dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                     <thead>
                         <tr>
-                            <th>ชื่อ</th>
-                            <th>รอบเริ่ม</th>
-                            <th>รอบจบ</th>
+                            <th">ชื่อ</th>
                             <th>สถานะ</th>
                             <th>โดย</th>
                             <th>วันล่าสุด</th>

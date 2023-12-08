@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 // require APPPATH . '/libraries/API_Controller.php';
 
-class Ctl_round extends MY_Controller
+class Ctl_customer extends MY_Controller
 {
 
     private $model;
@@ -12,8 +12,8 @@ class Ctl_round extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $modelname = 'mdl_round';
-        $this->load->model(array('information/mdl_round','mdl_round_time'));
+        $modelname = 'mdl_customer';
+        $this->load->model(array('information/mdl_customer'));
 
         $this->middleware(
             array(
@@ -31,17 +31,14 @@ class Ctl_round extends MY_Controller
 
         // setting
         $this->model = $this->$modelname;
-        $this->title = 'จัดการข้อมูลรอบการเข้าชม';
+        $this->title = 'จัดการข้อมูลลูกค้า';
     }
 
     public function index()
     {
-        $optional['order_by'] = array('id'=>'asc');
-        $data['time'] = $this->mdl_round_time->get_data(null,$optional);
-
         $this->template->set_layout('lay_datatable');
         $this->template->title($this->title);
-        $this->template->build('round/index',$data);
+        $this->template->build('customer/index');
     }
     
     /**
@@ -87,15 +84,6 @@ class Ctl_round extends MY_Controller
 
                 $sub_data['ID'] = $row->ID;
                 $sub_data['NAME'] = textNull($row->NAME);
-
-                $sub_data['TIME_START'] = array(
-                    "display"   => toTime($row->TIME_START,'H:i'),
-                    "data"      => $row->TIME_START,
-                );
-                $sub_data['TIME_END'] = array(
-                    "display"   => toTime($row->TIME_END,'H:i'),
-                    "data"      => $row->TIME_END,
-                );
 
                 $sub_data['STATUS'] = array(
                     "display"   => $dom_status,

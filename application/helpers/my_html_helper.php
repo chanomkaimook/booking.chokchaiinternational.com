@@ -172,3 +172,17 @@ function html_roles_jstree(array $array = null, string $classplugin = "jstree")
 
   return $jstree;
 }
+
+/**
+ * create html status
+ *
+ * @return void
+ */
+function html_status_offview()
+{
+  $html = '';
+  $html .= '<option value="">ปกติ</option>';
+  $html .= '<option value="1">ซ่อน</option>';
+
+  return $html;
+}

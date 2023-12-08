@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_information extends CI_Model
+class Mdl_round extends CI_Model
 
 {
     private $table = "round";
@@ -106,26 +106,57 @@ class Mdl_information extends CI_Model
 
         $result = false;
 
-        if ($array_to_find) {
-            $array_text_error = $array_to_find;
-        } else {
-            $array_text_error = array(
-                'label_2'       => 'ชื่อ',
-                'label_3'       => 'code',
-            );
-        }
-
-        if (is_array($array_text_error) && count($array_text_error)) {
-            if ($text = check_value_valid($array_text_error, $arrayset)) {
-                $result = array(
-                    'error' => 1,
-                    'txt'   => 'โปรดระบุ ' . $text,
+        if ($arrayset) {
+            if ($array_to_find) {
+                $array_text_error = $array_to_find;
+            } else {
+                $array_text_error = array(
+                    'item_name'       => 'ชื่อรอบ',
+                    'time_start_text'       => 'เวลาเริ่มรอบ',
+                    'time_end_text'       => 'เวลาสิ้นสุดรอบ',
                 );
+            }
 
-                return $result;
+            if (is_array($array_text_error) && count($array_text_error)) {
+                if ($text = check_value_valid($array_text_error, $arrayset)) {
+                    $result = array(
+                        'error' => 1,
+                        'txt'   => 'โปรดระบุ ' . $text,
+                    );
+
+                    return $result;
+                }
             }
         }
 
+        return $result;
+    }
+
+    /**
+     * Check duplicate
+     *
+     * @param array|null $arraywhere = array where query
+     * @param string|null $valueshow = value for show when error
+     * @param string|null $table = table name for check
+     * @return void
+     */
+    function check_dup($arraywhere, string $valueshow = null, string $table = null)
+    {
+        $result = false;
+
+        if ($arraywhere && $valueshow) {
+
+            if (!$table) {
+                $table = $this->table;
+            }
+
+            if (check_dup($arraywhere, $table)) {
+                $result = array(
+                    'error' => 1,
+                    'txt'   => $valueshow . ' ซ้ำในระบบ ',
+                );
+            }
+        }
 
         return $result;
     }
@@ -149,16 +180,29 @@ class Mdl_information extends CI_Model
             return $return;
         }
 
+        $array_chk_dup = array(
+            'name' => $request['item_name'],
+            'status' => 1
+        );
+        if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+            return $return;
+        }
+
         if ($data_insert && is_array($data_insert)) {
             $this->db->insert($this->table, $data_insert);
             $new_id = $this->db->insert_id();
         } else {
+            $item_name = textNull($this->input->post('item_name'));
+            $time_start = textNull($this->input->post('time_start_text'));
+            $time_end = textNull($this->input->post('time_end_text'));
+            $timediff = TimeDiff($time_start, $time_end);
 
-            if (textNull($this->input->post('label_6'))) {
+            if ($item_name) {
                 $data = array(
-                    'code'  => textNull($this->input->post('label_2')),
-                    'name'  => textNull($this->input->post('label_6')),
-                    'workstatus'  => $this->input->post('label_1'),
+                    'name'          => $item_name,
+                    'time_start'    => $time_start,
+                    'time_end'      => $time_end,
+                    'time_diff'     => $timediff,
 
                     'user_starts'  => $this->userlogin,
                 );
@@ -196,14 +240,37 @@ class Mdl_information extends CI_Model
     {
         $item_id = $this->input->post('item_id');
 
+        $request = $_POST;
+        if ($return = $this->check_value_valid($request)) {
+            return $return;
+        }
+
+        $array_chk_dup = array(
+            'name' => $request['item_name'],
+            'status' => 1,
+            'id !=' => $item_id,
+        );
+        if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+            return $return;
+        }
+
         if ($data_update && is_array($data_update)) {
             $this->db->where('id', $item_id);
             $this->db->update($this->table, $data_update);
         } else {
+            $item_name = textNull($this->input->post('item_name'));
+            $time_start = textNull($this->input->post('time_start_text'));
+            $time_end = textNull($this->input->post('time_end_text'));
+            $timediff = TimeDiff($time_start, $time_end);
+
+            $status_offview = textNull($this->input->post('status_offview'));
+
             $data = array(
-                'code'  => textNull($this->input->post('label_2')),
-                'name'  => textNull($this->input->post('label_6')),
-                'workstatus'  => $this->input->post('label_1'),
+                'name'          => $item_name,
+                'time_start'    => $time_start,
+                'time_end'      => $time_end,
+                'time_diff'     => $timediff,
+                'status_offview'     => $status_offview,
 
                 'date_update'  => date('Y-m-d H:i:s'),
                 'user_update'  => $this->userlogin,

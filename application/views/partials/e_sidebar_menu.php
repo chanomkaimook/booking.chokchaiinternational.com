@@ -57,13 +57,23 @@
                     <li class="">
                         <a href="javascript: void(0);">
                             <i class="fe-database"></i>
+                            <span> รายการจอง </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul class="nav-second-level" aria-expanded="false">
+                            <li class=""><a href="<?= site_url('bill/ctl_page'); ?>" data-show="ตารางจอง">ตารางจอง</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="">
+                        <a href="javascript: void(0);">
+                            <i class="fe-database"></i>
                             <span> ข้อมูลพื้นฐาน </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul class="nav-second-level" aria-expanded="false">
-                            <li class=""><a href="<?= site_url('information/ctl_round'); ?>" data-show="รอบจองหหห">รอบเข้าชม</a></li>
-                            <!-- <li class="<?= check_permit_menu($menu_path_base['sub_menu'][1]) ?>"><a href="<?= site_url('bill/ctl_bill'); ?>" data-show="document bills">ใบขอรับบริการ</a></li> -->
-                            <!-- <li class="<?= check_permit_menu($menu_path_base['sub_menu'][2]) ?>"><a href="<?= site_url('bill/ctl_workorder'); ?>" data-show="work orders">Work Order</a></li> -->
+                            <li class=""><a href="<?= site_url('information/ctl_round'); ?>" data-show="รอบเข้าชม">รอบเข้าชม</a></li>
+                            <li class=""><a href="<?= site_url('information/ctl_customer'); ?>" data-show="ลูกค้า">ลูกค้า</a></li>
                         </ul>
                     </li>
 

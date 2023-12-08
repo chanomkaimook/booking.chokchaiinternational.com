@@ -1,10 +1,10 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_page extends CI_Model
+class Mdl_customer extends CI_Model
 
 {
-    private $table = "blank";
+    private $table = "customers";
     private $fildstatus = "status";
 
     public function __construct()
@@ -111,8 +111,7 @@ class Mdl_page extends CI_Model
                 $array_text_error = $array_to_find;
             } else {
                 $array_text_error = array(
-                    'label_2'       => 'ชื่อ',
-                    'label_3'       => 'code',
+                    'item_name'       => 'ชื่อลูกค้า',
                 );
             }
 
@@ -191,12 +190,11 @@ class Mdl_page extends CI_Model
             $this->db->insert($this->table, $data_insert);
             $new_id = $this->db->insert_id();
         } else {
+            $item_name = textNull($this->input->post('item_name'));
 
-            if (textNull($this->input->post('label_6'))) {
+            if ($item_name) {
                 $data = array(
-                    'code'  => textNull($this->input->post('label_2')),
-                    'name'  => textNull($this->input->post('label_6')),
-                    'workstatus'  => $this->input->post('label_1'),
+                    'name'          => $item_name,
 
                     'user_starts'  => $this->userlogin,
                 );
@@ -247,15 +245,17 @@ class Mdl_page extends CI_Model
         if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
             return $return;
         }
-        
+
         if ($data_update && is_array($data_update)) {
             $this->db->where('id', $item_id);
             $this->db->update($this->table, $data_update);
         } else {
+            $item_name = textNull($this->input->post('item_name'));
+            $status_offview = textNull($this->input->post('status_offview'));
+
             $data = array(
-                'code'  => textNull($this->input->post('label_2')),
-                'name'  => textNull($this->input->post('label_6')),
-                'workstatus'  => $this->input->post('label_1'),
+                'name'          => $item_name,
+                'status_offview'     => $status_offview,
 
                 'date_update'  => date('Y-m-d H:i:s'),
                 'user_update'  => $this->userlogin,

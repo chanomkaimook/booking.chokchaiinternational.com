@@ -212,12 +212,14 @@
                 case 'view':
                     $(modal_body_view)
                         .find('.name').text(data.NAME).end()
+                        .find('.remark').text(data.REMARK).end()
                         .find('.status_text').html(data.STATUS_TEXT).end()
 
                     break
                 case 'edit':
                     $(modal_body_form)
                         .find('[name=item_name]').val(data.NAME).end()
+                        .find('[name=remark]').val(data.REMARK).end()
                         .find('[name=status_offview]').val(data.STATUS_OFFVIEW).end()
                     break
                 default:

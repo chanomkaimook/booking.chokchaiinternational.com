@@ -19,21 +19,22 @@
         </div>
         <style>
             .truncate {
-                 max-width: 200px;
-             }
+                max-width: 200px;
+            }
         </style>
         <div class="">
             <div class="card-box">
                 <table id="datatable" class="table table-hover m-0 table-actions-bar dt-responsive dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th><?= mb_ucfirst($this->lang->line('_name')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_status')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_display')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_usernow')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_datenow')) ?></th>
-                            <th class="hidden-sm"><?= mb_ucfirst($this->lang->line('_action')) ?></th>
+                            <th>ชื่อ</th>
+                            <th>ประเภท</th>
+                            <th>รุ่น</th>
+                            <th>ราคา</th>
+                            <th>สถานะ</th>
+                            <th>โดย</th>
+                            <th>วันล่าสุด</th>
+                            <th class="hidden-sm">เพิ่มเติม</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -63,24 +64,8 @@
                 this.value = this.value.replace(/[^0-9.]/g, '');
             })
         })
-
-        /* //	format number and float (.00) return string!! 
-        function formatMoney(number, decPlaces, decSep, thouSep) {
-            decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-                decSep = typeof decSep === "undefined" ? "." : decSep;
-            thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-            var sign = number < 0 ? "-" : "";
-            var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-            var j = (j = i.length) > 3 ? j % 3 : 0;
-
-            return sign +
-                (j ? i.substr(0, j) + thouSep : "") +
-                i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-                (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
-        } */
     })
 </script>
 <?php include('script.php') ?>
 <?php include('script_crud.php') ?>
 <?php include('script_datatable.php') ?>
-<?php //require_once('application/views/partials/e_script_print.php'); ?>

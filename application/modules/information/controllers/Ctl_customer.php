@@ -129,14 +129,10 @@ class Ctl_customer extends MY_Controller
         $item_id = $request['id'];
         $data = $this->model->get_data($item_id);
 
-        if($data){
+        if($data && $item_id){
             if(is_array($data)){
-                $data['TIME_END'] = toTime($data['TIME_END']);
-                $data['TIME_START'] = toTime($data['TIME_START']);
                 $data['STATUS_TEXT'] = status_offview($data['STATUS_OFFVIEW']);
             }else{
-                $data->TIME_END = toTime($data->TIME_END);
-                $data->TIME_START = toTime($data->TIME_START);
                 $data->STATUS_TEXT = status_offview($data->STATUS_OFFVIEW);
             }
         }

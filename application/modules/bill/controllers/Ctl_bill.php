@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 // require APPPATH . '/libraries/API_Controller.php';
 
-class Ctl_page extends MY_Controller
+class Ctl_bill extends MY_Controller
 {
 
     private $model;
@@ -12,8 +12,8 @@ class Ctl_page extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $modelname = 'mdl_page';
-        $this->load->model(array('page/mdl_page'));
+        $modelname = 'mdl_bill';
+        $this->load->model(array('bill/mdl_bill','information/mdl_round'));
 
         $this->middleware(
             array(
@@ -31,19 +31,21 @@ class Ctl_page extends MY_Controller
 
         // setting
         $this->model = $this->$modelname;
-        $this->title = 'Title';
+        $this->title = 'ตารางจองทัวร์';
     }
 
     public function index()
     {
-        $this->template->set_layout('lay_datatable');
-        $this->template->title($this->title);
-        /* $this->template->set_partial(
+        $optional['order_by'] = array('id'=>'asc');
+        $data['round'] = $this->mdl_round->get_dataShow(null,$optional);
+
+        $this->template->set_partial(
             'headlink',
             'partials/link/page',
             array(
                 'data'  => array(
-                    '<link href="' . base_url('') . 'asset/libs/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />',
+                    '<link href="' . base_url('') . 'asset/plugins/jquery/ui/1.13.2/jquery-ui.css" rel="stylesheet" type="text/css" />',
+                    '<link href="' . base_url('') . 'asset/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.css" rel="stylesheet" type="text/css" />',
                 )
             )
         );
@@ -52,11 +54,15 @@ class Ctl_page extends MY_Controller
             'partials/script/page',
             array(
                 'data'  => array(
-                    '<script src="' . base_url('') . 'asset/js/pages/scrollbar.init.js"></script>',
+                    '<script src="' . base_url('') . 'asset/plugins/jquery/ui/1.13.2/jquery-ui.js"></script>',
+                    '<script src="' . base_url('') . 'asset/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>',
                 )
             )
-        ); */
-        $this->template->build('pages/index');
+        );
+
+        $this->template->set_layout('lay_datatable');
+        $this->template->title($this->title);
+        $this->template->build('bills/index',$data);
     }
     
     /**
@@ -96,26 +102,64 @@ class Ctl_page extends MY_Controller
                     $user_active =  whois($row->USER_STARTS);
                 }
 
-                $dom_workstatus = workstatus($row->WORKSTATUS, 'status');
-                $dom_status = status_offview($row->STATUS_OFFVIEW);
-
                 $sub_data = [];
 
                 $sub_data['ID'] = $row->ID;
-                $sub_data['CODE'] = textShow($row->CODE);
-                $sub_data['NAME'] = textLang($row->NAME,$row->NAME_US,false);
+                $sub_data['CODE'] = $row->CODE;
+                $sub_data['REMARK'] = $row->REMARK;
 
-                $sub_data['WORKSTATUS'] = array(
-                    "display"   => $dom_workstatus,
+                $sub_data['CUSTOMER'] = array(
+                    "display"   => $row->CUSTOMER_NAME,
                     "data"      =>  array(
-                        'id'    => $row->WORKSTATUS,
+                        'id'    => $row->CUSTOMER_ID,
                     ),
                 );
 
-                $sub_data['STATUS'] = array(
-                    "display"   => $dom_status,
+                $sub_data['AGENT'] = array(
+                    "display"   => $row->AGENT_NAME,
+                    "data"      =>  array(
+                        'contact'    => $row->AGENT_CONTACT,
+                    ),
+                );
+
+                $sub_data['COMPLETE'] = array(
+                    "display"   => $row->COMPLETE_ALIAS,
+                    "data"      =>  array(
+                        'id'    => $row->COMPLETE_ID,
+                    ),
+                );
+
+                $sub_data['PAYMENT'] = array(
+                    "display"   => $row->PAYMENT_ALIAS,
+                    "data"      =>  array(
+                        'id'    => $row->PAYMENT_ID,
+                    ),
+                );
+
+                $sub_data['BOOKING'] = array(
+                    "display"   => $row->BOOKING_DATE,
+                    "data"      =>  array(
+                        'staff'    => whois($row->BOOKING_USER),
+                    ),
+                );
+
+                $sub_data['ROUND'] = array(
+                    "display"   => $row->ROUND_NAME,
+                    "data"      =>  array(
+                        'id'    => $row->ROUND_ID,
+                        'time_start'    => $row->TIME_START,
+                        'time_end'    => $row->TIME_END,
+                    ),
+                );
+
+                $sub_data['BILL_PRICE'] = array(
+                    "display"   => textMoney($row->NET),
                     "data"   => array(
-                        'id'    => $row->STATUS_OFFVIEW,
+                        'price'     => textMoney($row->PRICE),
+                        'discount'  => textMoney($row->DISCOUNT),
+                        'deposit'   => textMoney($row->DEPOSIT),
+                        'vat'       => textMoney($row->VAT),
+                        'vatnum'       => $row->VATNUM
                     ),
                 );
 

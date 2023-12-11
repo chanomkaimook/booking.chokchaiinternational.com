@@ -108,6 +108,9 @@ function workstatus(int $status = null, string $text = null, array $optional = [
     case 4:
       $result = '<span class="badge badge-danger"> ' . $text . ' </span>';
       break;
+    case 5:
+      $result = '<span class="badge badge-muted"> ' . $text . ' </span>';
+      break;
     default:
       $result = '<span class="badge badge-primary"> ' . $text . ' </span>';
       break;

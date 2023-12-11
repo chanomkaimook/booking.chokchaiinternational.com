@@ -1,10 +1,10 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_page extends CI_Model
+class Mdl_ticket extends CI_Model
 
 {
-    private $table = "blank";
+    private $table = "ticket";
     private $offview = "status_offview";
     private $fildstatus = "status";
 
@@ -78,6 +78,7 @@ class Mdl_page extends CI_Model
     {
         # code...
         $sql = (object) $this->get_sql($id, $optionnal, $type);
+
         if ($this->fildstatus) {
             $sql->where($this->table . '.' . $this->fildstatus, 1);
         }
@@ -103,30 +104,12 @@ class Mdl_page extends CI_Model
         $sql = (object) $this->get_sql($id, $optionnal, $type);
 
         if ($this->offview) {
-            $sql->where($this->table . '.' . $this->offview . ' is null', null, false);
+            $sql->where($this->table . '.' . $this->offview.' is null', null,false);
         }
-
+        
         if ($this->fildstatus) {
             $sql->where($this->table . '.' . $this->fildstatus, 1);
         }
-
-        $query = $sql->get();
-
-        if ($id) {
-            return $query->row();
-        } else {
-            return $query->$type();
-        }
-    }
-
-    public function get_dataShowForEdit(int $id = null, array $optionnal = null, string $type = "result")
-    {
-        # code...
-        $sql = (object) $this->get_sql($id, $optionnal, $type);
-        if ($this->fildstatus) {
-            $sql->where($this->table . '.' . $this->fildstatus, 1);
-        }
-        $sql->where($this->table . '.noedit', null);
 
         $query = $sql->get();
 
@@ -153,25 +136,26 @@ class Mdl_page extends CI_Model
 
         $result = false;
 
-        if ($array_to_find) {
-            $array_text_error = $array_to_find;
-        } else {
-            $array_text_error = array(
-                'item_name'       => 'ชื่อ',
-            );
-        }
-
-        if (is_array($array_text_error) && count($array_text_error)) {
-            if ($text = check_value_valid($array_text_error, $arrayset)) {
-                $result = array(
-                    'error' => 1,
-                    'txt'   => 'โปรดระบุ ' . $text,
+        if ($arrayset) {
+            if ($array_to_find) {
+                $array_text_error = $array_to_find;
+            } else {
+                $array_text_error = array(
+                    'item_name'       => 'ชื่อรายการ',
                 );
+            }
 
-                return $result;
+            if (is_array($array_text_error) && count($array_text_error)) {
+                if ($text = check_value_valid($array_text_error, $arrayset)) {
+                    $result = array(
+                        'error' => 1,
+                        'txt'   => 'โปรดระบุ ' . $text,
+                    );
+
+                    return $result;
+                }
             }
         }
-
 
         return $result;
     }
@@ -237,10 +221,12 @@ class Mdl_page extends CI_Model
             $new_id = $this->db->insert_id();
         } else {
             $item_name = textNull($this->input->post('item_name'));
+            $remark = textNull($this->input->post('remark'));
 
             if ($item_name) {
                 $data = array(
                     'name'          => $item_name,
+                    'remark'        => $remark,
 
                     'user_starts'  => $this->userlogin,
                 );
@@ -264,6 +250,7 @@ class Mdl_page extends CI_Model
             );
         }
 
+
         return $result;
     }
 
@@ -275,57 +262,54 @@ class Mdl_page extends CI_Model
     //  *
     public function update_data($data_update = null)
     {
-        $result = false;
         $item_id = $this->input->post('item_id');
 
-        if ($item_id) {
-            $request = $_POST;
-            if ($return = $this->check_value_valid($request)) {
-                return $return;
-            }
-
-            $array_chk_dup = array(
-                'name' => $request['item_name'],
-                'status' => 1,
-                'id !=' => $item_id,
-            );
-            if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
-                return $return;
-            }
-
-            if ($data_update && is_array($data_update)) {
-                $this->db->where('id', $item_id);
-                $this->db->update($this->table, $data_update);
-            } else {
-                $item_name = textNull($this->input->post('item_name'));
-
-                $data = array(
-                    'name'          => $item_name,
-
-                    'date_update'  => date('Y-m-d H:i:s'),
-                    'user_update'  => $this->userlogin,
-                );
-
-                if ($this->offview) {
-                    $status_offview = textNull($this->input->post('status_offview'));
-                    $data['status_offview'] = $status_offview;
-                }
-
-                $this->db->where('id', $item_id);
-                $this->db->update($this->table, $data);
-            }
-
-            // keep log
-            log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
-
-            $result = array(
-                'error'     => 0,
-                'txt'       => 'ทำรายการสำเร็จ',
-                'data'      => array(
-                    'id'    => $item_id
-                )
-            );
+        $request = $_POST;
+        if ($return = $this->check_value_valid($request)) {
+            return $return;
         }
+
+        $array_chk_dup = array(
+            'name' => $request['item_name'],
+            'status' => 1,
+            'id !=' => $item_id,
+        );
+        if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+            return $return;
+        }
+
+        if ($data_update && is_array($data_update)) {
+            $this->db->where('id', $item_id);
+            $this->db->update($this->table, $data_update);
+        } else {
+            $item_name = textNull($this->input->post('item_name'));
+            $remark = textNull($this->input->post('remark'));
+            $status_offview = textNull($this->input->post('status_offview'));
+
+            $data = array(
+                'name'          => $item_name,
+                'remark'        => $remark,
+                'status_offview'     => $status_offview,
+
+                'date_update'  => date('Y-m-d H:i:s'),
+                'user_update'  => $this->userlogin,
+            );
+
+            $this->db->where('id', $item_id);
+            $this->db->update($this->table, $data);
+        }
+
+        // keep log
+        log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
+
+        $result = array(
+            'error'     => 0,
+            'txt'       => 'ทำรายการสำเร็จ',
+            'data'      => array(
+                'id'    => $item_id
+            )
+        );
+
         return $result;
     }
 

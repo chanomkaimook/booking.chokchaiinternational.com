@@ -65,6 +65,15 @@
             let item_id = $(modal).find(form_hidden_id).val()
 
             let data = $(form_name).serializeArray()
+            data.push({
+                name : 'ticket_name',
+                value : $(form_name).find('#ticket option:selected').text()
+            })
+            data.push({
+                name : 'division_name',
+                value : $(form_name).find('#division option:selected').text()
+            })
+
             let func
 
             if (item_id) {
@@ -88,7 +97,7 @@
                             timer: swal_autoClose,
                         }).then((result) => {
 
-                            dataReload()
+                            dataReload(false)
 
                         })
                     }
@@ -210,13 +219,22 @@
             switch (action) {
                 case 'view':
                     $(modal_body_view)
-                        .find('.label_1').text(data.NAME).end()
+                        .find('.name').text(data.NAME).end()
+                        .find('.price').text(data.PRICE_DISPLAY).end()
+                        .find('.ticket_name').text(data.TICKET_NAME).end()
+                        .find('.division_name').text(data.DIVISION_NAME).end()
+                        .find('.remark').text(data.REMARK).end()
+                        .find('.status_text').html(data.STATUS_TEXT).end()
 
                     break
                 case 'edit':
                     $(modal_body_form)
-                        .find('[name=label_1]').val(data.WORKSTATUS).end()
-
+                        .find('[name=item_name]').val(data.NAME).end()
+                        .find('[name=price]').val(data.PRICE).end()
+                        .find('[name=ticket]').val(data.TICKET_ID).end()
+                        .find('[name=division]').val(data.DIVISION_ID).end()
+                        .find('[name=remark]').val(data.REMARK).end()
+                        .find('[name=status_offview]').val(data.STATUS_OFFVIEW).end()
                     break
                 default:
                     break
@@ -322,8 +340,8 @@
     //  *
     function delete_data(item_id) {
         Swal.fire(
-                swal_setConfirmInput()
-                // swal_setConfirm()
+                // swal_setConfirmInput()
+                swal_setConfirm()
             )
             .then((result) => {
                 if (!result.dismiss) {
@@ -390,6 +408,7 @@
         form.forEach((item, key) => {
             document.getElementsByTagName('form')[key].reset();
         })
+        $(modal).find('.modal_text_header').html('')
     }
 
     //  *

@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 // require APPPATH . '/libraries/API_Controller.php';
 
-class Ctl_page extends MY_Controller
+class Ctl_item extends MY_Controller
 {
 
     private $model;
@@ -12,8 +12,8 @@ class Ctl_page extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $modelname = 'mdl_page';
-        $this->load->model(array('page/mdl_page'));
+        $modelname = 'mdl_item';
+        $this->load->model(array('mdl_item','information/mdl_ticket','information/mdl_division'));
 
         $this->middleware(
             array(
@@ -31,32 +31,18 @@ class Ctl_page extends MY_Controller
 
         // setting
         $this->model = $this->$modelname;
-        $this->title = 'Title';
+        $this->title = 'ข้อมูลใบตั๋วจอง';
     }
 
     public function index()
     {
+        $optional['order_by'] = array('id'=>'asc');
+        $data['ticket'] = $this->mdl_ticket->get_dataDisplay(null,$optional);
+        $data['division'] = $this->mdl_division->get_dataDisplay(null,$optional);
+        
         $this->template->set_layout('lay_datatable');
         $this->template->title($this->title);
-        /* $this->template->set_partial(
-            'headlink',
-            'partials/link/page',
-            array(
-                'data'  => array(
-                    '<link href="' . base_url('') . 'asset/libs/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />',
-                )
-            )
-        );
-        $this->template->set_partial(
-            'footerscript',
-            'partials/script/page',
-            array(
-                'data'  => array(
-                    '<script src="' . base_url('') . 'asset/js/pages/scrollbar.init.js"></script>',
-                )
-            )
-        ); */
-        $this->template->build('pages/index');
+        $this->template->build('item/index',$data);
     }
     
     /**
@@ -102,9 +88,30 @@ class Ctl_page extends MY_Controller
                 $sub_data = [];
 
                 $sub_data['ID'] = $row->ID;
-                $sub_data['CODE'] = textShow($row->CODE);
-                $sub_data['NAME'] = textLang($row->NAME,$row->NAME_US,false);
+                $sub_data['NAME'] = textNull($row->NAME);
 
+                $sub_data['TICKET'] = array(
+                    "display"   => textNull($row->TICKET_NAME),
+                    "data"      =>  array(
+                        'id'    => $row->TICKET_ID,
+                    ),
+                );
+
+                $sub_data['DIVISION'] = array(
+                    "display"   => textNull($row->DIVISION_NAME),
+                    "data"      =>  array(
+                        'id'    => $row->DIVISION_ID,
+                    ),
+                );
+
+                $sub_data['PRICE'] = array(
+                    // "display"   => number_format($row->PRICE),
+                    "display"   => textMoney($row->PRICE,'int'),
+                    "data"      =>  array(
+                        'value'    => $row->PRICE,
+                    ),
+                );
+                
                 $sub_data['WORKSTATUS'] = array(
                     "display"   => $dom_workstatus,
                     "data"      =>  array(
@@ -155,6 +162,24 @@ class Ctl_page extends MY_Controller
         $request = $_REQUEST;
         $item_id = $request['id'];
         $data = $this->model->get_data($item_id);
+
+        if($data && $item_id){
+            if(is_array($data)){
+                $data['PRICE_DISPLAY'] = textMoney($data['PRICE']);
+                $data['STATUS_TEXT'] = status_offview($data['STATUS_OFFVIEW']);
+            }else{
+                $data->PRICE_DISPLAY = textMoney($data->PRICE);
+                $data->STATUS_TEXT = status_offview($data->STATUS_OFFVIEW);
+            }
+        }
+
+        $result = $data;
+        echo json_encode($result);
+    }
+    public function get_dataDisplay()
+    {
+        $request = $_REQUEST;
+        $data = $this->model->get_dataDisplay();
 
         $result = $data;
         echo json_encode($result);

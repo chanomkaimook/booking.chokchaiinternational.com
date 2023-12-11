@@ -1,69 +1,6 @@
-<div class="content">
-    <input type="hidden" id="hidden_task_id">
-    <!-- Start Content-->
-    <div class="container-fluid">
-        <div class="section-tool d-flex flex-column flex-md-row justify-content-between">
-
-            <div class="mb-1 mb-md-0">
-                <div class="d-flex gap-2">
-                    <div class="tool-btn">
-                        <button type="button" class="btn-add btn"><?= mb_ucfirst($this->lang->line('_form_btn_add')) ?></button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="">
-                <?php require_once('application/views/partials/e_filter_base.php'); ?>
-            </div>
-
-        </div>
-        <style>
-            .truncate {
-                 max-width: 200px;
-             }
-        </style>
-        <div class="">
-            <div class="card-box">
-                <table id="datatable" class="table table-hover m-0 table-actions-bar dt-responsive dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th><?= mb_ucfirst($this->lang->line('_name')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_status')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_display')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_usernow')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_datenow')) ?></th>
-                            <th class="hidden-sm"><?= mb_ucfirst($this->lang->line('_action')) ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- end row -->
-
-    </div> <!-- end container-fluid -->
-
-</div> <!-- end content -->
-
-<!-- Modal -->
-<?php require_once('component/modal_item.php') ?>
-<!-- End Modal -->
-
-<!-- Script -->
-<?php require_once('script_crud.php') ?>
-<?php require_once('script.php') ?>
-<?php require_once('application/views/partials/e_script_print.php'); ?>
-<!-- End Script -->
-
 <script>
-    $(document).ready(function() {
-        //
-        // # datatable_name = form script.php
-        let datatable = $(datatable_name)
+    function getData() {
+        let datatable = $('#datatable')
 
         let last_columntable = datatable.find('th').length - 1
         let last_defaultSort = last_columntable - 1
@@ -106,13 +43,12 @@
                     targets: last_columntable
                 },
                 {
-                    "targets": [2, 3, 4],
+                    "targets": [0,1],
                     "className": "truncate"
                 },
             ],
             columns: [{
                     "data": "CODE",
-                    "width": "60px",
                     "render": function(data, type, row, meta) {
                         let code = data
                         if (!code) {
@@ -123,18 +59,9 @@
                 },
                 {
                     "data": "NAME",
-                    "width": "",
+                    "width": "100",
                     "createdCell": function(td, cellData, rowData, row, col) {
                         $(td).css('min-width', '150px')
-                    },
-                    "render": function(data, type, row, meta) {
-
-                        let task = `${data}`
-                        if (row.CODE) {
-                            task += `<a href=# data-target="#modal_ticket" class="text-info" data-toggle="modal" data-code="${row.CODE}">#${row.CODE}</a> `
-                        }
-
-                        return task
                     }
                 },
                 {
@@ -186,5 +113,7 @@
             buttons: datatable_button,
         })
 
-    })
+        // table.buttons(0, 0).remove();
+        // table.button().add(0,'print');
+    }
 </script>

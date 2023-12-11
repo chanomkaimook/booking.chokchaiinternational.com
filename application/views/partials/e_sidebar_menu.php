@@ -61,7 +61,8 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <ul class="nav-second-level" aria-expanded="false">
-                            <li class=""><a href="<?= site_url('bill/ctl_page'); ?>" data-show="ตารางจอง">ตารางจอง</a></li>
+                            <li class=""><a href="<?= site_url('bill/ctl_bill'); ?>" data-show="ตารางจอง">ตารางจอง</a></li>
+                            <li class=""><a href="<?= site_url('bill/ctl_item'); ?>" data-show="สินค้า">สินค้า</a></li>
                         </ul>
                     </li>
 
@@ -74,6 +75,8 @@
                         <ul class="nav-second-level" aria-expanded="false">
                             <li class=""><a href="<?= site_url('information/ctl_round'); ?>" data-show="รอบเข้าชม">รอบเข้าชม</a></li>
                             <li class=""><a href="<?= site_url('information/ctl_customer'); ?>" data-show="ลูกค้า">ลูกค้า</a></li>
+                            <li class=""><a href="<?= site_url('information/ctl_ticket'); ?>" data-show="ประเภทลูกค้า">ประเภทลูกค้า</a></li>
+                            <li class=""><a href="<?= site_url('information/ctl_division'); ?>" data-show="รุ่นลูกค้า">รุ่นลูกค้า</a></li>
                         </ul>
                     </li>
 

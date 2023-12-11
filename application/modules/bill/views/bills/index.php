@@ -19,15 +19,19 @@
         </div>
         <style>
             .truncate {
-                 max-width: 200px;
-             }
+                max-width: 100px;
+            }
         </style>
         <div class="">
             <div class="card-box">
                 <table id="datatable" class="table table-hover m-0 table-actions-bar dt-responsive dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                     <thead>
                         <tr>
-                            <th>ชื่อ</th>
+                            <th>เลขที่</th>
+                            <th>ลูกค้า</th>
+                            <th>จำนวน</th>
+                            <th>วันเข้าชม</th>
+                            <th>ชำระ</th>
                             <th>สถานะ</th>
                             <th>โดย</th>
                             <th>วันล่าสุด</th>
@@ -54,8 +58,32 @@
 <script>
     $(document).ready(function() {
         getData()
+
+        input_int_only()
+
+        function input_int_only() {
+            let inputInt = d.querySelectorAll('input.int_only')
+            inputInt.forEach(function(item, index) {
+                item.addEventListener("keyup", function() {
+                    this.value = this.value.replace(/[^0-9.]/g, '');
+                })
+            })
+        }
+
+        $("[name=bookingdate]").datepicker({
+            autoclose: !0,
+            todayHighlight: !0,
+            dateFormat: 'dd/mm/yy',
+        })
+
+        $(".touchspin").TouchSpin({
+            min: 1,
+            max: 100,
+        })
+
     })
 </script>
 <?php include('script.php') ?>
 <?php include('script_crud.php') ?>
 <?php include('script_datatable.php') ?>
+<?php include('script_autocustomer.php') ?>

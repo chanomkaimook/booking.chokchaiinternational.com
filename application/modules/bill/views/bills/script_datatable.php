@@ -51,24 +51,42 @@
                     "data": "CODE",
                     "render": function(data, type, row, meta) {
                         let code = data
+
+                        code = `<a href=# class="text-info">
+                        #${data}
+                        </a> `
+
                         if (!code) {
                             code = ""
                         }
-                        return "<b>#" + code + "</b>"
+                        return "<b>" + code + "</b>"
                     }
                 },
                 {
-                    "data": "NAME",
+                    "data": "CUSTOMER.display",
                     "width": "100",
                     "createdCell": function(td, cellData, rowData, row, col) {
                         $(td).css('min-width', '150px')
                     }
                 },
                 {
-                    "data": "WORKSTATUS.display",
+                    "data": "USER_ACTIVE.display",
                 },
                 {
-                    "data": "STATUS.display",
+                    "data": {
+                        _: "BOOKING.display",
+                        sort: 'BOOKING.timestamp'
+                    }   
+                },
+                {
+                    "data": {
+                        _: 'USER_ACTIVE.display', // default show
+                    }
+                },
+                {
+                    "data": {
+                        _: 'USER_ACTIVE.display', // default show
+                    }
                 },
                 {
                     "data": {
@@ -88,7 +106,7 @@
                         let btn_edit = `<a data-id="${data}" class="btn-edit text-capitalize dropdown-item" href="#"><i class="mdi mdi-wrench mr-2 text-warning font-18 vertical-middle"></i>${table_column_edit[setlang]}</a>`
                         let btn_del = `<a data-id="${data}" class="btn-del text-capitalize dropdown-item" href="#" ><i class="mdi mdi-delete mr-2 text-danger font-18 vertical-middle"></i>${table_column_del[setlang]}</a>`
 
-                        if (row.STATUS.data.id == 1) {
+                        if (row.COMPLETE.data.id >= 1) {
                             btn_edit = ''
                         }
 

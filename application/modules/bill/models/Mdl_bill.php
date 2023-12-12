@@ -157,7 +157,7 @@ class Mdl_bill extends CI_Model
             $array_text_error = $array_to_find;
         } else {
             $array_text_error = array(
-                'item_name'       => 'ชื่อ',
+                'customer'       => 'ชื่อลูกค้า',
             );
         }
 
@@ -233,8 +233,8 @@ class Mdl_bill extends CI_Model
         }
 
         if ($data_insert && is_array($data_insert)) {
-            $this->db->insert($this->table, $data_insert);
-            $new_id = $this->db->insert_id();
+            // $this->db->insert($this->table, $data_insert);
+            // $new_id = $this->db->insert_id();
         } else {
             $item_name = textNull($this->input->post('item_name'));
 
@@ -245,11 +245,12 @@ class Mdl_bill extends CI_Model
                     'user_starts'  => $this->userlogin,
                 );
 
-                $this->db->insert($this->table, $data);
-                $new_id = $this->db->insert_id();
+                // $this->db->insert($this->table, $data);
+                // $new_id = $this->db->insert_id();
+                
             }
         }
-
+        $new_id = 999;
         if ($new_id) {
 
             // keep log

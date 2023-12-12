@@ -111,7 +111,7 @@ class Mdl_customer extends CI_Model
                 $array_text_error = $array_to_find;
             } else {
                 $array_text_error = array(
-                    'item_name'       => 'ชื่อลูกค้า',
+                    'name'       => 'ชื่อลูกค้า',
                 );
             }
 
@@ -167,26 +167,28 @@ class Mdl_customer extends CI_Model
     //  *
     public function insert_data($data_insert = null)
     {
-
+       
         $result = array(
             'error'     => 1,
             'txt'       => 'ไม่มีการทำรายการ',
         );
 
         $request = $_POST;
-        if ($return = $this->check_value_valid($request)) {
-            return $return;
-        }
 
+        $item_name = textNull($data_insert['name']) ? $data_insert['name'] : $request['item_name'];
         $array_chk_dup = array(
-            'name' => $request['item_name'],
+            'name' => $item_name,
             'status' => 1
         );
-        if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+        if ($return = $this->check_value_valid($array_chk_dup)) {
             return $return;
         }
-
+        
+        if ($return = $this->check_dup($array_chk_dup, $item_name)) {
+            return $return;
+        }
         if ($data_insert && is_array($data_insert)) {
+            $data_insert['user_starts'] = $this->userlogin;
             $this->db->insert($this->table, $data_insert);
             $new_id = $this->db->insert_id();
         } else {
@@ -247,6 +249,7 @@ class Mdl_customer extends CI_Model
         }
 
         if ($data_update && is_array($data_update)) {
+            $data_update['user_update'] = $this->userlogin;
             $this->db->where('id', $item_id);
             $this->db->update($this->table, $data_update);
         } else {

@@ -13,7 +13,8 @@ class Ctl_bill extends MY_Controller
     {
         parent::__construct();
         $modelname = 'mdl_bill';
-        $this->load->model(array('bill/mdl_bill','information/mdl_round'));
+        $this->load->model(array('bill/mdl_bill', 'information/mdl_round'));
+        $this->load->library(array('Bill'));
 
         $this->middleware(
             array(
@@ -36,8 +37,8 @@ class Ctl_bill extends MY_Controller
 
     public function index()
     {
-        $optional['order_by'] = array('id'=>'asc');
-        $data['round'] = $this->mdl_round->get_dataShow(null,$optional);
+        $optional['order_by'] = array('id' => 'asc');
+        $data['round'] = $this->mdl_round->get_dataShow(null, $optional);
 
         $this->template->set_partial(
             'headlink',
@@ -62,9 +63,9 @@ class Ctl_bill extends MY_Controller
 
         $this->template->set_layout('lay_datatable');
         $this->template->title($this->title);
-        $this->template->build('bills/index',$data);
+        $this->template->build('bills/index', $data);
     }
-    
+
     /**
      *
      * get data to datatable
@@ -102,6 +103,15 @@ class Ctl_bill extends MY_Controller
                     $user_active =  whois($row->USER_STARTS);
                 }
 
+                $bookingd_date = null;
+                $booking_user = null;
+                if ($row->BOOKING_DATE) {
+                    $bookingd_date = $row->BOOKING_DATE;
+                }
+                if ($row->BOOKING_USER) {
+                    $booking_user = $row->BOOKING_USER;
+                }
+
                 $sub_data = [];
 
                 $sub_data['ID'] = $row->ID;
@@ -137,9 +147,10 @@ class Ctl_bill extends MY_Controller
                 );
 
                 $sub_data['BOOKING'] = array(
-                    "display"   => $row->BOOKING_DATE,
+                    "display"   => $bookingd_date ? toDateTimeString($bookingd_date,'date') : null,
+                    "timestamp" => date('Y-m-d H:i:s', strtotime($bookingd_date)),
                     "data"      =>  array(
-                        'staff'    => whois($row->BOOKING_USER),
+                        'staff'    => $booking_user ? whois($booking_user) : null,
                     ),
                 );
 
@@ -215,9 +226,16 @@ class Ctl_bill extends MY_Controller
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
 
-            $returns = $this->model->insert_data();
+            // print_r($_POST);
+            // print_r(json_decode($_POST['item_list']));
+
+
+            $this->bill->insert_item();
+            
+            die;
+            // $returns = $this->model->insert_data();
             echo json_encode($returns);
-        } 
+        }
     }
 
     //  *
@@ -233,7 +251,7 @@ class Ctl_bill extends MY_Controller
 
             $returns = $this->model->update_data();
             echo json_encode($returns);
-        } 
+        }
     }
 
 
@@ -250,6 +268,6 @@ class Ctl_bill extends MY_Controller
 
             $returns = $this->model->delete_data();
             echo json_encode($returns);
-        } 
+        }
     }
 }

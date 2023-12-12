@@ -2,6 +2,38 @@
 error_reporting(E_ALL & ~E_NOTICE);
 
 /**
+ * status complete
+ *
+ * @param string $type
+ * @return void
+ */
+function complete(string $type = 'pending')
+{
+  # code...
+  $result = '';
+
+  switch ($type) {
+    case 'delete':
+      $result = status_document(5);
+      break;
+    case 'cancel':
+      $result = status_document(4);
+      break;
+    case 'success':
+      $result = status_document(3);
+      break;
+    case 'checking':
+      $result = status_document(2);
+      break;
+    default:
+      $result = status_document(1);
+      break;
+  }
+
+  return $result;
+}
+
+/**
  * status payment
  *
  * @param string $type = [pending,deposit,success]

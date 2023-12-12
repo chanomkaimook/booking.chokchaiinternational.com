@@ -61,41 +61,95 @@
         //  *
         $(d).on('submit', form_name, function(e) {
             e.preventDefault()
+
             let f = $(modal_body_form)
             let item_id = $(modal).find(form_hidden_id).val()
 
             let data = $(form_name).serializeArray()
-            let func
 
-            if (item_id) {
-                func = async_update_data(item_id, data)
-            } else {
-                func = async_insert_data(data)
+            let item_list = []
 
-            }
+            step()
 
-            func
-                .then((resp) => {
-                    if (resp.error == 1) {
-                        swalalert('error', resp.txt, {
-                            auto: false
-                        })
-                    } else {
-                        Swal.fire({
-                            type: 'success',
-                            title: 'สำเร็จ',
-                            text: resp.txt,
-                            timer: swal_autoClose,
-                        }).then((result) => {
+            async function step() {
+                await new Promise((resolve, reject) => {
 
-                            dataReload()
+                    let list = $('#list_item tbody').find('tr')
 
+                    if (list.length) {
+                        let totalprice = 0.00
+                        $.each(list, function(index, item) {
+                            let item_select = $(item).find('select[name=item_list] option:selected')
+                            if (item_select.val()) {
+                                let bill_item_id = item_select.val()
+                                let bill_item_name = item_select.attr('data-name')
+                                let bill_item_price = item_select.attr('data-price')
+                                let bill_item_qty = $(item).find('input[name=item_qty]').val()
+
+                                resolve(
+                                    item_list.push({
+                                        item_id: bill_item_id,
+                                        item_name: bill_item_name,
+                                        item_price: bill_item_price,
+                                        item_qty: bill_item_qty
+                                    })
+                                )
+                            }
                         })
                     }
-                });
+                })
 
+                if ($('[name=bookingdate]').val()) {
+                    var dateTypeVar = $('[name=bookingdate]').datepicker('getDate');
+                    data.push({
+                        'name': 'bookingdate',
+                        'value': $.datepicker.formatDate('yy-mm-dd', dateTypeVar)
+                    })
+                }
 
-            return false
+                data.push({
+                    'name': 'item_list',
+                    'value': JSON.stringify(item_list)
+                })
+
+                await new Promise((resolve, reject) => {
+
+                    modalLoading()
+
+                    let func
+
+                    if (item_id) {
+                        func = async_update_data(item_id, data)
+                    } else {
+                        func = async_insert_data(data)
+                    }
+
+                    func
+                        .then((resp) => {
+                            if (resp.error == 1) {
+                                swalalert('error', resp.txt, {
+                                    auto: false
+                                })
+                            } else {
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'สำเร็จ',
+                                    text: resp.txt,
+                                    timer: swal_autoClose,
+                                }).then((result) => {
+
+                                    dataReload()
+
+                                })
+                            }
+                        });
+
+                    resolve(
+                        modalLoading_clear()
+                    )
+                })
+
+            }
         })
 
         //  *
@@ -372,7 +426,7 @@
         modalHide()
 
         if (reload == false) {
-            $(datatable_name).DataTable().ajax.reload(null,false)
+            $(datatable_name).DataTable().ajax.reload(null, false)
         } else {
             $(datatable_name).DataTable().ajax.reload()
         }
@@ -390,8 +444,19 @@
         form.forEach((item, key) => {
             document.getElementsByTagName('form')[key].reset();
         })
-        
+
         $(modal).find('.modal_text_header').html('')
+
+        // clear element
+        $(modal)
+        .find('[name=item_net]').val('').end()
+        .find('.total_price').html('').end()
+        .find('.total_discount').html('').end()
+        .find('.total_net').html('').end()
+        .find('.total_pay').html('').end()
+        .find('.total_unit').html('').end()
+        .find('.status_payment').html('').end()
+        .find('#list_item tbody').html('').end()
     }
 
     //  *

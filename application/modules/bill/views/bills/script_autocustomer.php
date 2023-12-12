@@ -14,8 +14,15 @@
                         })
 
                         $("[name=customer]").autocomplete({
-                            source: result
-                            // source: ['farmchokchai','zeer']
+                            source: result,
+                            /* source: [{
+                                id: 10,
+                                label: "ActionScript"
+                            }], */
+                            select: function(event, ui) {
+                                $('[name=customer_id]').val('');
+                                $('[name=customer_id]').val(ui.item.id);
+                            }
                         });
 
                         return result

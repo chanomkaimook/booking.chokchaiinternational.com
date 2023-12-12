@@ -3,6 +3,7 @@
         <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">ชื่อลูกค้า</label>
         <input type="text" class="form-control" name="customer" placeholder="ระบุ" required>
+        <input type="hidden" name="customer_id">
     </div>
 </div>
 
@@ -13,7 +14,7 @@
     </div>
     <div class="form-group col-md-6">
         <label class="text-capitalize">เบอร์ติดต่อ</label>
-        <input type="text" class="form-control" name="agent_customer" placeholder="ระบุ">
+        <input type="text" class="form-control" name="agent_contact" placeholder="ระบุ">
     </div>
 </div>
 
@@ -43,29 +44,36 @@
         <input type="text" class="form-control" name="bookingdate" placeholder="ระบุ">
     </div>
     <div class="form-group col-md-4">
-        <label class="text-capitalize">ยอดเงินชำระ</label>
-        <input type="text" class="form-control int_only" name="price" placeholder="ระบุตัวเลข">
+        <label class="text-capitalize">ยอดเงินโอน</label>
+        <input type="text" class="form-control int_only" name="deposit" placeholder="ระบุตัวเลข">
     </div>
 </div>
 
 <div class="row section_item">
     <div class="form-group col-md-12">
         <div class="row">
-            <div class="col-md-3 col-6">
-                <h5><small>ยอดรวม </small><br><span class="total_net"></span></h5>
+            <div class="col-md-4 col-6">
+                <h5><small>ราคาเต็ม </small><br><span class="total_price"></span></h5>
             </div>
-            <div class="col-md-3 col-6">
-                <h5><small>ยอดชำระ </small><br><span class="total_pay"></span></h5>
+            <div class="col-md-4 col-6">
+                <h5><small>ส่วนลด </small><br><span class="total_discount"></span></h5>
             </div>
-            <div class="col-md-3 col-6">
+
+
+            <div class="col-md-4 col-6">
+                <h5><small>ยอดชำระ </small><br><span class="total_net"></span></h5>
+            </div>
+            <div class="col-md-4 col-6">
+                <h5><small>ยอดโอน </small><br><span class="total_pay"></span></h5>
+            </div>
+            <div class="col-md-4 col-6">
                 <h5><small>จำนวนคน </small><br><span class="total_unit"></span></h5>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="col-md-4 col-6">
                 <h5><small>สถานะ </small><br><span class="status_payment"></span></h5>
             </div>
 
-
-
+            <input type="hidden" name="item_net">
         </div>
     </div>
     <div class="form-group col-md-12">
@@ -118,6 +126,7 @@
                 if (resp) {
                     resp.forEach(function(item, index) {
                         select += `<option value="${item.ID}" 
+                        data-name="${item.NAME}"
                         data-price="${item.PRICE}">
                         ${item.NAME}
                         </option>`
@@ -125,7 +134,7 @@
                 }
             })
 
-        let input_total = `<input type="text" name="item_price" class="form-control form-control-sm int_only" value="1">`
+        let input_total = `<input type="text" name="item_qty" class="form-control form-control-sm int_only" value="1">`
 
         let table_list_body = $('table#list_item tbody')
 
@@ -146,6 +155,10 @@
             cal_item_list()
         })
 
+        $(document).on('keyup', 'input[name=customer]', function() {
+            $('input[name=customer_id]').val('')
+        })
+
         // event for calculate price
         $(document).on('change', 'select[name=item_list]', function() {
             cal_item_list()
@@ -153,7 +166,7 @@
         $(document).on('keyup', '#list_item tbody input.int_only', function() {
             cal_item_list()
         })
-        $(document).on('keyup', 'input[name=price]', function() {
+        $(document).on('keyup', 'input[name=deposit]', function() {
             $('.status_payment').text(cal_status_payment())
             // set show detail price
             $('.total_pay').text(formatMoney($(this).val()))
@@ -169,6 +182,7 @@
             let price
             let total
             let total_unit = 0
+            let total_discount = 0.00
             let net = 0.00
 
             let list = $('#list_item tbody').find('tr')
@@ -177,13 +191,17 @@
                 let totalprice = 0.00
                 $.each(list, function(index, item) {
                     price = $(item).find('select[name=item_list] option:selected').attr('data-price')
-                    total = $(item).find('input[name=item_price]').val()
+                    total = $(item).find('input[name=item_qty]').val()
 
                     if (price && total) {
                         totalprice = price * total
+                        total_price = price * total
 
                         $(item).find('td.price').text(price)
                         $(item).find('td.net').text(formatMoney(totalprice))
+
+                        // promotion price value
+                        total_discount = (price - 10) * total
 
                         // value for set show detail price
                         net = net + totalprice
@@ -191,7 +209,12 @@
                     }
                 })
 
+                // input
+                $('input[name=item_net]').val(net)
+
                 // set show detail price
+                $('.total_price').text(formatMoney(total_price))
+                $('.total_discount').text(formatMoney(total_discount))
                 $('.total_net').text(formatMoney(net))
                 $('.total_unit').text(parseInt(total_unit))
                 $('.status_payment').text(cal_status_payment(net))
@@ -204,14 +227,14 @@
         function cal_status_payment(net = null) {
             let result = ''
 
-            let total_pay = $('input[name=price]').val() ? $('input[name=price]').val() : 0
+            let total_pay = $('input[name=deposit]').val() ? $('input[name=deposit]').val() : 0
             let list = $('#list_item tbody').find('tr')
 
             if (list.length) {
-                if($('input[name=price]').val() > 0){
+                if ($('input[name=deposit]').val() > 0) {
                     result = 'มัดจำ'
-                }else{
-                    result = 'รอ'
+                } else {
+                    result = 'รอโอน'
                 }
 
                 if (!net) {
@@ -219,7 +242,7 @@
                         let totalprice = 0.00
                         $.each(list, function(index, item) {
                             price = $(item).find('select[name=item_list] option:selected').attr('data-price')
-                            total = $(item).find('input[name=item_price]').val()
+                            total = $(item).find('input[name=item_qty]').val()
 
                             if (price && total) {
                                 totalprice = price * total

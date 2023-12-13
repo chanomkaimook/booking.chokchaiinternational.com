@@ -243,7 +243,8 @@
                 fetch(url, method)
                     .then(res => res.json())
                     .then((resp) => {
-
+                        console.log(resp)
+                        console.log(resp.promotion.length)
                         if (resp.promotion && resp.promotion.length) {
                             let text_promotion = $('.text_promotion')
                             text_promotion.removeClass('d-none')
@@ -255,10 +256,14 @@
                                 await new Promise((resolve, reject) => {
                                     resolve(
                                         $.each(resp.promotion, function(index, item) {
-                                            p += `<div class="">
-                                            <h6 class="text-info">${item.NAME} - ${item.DISCOUNT}/คน (ทั้งหมด ${item.TOTAL_UNIT} ท่าน)</h6>
-                                            </div>`
-                                        })
+                                            if(item.ID != null){
+                                                p += `<div class="">
+                                                <h6 class="text-info">${item.NAME} - ${formatMoney(item.DISCOUNT,0)}/คน 
+                                                ราคา ${formatMoney(item.TOTAL_DISCOUNT,0)} 
+                                                (ทั้งหมด ${item.TOTAL_UNIT} ท่าน)</h6>
+                                                </div>`
+                                            }
+                                        }),
                                     )
 
                                 })
@@ -273,10 +278,10 @@
                             $('.text_promotion div').empty()
                         }
 
-                        $('.total_pay').text(resp.pay)
-                        $('.total_price').text(resp.price)
-                        $('.total_discount').text(resp.discount)
-                        $('.total_net').text(resp.net)
+                        $('.total_pay').text(formatMoney(resp.pay))
+                        $('.total_price').text(formatMoney(resp.price))
+                        $('.total_discount').text(formatMoney(resp.discount))
+                        $('.total_net').text(formatMoney(resp.net))
                         $('.total_unit').text(resp.unit)
                         $('.status_payment').text(resp.payment_status)
                     })
@@ -302,7 +307,7 @@
         // 
         // promotion
         // 
-        function get_promotion(id = null, item_data = null) {
+        /* function get_promotion(id = null, item_data = null) {
             if (id && item_data) {
                 let url = new URL(path('promotion/ctl_page/get_proitem'), domain)
 
@@ -321,7 +326,7 @@
                     })
             }
 
-        }
+        } */
 
         function add_html_list_item() {
             let tr = create_html_list_item()

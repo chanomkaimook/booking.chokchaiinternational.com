@@ -91,9 +91,6 @@ class Bill
 
                     $discount_detail = $this->ci->promotion->get_itemPromotion($value->id, $value);
                     if ($discount_detail && $discount_detail['discount']) {
-                        $discount_detail['promotion']->TOTAL_UNIT = $value->total;
-                        $promotion[] = $discount_detail['promotion'];
-
                         if ($discount_detail['type'] == 'q') {
                             $discount_item = $discount_detail['discount'] * $value->total;
                         } else {
@@ -101,6 +98,23 @@ class Bill
                         }
 
                         $discount = $discount + $discount_item;
+
+                        $total_item_unit = $value->total;
+                        $total_item_discount = 0.00;
+
+                        $t = array_keys(array_column($promotion,'ID'),$discount_detail['promotion']->ID);
+
+                        if($t){
+                            foreach($t as $key => $value){
+                                $total_item_discount = $total_item_discount + $promotion[$value]->TOTAL_DISCOUNT;
+                                $total_item_unit = $total_item_unit + $promotion[$value]->TOTAL_UNIT;
+                                $promotion[$value] = (object)array('ID'=>null);
+                            }
+                        }
+                        $discount_detail['promotion']->TOTAL_UNIT = $total_item_unit;
+                        $discount_detail['promotion']->TOTAL_DISCOUNT = $discount_item + $total_item_discount;
+                        $promotion[] = $discount_detail['promotion'];
+                        // array_push($promotion,$discount_detail['promotion']);
                     }
                 }
 

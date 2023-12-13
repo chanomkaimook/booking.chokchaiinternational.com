@@ -88,10 +88,10 @@
 
                                 resolve(
                                     item_list.push({
-                                        item_id: bill_item_id,
-                                        item_name: bill_item_name,
-                                        item_price: bill_item_price,
-                                        item_qty: bill_item_qty
+                                        id: bill_item_id,
+                                        name: bill_item_name,
+                                        price: bill_item_price,
+                                        total: bill_item_qty
                                     })
                                 )
                             }
@@ -107,8 +107,14 @@
                     })
                 }
 
+                // 
+                // argument for get_cartData
                 data.push({
-                    'name': 'item_list',
+                    'name': 'pay',
+                    'value': $(modal).find('[name=deposit]').val()
+                })
+                data.push({
+                    'name': 'item_data',
                     'value': JSON.stringify(item_list)
                 })
 

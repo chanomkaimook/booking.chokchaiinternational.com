@@ -113,6 +113,27 @@ function textMoney(String $text = null, string $type = "float")
   return $result;
 }
 
+/**
+ * format number float
+ *
+ * @param String|null $text
+ * @param string $type = int || float
+ * @return void
+ */
+function textFloat(String $text = null,int $number = 2)
+{
+  # code...
+  $result = null;
+
+  $string = textNull($text);
+
+  if ($string) {
+    $result = number_format((float)$string, $number,null,"");
+  }
+
+  return $result;
+}
+
 if (!function_exists('mb_ucfirst')) {
   function mb_ucfirst($str, $encoding = "UTF-8", $lower_str_end = false)
   {

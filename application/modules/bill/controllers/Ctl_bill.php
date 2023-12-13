@@ -147,7 +147,7 @@ class Ctl_bill extends MY_Controller
                 );
 
                 $sub_data['BOOKING'] = array(
-                    "display"   => $bookingd_date ? toDateTimeString($bookingd_date,'date') : null,
+                    "display"   => $bookingd_date ? toDateTimeString($bookingd_date, 'date') : null,
                     "timestamp" => date('Y-m-d H:i:s', strtotime($bookingd_date)),
                     "data"      =>  array(
                         'staff'    => $booking_user ? whois($booking_user) : null,
@@ -199,6 +199,22 @@ class Ctl_bill extends MY_Controller
         echo json_encode($result);
     }
 
+    /**
+     * get detail from cart
+     *
+     * @return void
+     */
+    public function get_cartData()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+
+            $data = $this->bill->get_cartData();
+
+            $result = $data;
+            echo json_encode($result);
+        }
+    }
+
     //  *
     //  * CRUD
     //  * read
@@ -231,7 +247,7 @@ class Ctl_bill extends MY_Controller
 
 
             $this->bill->insert_item();
-            
+
             die;
             // $returns = $this->model->insert_data();
             echo json_encode($returns);

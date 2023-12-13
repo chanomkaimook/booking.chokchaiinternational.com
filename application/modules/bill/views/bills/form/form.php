@@ -72,8 +72,10 @@
             <div class="col-md-4 col-6">
                 <h5><small>สถานะ </small><br><span class="status_payment"></span></h5>
             </div>
-
-            <input type="hidden" name="item_net">
+        </div>
+    </div>
+    <div class="text_promotion w-100 d-none">
+        <div class="form-group col-md-12">
         </div>
     </div>
     <div class="form-group col-md-12">
@@ -134,7 +136,7 @@
                 }
             })
 
-        let input_total = `<input type="text" name="item_qty" class="form-control form-control-sm int_only" value="1">`
+        let input_total = `<input type="text" name="item_qty" class="form-control form-control-sm int_only" value="1" required>`
 
         let table_list_body = $('table#list_item tbody')
 
@@ -167,9 +169,7 @@
             cal_item_list()
         })
         $(document).on('keyup', 'input[name=deposit]', function() {
-            $('.status_payment').text(cal_status_payment())
-            // set show detail price
-            $('.total_pay').text(formatMoney($(this).val()))
+            cal_item_list()
         })
         // 
         // 
@@ -179,85 +179,148 @@
         // calculate price list
         // 
         function cal_item_list() {
-            let price
-            let total
-            let total_unit = 0
-            let total_discount = 0.00
-            let net = 0.00
-
             let list = $('#list_item tbody').find('tr')
 
             if (list.length) {
+                let price
+                let total
+                let total_unit = 0
+                let net = 0.00
+
                 let totalprice = 0.00
+                let total_price = 0.00
+                let totaldiscount = 0.00
+                let total_discount = 0.00
+                let discount = 0.00
+
+                let item_data = []
+                let deposit = $(modal).find('input[name=deposit]').val()
+
                 $.each(list, function(index, item) {
+                    id = $(item).find('select[name=item_list]').val()
                     price = $(item).find('select[name=item_list] option:selected').attr('data-price')
                     total = $(item).find('input[name=item_qty]').val()
 
                     if (price && total) {
                         totalprice = price * total
-                        total_price = price * total
 
                         $(item).find('td.price').text(price)
                         $(item).find('td.net').text(formatMoney(totalprice))
-
-                        // promotion price value
-                        total_discount = (price - 10) * total
-
-                        // value for set show detail price
-                        net = net + totalprice
                         total_unit = total_unit + parseInt(total)
+
+                        item_data.push({
+                            'id': id,
+                            'price': price,
+                            'total': total,
+                        })
                     }
                 })
 
-                // input
-                $('input[name=item_net]').val(net)
+                //
+                // get detail bill price
+                if (item_data.length) {
+                    get_cartData(deposit, item_data)
+                }
 
-                // set show detail price
-                $('.total_price').text(formatMoney(total_price))
-                $('.total_discount').text(formatMoney(total_discount))
-                $('.total_net').text(formatMoney(net))
-                $('.total_unit').text(parseInt(total_unit))
-                $('.status_payment').text(cal_status_payment(net))
+            } else {
+
+                reset_detail()
             }
         }
 
-        // 
-        // calculate price list
-        // 
-        function cal_status_payment(net = null) {
-            let result = ''
+        async function get_cartData(deposit = null, item_data = null) {
+            if (item_data) {
+                let url = new URL(path('bill/ctl_bill/get_cartData'), domain)
 
-            let total_pay = $('input[name=deposit]').val() ? $('input[name=deposit]').val() : 0
-            let list = $('#list_item tbody').find('tr')
+                let body = new FormData();
+                body.append('pay', deposit)
+                body.append('item_data', JSON.stringify(item_data))
 
-            if (list.length) {
-                if ($('input[name=deposit]').val() > 0) {
-                    result = 'มัดจำ'
-                } else {
-                    result = 'รอโอน'
+                let method = {
+                    'method': 'post',
+                    'body': body,
                 }
+                fetch(url, method)
+                    .then(res => res.json())
+                    .then((resp) => {
 
-                if (!net) {
-                    if (list.length) {
-                        let totalprice = 0.00
-                        $.each(list, function(index, item) {
-                            price = $(item).find('select[name=item_list] option:selected').attr('data-price')
-                            total = $(item).find('input[name=item_qty]').val()
+                        if (resp.promotion && resp.promotion.length) {
+                            let text_promotion = $('.text_promotion')
+                            text_promotion.removeClass('d-none')
 
-                            if (price && total) {
-                                totalprice = price * total
+                            step_pro()
+                            async function step_pro() {
 
-                                net = net + totalprice
+                                let p = ''
+                                await new Promise((resolve, reject) => {
+                                    resolve(
+                                        $.each(resp.promotion, function(index, item) {
+                                            p += `<div class="">
+                                            <h6 class="text-info">${item.NAME} - ${item.DISCOUNT}/คน (ทั้งหมด ${item.TOTAL_UNIT} ท่าน)</h6>
+                                            </div>`
+                                        })
+                                    )
+
+                                })
+                                await new Promise((resolve, reject) => {
+                                    resolve(
+                                        text_promotion.find('div').html(p)
+                                    )
+                                })
                             }
-                        })
-                    }
-                }
+                        } else {
+                            $('.text_promotion').addClass('d-none')
+                            $('.text_promotion div').empty()
+                        }
 
-                if (total_pay >= net) {
-                    result = 'โอนเต็ม'
-                }
+                        $('.total_pay').text(resp.pay)
+                        $('.total_price').text(resp.price)
+                        $('.total_discount').text(resp.discount)
+                        $('.total_net').text(resp.net)
+                        $('.total_unit').text(resp.unit)
+                        $('.status_payment').text(resp.payment_status)
+                    })
             }
-            return result
+
+        }
+
+        // 
+        // reset detail bill
+        // 
+        function reset_detail() {
+            $('.text_promotion').addClass('d-none')
+            $('.text_promotion div').empty()
+
+            $('.total_pay').empty()
+            $('.total_price').empty()
+            $('.total_discount').empty()
+            $('.total_net').empty()
+            $('.total_unit').empty()
+            $('.status_payment').empty()
+        }
+
+        // 
+        // promotion
+        // 
+        function get_promotion(id = null, item_data = null) {
+            if (id && item_data) {
+                let url = new URL(path('promotion/ctl_page/get_proitem'), domain)
+
+                let body = new FormData();
+                body.append('id', id)
+                body.append('item_data', JSON.stringify(item_data))
+
+                let method = {
+                    'method': 'post',
+                    'body': body,
+                }
+                fetch(url, method)
+                    .then(res => res.json())
+                    .then((resp) => {
+                        console.log(resp)
+                    })
+            }
+
         }
 
         function add_html_list_item() {

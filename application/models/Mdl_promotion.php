@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_bill extends CI_Model
+class Mdl_promotion extends CI_Model
 
 {
-    private $table = "bill";
-    private $offview = "";
+    private $table = "promotion";
+    private $offview = "status_offview";
     private $fildstatus = "status";
 
     public function __construct()
@@ -157,7 +157,7 @@ class Mdl_bill extends CI_Model
             $array_text_error = $array_to_find;
         } else {
             $array_text_error = array(
-                'customer_id'       => 'ชื่อลูกค้า',
+                'item_name'       => 'ชื่อ',
             );
         }
 
@@ -213,38 +213,45 @@ class Mdl_bill extends CI_Model
     //  *
     public function insert_data($data_insert = null)
     {
-        print_r($data_insert);
-        
+
         $result = array(
             'error'     => 1,
             'txt'       => 'ไม่มีการทำรายการ',
         );
 
         $request = $_POST;
-        $code = textNull($data_insert['code']) ? $data_insert['code'] : $request['code'];
-        $customer_id = textNull($data_insert['customer_id']) ? $data_insert['customer_id'] : $request['customer_id'];
+
+        $item_name = textNull($data_insert['name']) ? $data_insert['name'] : $request['item_name'];
         $array_chk_dup = array(
-            'code' => $code,
-            'customer_id' => $customer_id,
+            'name' => $item_name,
             'status' => 1
         );
+
         if ($return = $this->check_value_valid($array_chk_dup)) {
             return $return;
         }
 
-        $array_chk_dup = array(
-            'code' => $request['code'],
-            'status' => 1
-        );
-        if ($return = $this->check_dup($array_chk_dup, $request['code'])) {
+        if ($return = $this->check_dup($array_chk_dup, $item_name)) {
             return $return;
         }
-        
-        // insert passing on library bill only
+
         if ($data_insert && is_array($data_insert)) {
-            $data_insert['booking_user'] = $this->userlogin;
+            $data_insert['user_starts'] = $this->userlogin;
             $this->db->insert($this->table, $data_insert);
             $new_id = $this->db->insert_id();
+        } else {
+            $item_name = textNull($this->input->post('item_name'));
+
+            if ($item_name) {
+                $data = array(
+                    'name'          => $item_name,
+
+                    'user_starts'  => $this->userlogin,
+                );
+
+                $this->db->insert($this->table, $data);
+                $new_id = $this->db->insert_id();
+            }
         }
 
         if ($new_id) {
@@ -277,20 +284,24 @@ class Mdl_bill extends CI_Model
 
         if ($item_id) {
             $request = $_POST;
-            if ($return = $this->check_value_valid($request)) {
-                return $return;
-            }
-
+            
+            $item_name = textNull($data_update['name']) ? $data_update['name'] : $request['item_name'];
             $array_chk_dup = array(
-                'name' => $request['item_name'],
+                'name' => $item_name,
                 'status' => 1,
                 'id !=' => $item_id,
             );
-            if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+
+            if ($return = $this->check_value_valid($array_chk_dup)) {
+                return $return;
+            }
+            
+            if ($return = $this->check_dup($array_chk_dup, $item_name)) {
                 return $return;
             }
 
             if ($data_update && is_array($data_update)) {
+                $data_update['user_update'] = $this->userlogin;
                 $this->db->where('id', $item_id);
                 $this->db->update($this->table, $data_update);
             } else {

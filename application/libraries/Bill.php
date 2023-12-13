@@ -13,8 +13,16 @@ class Bill
         $this->ci->load->database();
         //===================//
 
-        $this->ci->load->helper('My_status');
-        $this->ci->load->model(array('information/mdl_customer', 'information/mdl_round'));
+        $this->ci->load->helper(array('My_status','My_calculate'));
+        $this->ci->load->library('Promotion');
+        $this->ci->load->model(
+            array(
+                'information/mdl_customer', 
+                'information/mdl_round',
+                'mdl_settings',
+                'bill/mdl_bill'
+            )
+        );
 
         $this->tb = 'bill';
         $this->tbd = 'bill_detail';
@@ -43,6 +51,99 @@ class Bill
         }
 
         $result = $code;
+
+        return $result;
+    }
+
+    /**
+     * get data from cart
+     *
+     * POST
+     * @param int pay = deposit  
+     * @param array|string item_data = [id,price,total]  
+     * @return array
+     */
+    public function get_cartData()
+    {
+        $result = array();
+        $request = $_REQUEST;
+
+        if ($request['item_data'] && is_string($request['item_data'])) {
+
+            $item_data = json_decode($request['item_data']);
+
+            $unit = 0;
+            $price = 0.00;
+            $discount = 0.00;
+            $net = 0.00;
+            $pay = 0.00;
+            $promotion = [];
+
+            if (count($item_data)) {
+                foreach ($item_data as $key => $value) {
+                    $unit = $unit + $value->total;
+
+                    $price_item = 0.00;
+                    $discount_item = 0.00;
+
+                    $price_item = $value->price * $value->total;
+                    $price = $price + $price_item;
+
+                    $discount_detail = $this->ci->promotion->get_itemPromotion($value->id, $value);
+                    if ($discount_detail && $discount_detail['discount']) {
+                        $discount_detail['promotion']->TOTAL_UNIT = $value->total;
+                        $promotion[] = $discount_detail['promotion'];
+
+                        if ($discount_detail['type'] == 'q') {
+                            $discount_item = $discount_detail['discount'] * $value->total;
+                        } else {
+                            $discount_item = $discount_detail['discount'];
+                        }
+
+                        $discount = $discount + $discount_item;
+                    }
+                }
+
+                $net = $price - $discount;
+            }
+
+            if ($request['pay']) {
+                $pay = $request['pay'];
+            }
+
+            // calculate VAT
+            $q_vat = $this->ci->mdl_settings->get_vatNum();
+            if(!$q_vat){
+                $vatnum = $this->ci->config->item('vat_num');
+            }else{
+                $vatnum = $q_vat->VAT_NUM;
+            }
+
+            $price_withvat = get_priceVat($net,$vatnum);
+            if($price_withvat){
+                $result['vat'] = $price_withvat['vat'];
+                $result['vatnum'] = $price_withvat['vat_num'];
+                $result['price_novat'] = $price_withvat['before_vat'];
+            }else{
+                $result['vat'] = null;
+                $result['vatnum'] = null;
+                $result['price_novat'] = null;
+            }
+            
+
+            $result['discount'] = $discount;
+            $result['price'] = $price;
+            $result['net'] = $net;
+            $result['pay'] = $pay;
+            $result['unit'] = textNull($unit);
+
+            $r_status = $this->get_status_bill($pay, $net);
+            $result['payment_id'] = $r_status['payment_id'];
+            $result['payment_status'] = $r_status['payment_status'];
+            $result['complete_id'] = $r_status['complete_id'];
+            $result['complete_status'] = $r_status['complete_status'];
+            $result['promotion'] = $promotion;
+        }
 
         return $result;
     }
@@ -85,8 +186,6 @@ class Bill
         $agent_contact = $request['agent_contact'] ? textNull($request['agent_contact']) : null;
         $round_id = $request['round'] ? textNull($request['round']) : null;
         $bookingdate = $request['bookingdate'] ? textNull($request['bookingdate']) : null;
-        $deposit = $request['deposit'] ? textNull($request['deposit']) : null;
-        $item_net = $request['item_net'] ? textNull($request['item_net']) : null;
         $remark = $request['remark'] ? textNull($request['remark']) : null;
 
         $item_list = $request['item_list'] ? $request['item_list'] : null;
@@ -103,6 +202,9 @@ class Bill
             );
             return $result;
         } else {
+
+            // 
+            // add customer auto
             if (!$customer_id) {
                 $data_insert_customer = array(
                     'name'          => $customer,
@@ -133,76 +235,105 @@ class Bill
             'agent_contact'  => $agent_contact,
             'booking_date'  => $bookingdate,
 
-            'deposit'  => $deposit,
+            'price'     => null,
+            'discount'  => null,
+            'deposit'   => null,
+            'net'       => null,
 
             'remark'  => $remark,
         );
 
+        $data_insert['complete_id'] = 1;
+        $data_insert['complete_alias'] = complete('pending');
+        $data_insert['payment_id'] = 6;
+        $data_insert['payment_alias'] = payment('pending');
+
         //
-        // bill NET
+        // detail price bill
         //
-        if (!$item_net) {
-            $data_insert['net'] = $item_net;
-        } else {
-            if (is_string($item_list)) {
-                $item_list = json_decode($request['item_list']);
+        $detail_bill = $this->get_cartData();
+
+        if ($detail_bill) {
+            if ($detail_bill['payment_status']) {
+                $data_insert['payment_id'] = $detail_bill['payment_id'];
+                $data_insert['payment_alias'] = $detail_bill['payment_status'];
             }
-            if ($item_list && is_array($item_list)) {
-                $totalprice = 0.00;
-                $item_net = 0.00;
-                foreach ($item_list as $key => $item) {
-                    $totalprice = $item->item_price * $item->item_qty;
-                    $item_net = $item_net + $totalprice;
-                }
+            if ($detail_bill['complete_status']) {
+                $data_insert['complete_id'] = $detail_bill['complete_id'];
+                $data_insert['complete_alias'] = $detail_bill['complete_status'];
             }
 
-            $data_insert['net'] = $item_net;
+            if ($detail_bill['price']) {
+                $data_insert['price'] = $detail_bill['price'];
+            }
+
+            if ($detail_bill['discount']) {
+                $data_insert['discount'] = $detail_bill['discount'];
+            }
+
+            if ($detail_bill['pay']) {
+                $data_insert['deposit'] = $detail_bill['pay'];
+            }
+
+            if ($detail_bill['net']) {
+                $data_insert['net'] = $detail_bill['net'];
+            }
+
+            if ($detail_bill['price_novat']) {
+                $data_insert['price_novat'] = $detail_bill['price_novat'];
+            }
+
+            if ($detail_bill['vat']) {
+                $data_insert['vat'] = $detail_bill['vat'];
+            }
+
+            if ($detail_bill['vatnum']) {
+                $data_insert['vatnum'] = $detail_bill['vatnum'];
+            }
+
+            if ($detail_bill['unit']) {
+                $data_insert['total_unit'] = $detail_bill['unit'];
+            }
         }
-
         //
         // bill Round
         //
         if ($round_id) {
             if ($row_round = $this->ci->mdl_round->get_data($round_id)) {
+
+                $data_insert['round_id'] = $round_id;
+
                 $round_name = $row_round->NAME;
-                $round_start = $row_round->TIME_START;
-                $round_end = $row_round->TIME_END;
+                $time_start = $row_round->TIME_START;
+                $time_end = $row_round->TIME_END;
 
                 if ($row_round->NAME) {
                     $round_name = $row_round->NAME;
                     $data_insert['round_name'] = $round_name;
                 }
                 if ($row_round->TIME_START) {
-                    $round_start = $row_round->TIME_START;
-                    $data_insert['round_start'] = $round_start;
+                    $time_start = $row_round->TIME_START;
+                    $data_insert['time_start'] = $time_start;
                 }
                 if ($row_round->TIME_END) {
-                    $round_end = $row_round->TIME_END;
-                    $data_insert['round_end'] = $round_end;
+                    $time_end = $row_round->TIME_END;
+                    $data_insert['time_end'] = $time_end;
                 }
             }
         }
 
-        $data_insert['complete_id'] = 1;
-        $data_insert['complete_alias'] = complete('pending');
-        $data_insert['payment_alias'] = 6;
-        $data_insert['payment_alias'] = payment('pending');
-        // 
-        // status bill 
-        // 
-        // @param int|float $deposit = deposit
-        // @param int|float $item_net = net
-        if ($r_status = $this->get_status_bill($deposit, $item_net)) {
-            $data_insert['payment_id'] = $r_status['payment_id'];
-            $data_insert['payment_alias'] = $r_status['payment_status'];
-            $data_insert['complete_id'] = $r_status['complete_id'];
-            $data_insert['complete_alias'] = $r_status['complete_status'];
+        $this->ci->db->trans_begin();
+
+        $this->ci->mdl_bill->insert_data($data_insert);
+
+        // insert bill_detail
+
+        if ($this->ci->db->trans_status() === FALSE) {
+            $this->ci->db->trans_rollback();
+        } else {
+            $this->ci->db->trans_commit();
         }
-
-        print_r($data_insert);
         die;
-        $this->ci->db->insert('bill', $data_insert);
-
         echo $code;
     }
 
@@ -220,8 +351,8 @@ class Bill
         $payment_status = "";
         $complete_status = "";
 
-        $deposit = textNull($deposit) ? number_format($deposit, 2) : null;
-        $item_net = textNull($item_net) ? number_format($item_net, 2) : null;
+        $deposit = textNull($deposit) ? (float) $deposit : null;
+        $item_net = textNull($item_net) ? (float) $item_net : null;
 
         // โอนเงินและมียอดรวมบิล
         if ($deposit && $item_net) {

@@ -533,6 +533,8 @@ $config['modules_locations'] = array(APPPATH.'modules/' => '../modules/',);
 
 
 /**
- * set id master admin
+ * set paramiter for project
  */
+// set id master admin
 $config['masteradmin_id'] = array(1);
+$config['vat_num'] = 7;

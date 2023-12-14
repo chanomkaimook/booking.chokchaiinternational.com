@@ -1,11 +1,10 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_bill extends CI_Model
+class Mdl_bill_detail extends CI_Model
 
 {
-    private $table = "bill";
-    private $tabledetail = "bill_detail";
+    private $table = "bill_detail";
     private $offview = "";
     private $fildstatus = "status";
 
@@ -92,23 +91,6 @@ class Mdl_bill extends CI_Model
         }
     }
 
-    public function get_dataDoc(int $id = null, array $optionnal = null, string $type = "result")
-    {
-        # code...
-        $sql = (object) $this->get_sqldoc($id, $optionnal, $type);
-        if ($this->fildstatus) {
-            $sql->where($this->table . '.' . $this->fildstatus, 1);
-        }
-
-        $query = $sql->get();
-
-        if ($id) {
-            return $query->row();
-        } else {
-            return $query->$type();
-        }
-    }
-
     //  *
     //  * CRUD
     //  * read
@@ -127,24 +109,6 @@ class Mdl_bill extends CI_Model
         if ($this->fildstatus) {
             $sql->where($this->table . '.' . $this->fildstatus, 1);
         }
-
-        $query = $sql->get();
-
-        if ($id) {
-            return $query->row();
-        } else {
-            return $query->$type();
-        }
-    }
-
-    public function get_dataShowForEdit(int $id = null, array $optionnal = null, string $type = "result")
-    {
-        # code...
-        $sql = (object) $this->get_sql($id, $optionnal, $type);
-        if ($this->fildstatus) {
-            $sql->where($this->table . '.' . $this->fildstatus, 1);
-        }
-        $sql->where($this->table . '.noedit', null);
 
         $query = $sql->get();
 
@@ -229,41 +193,21 @@ class Mdl_bill extends CI_Model
     //  * 
     //  * insert data
     //  *
-    public function insert_data($data_insert = null)
+    public function insert_data_batch($data_insert = null)
     {
+        // print_r($data_insert);
+        
         $result = array(
             'error'     => 1,
             'txt'       => 'ไม่มีการทำรายการ',
         );
-
-        $request = $_POST;
-        $code = textNull($data_insert['code']) ? $data_insert['code'] : $request['code'];
-        $customer_id = textNull($data_insert['customer_id']) ? $data_insert['customer_id'] : $request['customer_id'];
-        $array_chk_dup = array(
-            'code' => $code,
-            'customer_id' => $customer_id,
-            'status' => 1
-        );
-        if ($return = $this->check_value_valid($array_chk_dup)) {
-            return $return;
-        }
-
-        // for check duplicate code
-        $array_chk_dup = array(
-            'code' => $code,
-            'status' => 1
-        );
-        if ($return = $this->check_dup($array_chk_dup, $code)) {
-            return $return;
-        }
-        
-        
-
+      
         // insert passing on library bill only
         if ($data_insert && is_array($data_insert)) {
-            $data_insert['booking_user'] = $this->userlogin;
-            $data_insert['user_starts'] = $this->userlogin;
-            $this->db->insert($this->table, $data_insert);
+            foreach($data_insert as $key => $row){
+                $data_insert[$key]['user_starts'] = $this->userlogin;
+            }
+            $this->db->insert_batch($this->table, $data_insert);
             $new_id = $this->db->insert_id();
         }
 
@@ -274,11 +218,7 @@ class Mdl_bill extends CI_Model
 
             $result = array(
                 'error'     => 0,
-                'txt'       => 'ทำรายการสำเร็จ',
-                'data'      => array(
-                    'id'    => $new_id,
-                    'code'    => $code
-                )
+                'txt'       => 'ทำรายการสำเร็จ'
             );
         }
 
@@ -421,80 +361,6 @@ class Mdl_bill extends CI_Model
         $hidden_end = "";
 
         $sql = $this->db->from($this->table);
-
-        if (textNull($request['hidden_datestart'])) {
-            $hidden_start = textNull($request['hidden_datestart']);
-        }
-        if (textNull($request['hidden_dateend'])) {
-            $hidden_end = textNull($request['hidden_dateend']);
-        }
-
-        if ($hidden_start && $hidden_end) {
-            $sql->where('date(' . $this->table . '.date_starts) >=', $hidden_start);
-            $sql->where('date(' . $this->table . '.date_starts) <=', $hidden_end);
-        }
-
-        if ($id) {
-            $sql->where($this->table . '.id', $id);
-        }
-
-        if ($optionnal['select']) {
-            $sql->select($optionnal['select']);
-        }
-
-        if ($optionnal['where'] && count($optionnal['where'])) {
-            foreach ($optionnal['where'] as $column => $value) {
-                $sql->where($column, $value);
-            }
-        }
-
-        if ($optionnal['order_by'] && count($optionnal['order_by'])) {
-            foreach ($optionnal['order_by'] as $column => $value) {
-                $sql->order_by($column, $value);
-            }
-        } else {
-            $sql->order_by($this->table . '.id', 'desc');
-        }
-
-        if ($optionnal['group_by'] && count($optionnal['group_by'])) {
-            foreach ($optionnal['group_by'] as $column) {
-                $sql->group_by($column);
-            }
-        }
-
-        if ($type != "row") {
-            if ($optionnal['limit']) {
-                $sql->limit($optionnal['limit']);
-            } else {
-
-                if (isset($request['start']) && isset($request['length'])) {
-                    $sql->limit($request['length'], $request['start']);
-                } else {
-                    // $sql->limit(10, 0);
-                }
-            }
-        }
-
-        return $sql;
-    }
-
-    /**
-     * query
-     *
-     * @param integer|null $id
-     * @param array $optionnal
-     * @param string $type
-     * @return void
-     */
-    function get_sqldoc(int $id = null, array $optionnal = null, string $type = 'result')
-    {
-        $request = $_REQUEST;
-
-        $hidden_start = "";
-        $hidden_end = "";
-
-        $sql = $this->db->from($this->table)
-        ->join($this->tabledetail,$this->table.'.id='.$this->tabledetail.'.bill_id','left');
 
         if (textNull($request['hidden_datestart'])) {
             $hidden_start = textNull($request['hidden_datestart']);

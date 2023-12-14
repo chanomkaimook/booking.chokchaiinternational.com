@@ -70,7 +70,7 @@
                     }
                 },
                 {
-                    "data": "USER_ACTIVE.display",
+                    "data": "CUSTOMER.data.total",
                 },
                 {
                     "data": {
@@ -80,12 +80,12 @@
                 },
                 {
                     "data": {
-                        _: 'USER_ACTIVE.display', // default show
+                        _: 'PAYMENT.display', // default show
                     }
                 },
                 {
                     "data": {
-                        _: 'USER_ACTIVE.display', // default show
+                        _: 'COMPLETE.display', // default show
                     }
                 },
                 {

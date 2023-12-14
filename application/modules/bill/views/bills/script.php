@@ -454,7 +454,9 @@
         $(modal).find('.modal_text_header').html('')
 
         // clear element
-        $(modal)
+        $('.text_promotion').addClass('d-none')
+        $('.text_promotion div').empty()
+        $(modal)    
         .find('[name=item_net]').val('').end()
         .find('.total_price').html('').end()
         .find('.total_discount').html('').end()

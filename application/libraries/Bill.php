@@ -13,14 +13,15 @@ class Bill
         $this->ci->load->database();
         //===================//
 
-        $this->ci->load->helper(array('My_status','My_calculate'));
+        $this->ci->load->helper(array('My_status', 'My_calculate'));
         $this->ci->load->library('Promotion');
         $this->ci->load->model(
             array(
-                'information/mdl_customer', 
+                'information/mdl_customer',
                 'information/mdl_round',
                 'mdl_settings',
-                'bill/mdl_bill'
+                'bill/mdl_bill',
+                'bill/mdl_bill_detail'
             )
         );
 
@@ -78,9 +79,11 @@ class Bill
             $net = 0.00;
             $pay = 0.00;
             $promotion = [];
+            $item_data_list = [];
 
             if (count($item_data)) {
                 foreach ($item_data as $key => $value) {
+                    $name = $value->name;
                     $unit = $unit + $value->total;
 
                     $price_item = 0.00;
@@ -89,12 +92,20 @@ class Bill
                     $price_item = $value->price * $value->total;
                     $price = $price + $price_item;
 
+                    $promotion_id = "";
+                    $promotion_name = "";
+                    $promotion_discount = "";
                     $discount_detail = $this->ci->promotion->get_itemPromotion($value->id, $value);
                     if ($discount_detail && $discount_detail['discount']) {
+
+                        $promotion_id = $discount_detail['promotion']->ID;
+                        $promotion_name = $discount_detail['promotion']->NAME;
+                        $promotion_discount = $discount_detail['discount'];
+
                         if ($discount_detail['type'] == 'q') {
-                            $discount_item = $discount_detail['discount'] * $value->total;
+                            $discount_item = $promotion_discount * $value->total;
                         } else {
-                            $discount_item = $discount_detail['discount'];
+                            $discount_item = $promotion_discount;
                         }
 
                         $discount = $discount + $discount_item;
@@ -102,20 +113,65 @@ class Bill
                         $total_item_unit = $value->total;
                         $total_item_discount = 0.00;
 
-                        $t = array_keys(array_column($promotion,'ID'),$discount_detail['promotion']->ID);
+                        $t = array_keys(array_column($promotion, 'ID'), $promotion_id);
 
-                        if($t){
-                            foreach($t as $key => $value){
-                                $total_item_discount = $total_item_discount + $promotion[$value]->TOTAL_DISCOUNT;
-                                $total_item_unit = $total_item_unit + $promotion[$value]->TOTAL_UNIT;
-                                $promotion[$value] = (object)array('ID'=>null);
+                        if ($t) {
+                            foreach ($t as $key_pro => $value_pro) {
+                                //
+                                // delete item list for promotion duplicate
+                                $p = array_keys(array_column($item_data_list, 'promotion_id'), $promotion_id);
+                                foreach ($p as $key_item_pro => $value_item_pro) {
+                                    unset($item_data_list[$value_item_pro]);
+                                }
+
+                                $total_item_discount = $total_item_discount + $promotion[$value_pro]->TOTAL_DISCOUNT;
+                                $total_item_unit = $total_item_unit + $promotion[$value_pro]->TOTAL_UNIT;
+
+                                //
+                                // clear promotion duplicate (no delete)
+                                $promotion[$value_pro] = (object)array('ID' => null);
                             }
                         }
                         $discount_detail['promotion']->TOTAL_UNIT = $total_item_unit;
                         $discount_detail['promotion']->TOTAL_DISCOUNT = $discount_item + $total_item_discount;
                         $promotion[] = $discount_detail['promotion'];
-                        // array_push($promotion,$discount_detail['promotion']);
                     }
+
+                    //
+                    // set item list
+                    $net_item = $price_item;
+                    $item_data_list[] = array(
+                        'item_id'       => $value->id,
+                        'promotion_id'  => null,
+                        'description'   => $name,
+                        'price_unit'    => $value->price,
+                        'quantity'      => $value->total,
+                        'price'         => $price_item,
+                        'discount'      => null,
+                        'net'           => $net_item,
+                        'p_id_use'      => textNull($promotion_id),
+                    );
+                    // 
+                    // 
+
+                    //
+                    // add item promotion list
+                    if (textNull($discount_detail['promotion']->TOTAL_DISCOUNT)) {
+
+                        $item_data_list[] = array(
+                            'item_id'       => null,
+                            'promotion_id'  => $promotion_id,
+                            'description'   => $promotion_name,
+                            'price_unit'    => $promotion_discount,
+                            'quantity'      => $discount_detail['promotion']->TOTAL_UNIT,
+                            'price'         => null,
+                            'discount'      => $discount_detail['promotion']->TOTAL_DISCOUNT,
+                            'net'           => null,
+                            'p_id_use'      => null,
+                        );
+                    }
+                    // 
+                    // 
                 }
 
                 $net = $price - $discount;
@@ -127,23 +183,23 @@ class Bill
 
             // calculate VAT
             $q_vat = $this->ci->mdl_settings->get_vatNum();
-            if(!$q_vat){
+            if (!$q_vat) {
                 $vatnum = $this->ci->config->item('vat_num');
-            }else{
+            } else {
                 $vatnum = $q_vat->VAT_NUM;
             }
 
-            $price_withvat = get_priceVat($net,$vatnum);
-            if($price_withvat){
+            $price_withvat = get_priceVat($net, $vatnum);
+            if ($price_withvat) {
                 $result['vat'] = $price_withvat['vat'];
                 $result['vatnum'] = $price_withvat['vat_num'];
                 $result['price_novat'] = $price_withvat['before_vat'];
-            }else{
+            } else {
                 $result['vat'] = null;
                 $result['vatnum'] = null;
                 $result['price_novat'] = null;
             }
-            
+
 
             $result['discount'] = $discount;
             $result['price'] = $price;
@@ -157,6 +213,7 @@ class Bill
             $result['complete_id'] = $r_status['complete_id'];
             $result['complete_status'] = $r_status['complete_status'];
             $result['promotion'] = $promotion;
+            $result['item_data_list'] = $item_data_list;
         }
 
         return $result;
@@ -167,31 +224,8 @@ class Bill
      *
      * @return array
      */
-    public function insert_item()
+    public function create_bill()
     {
-        /* [frm_hidden_id] => 
-    [customer] =>         
-    [agent_name] => aaaa
-    [agent_tel] => 080
-    [round] => 1
-    [bookingdate] => 2023-12-10
-    [price] => 1500
-    [item_net] => 120
-    [item_list] => [{"item_id":"2","item_name":"บัตรนั่งรถฟาร์ม ผู้ใหญ่","item_price":"120.00","item_qty":"1"}]
-    [item_qty] => 1
-    [remark] => remark
-    )
-    Array
-    (
-        [0] => stdClass Object
-            (
-                [item_id] => 2
-                [item_name] => บัตรนั่งรถฟาร์ม ผู้ใหญ่
-                [item_price] => 120.00
-                [item_qty] => 1
-            )
-
-    ) */
         $request = $_REQUEST;
 
         $customer = $request['customer'] ? textNull($request['customer']) : null;
@@ -286,7 +320,10 @@ class Bill
             }
 
             if ($detail_bill['pay']) {
-                $data_insert['deposit'] = $detail_bill['pay'];
+                // 
+                // create receipt
+                
+                // $data_insert['deposit'] = $detail_bill['pay'];
             }
 
             if ($detail_bill['net']) {
@@ -338,9 +375,54 @@ class Bill
 
         $this->ci->db->trans_begin();
 
-        $this->ci->mdl_bill->insert_data($data_insert);
+        // 
+        // insert bill
+        $data_bill = $this->ci->mdl_bill->insert_data($data_insert);
+        $item_new_data = [];
 
-        // insert bill_detail
+        if ($data_bill) {
+
+            $item_bill_id = $data_bill['data']['id'];
+            $item_bill_code = $data_bill['data']['code'];
+
+            $item_data = [];
+            if ($detail_bill['item_data_list']) {
+
+                $data_b_i_l = $detail_bill['item_data_list'];
+
+                if (is_string($data_b_i_l)) {
+                    $item_data = json_decode($data_b_i_l);
+                } else {
+                    $item_data = $data_b_i_l;
+                }
+                print_r($item_data);
+                if ($item_data) {
+                    foreach ($item_data as $key => $row) {
+                        $item_new_data[] = array(
+                            'bill_id'           => $item_bill_id,
+                            'bill_code'         => $item_bill_code,
+
+                            'item_id'           => $row['item_id'],
+                            'promotion_id'      => $row['promotion_id'],
+                            'description'       => $row['description'],
+                            'price_unit'        => $row['price_unit'],
+                            'quantity'          => $row['quantity'],
+                            'price'             => $row['price'],
+                            'discount'          => $row['discount'],
+                            'net'               => $row['net'],
+                            'p_id_use'          => $row['p_id_use'],
+                        );
+                    }
+                }
+            }
+
+            // 
+            // insert bill detail
+            if($item_new_data){
+                $data_bill = $this->ci->mdl_bill_detail->insert_data_batch($item_new_data);
+            }
+
+        }   // END if bill detail
 
         if ($this->ci->db->trans_status() === FALSE) {
             $this->ci->db->trans_rollback();
@@ -348,6 +430,7 @@ class Bill
             $this->ci->db->trans_commit();
         }
         die;
+
         echo $code;
     }
 

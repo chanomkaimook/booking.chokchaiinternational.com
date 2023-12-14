@@ -48,11 +48,7 @@ class Mdl_settings extends CI_Model
         $sql = (object) $this->get_sql($id, $optionnal);
         $query = $sql->get();
 
-        if ($id) {
-            return $query->row();
-        } else {
-            return $query->$type();
-        }
+        return $query->row();
     }
 
     public function get_vatNum()

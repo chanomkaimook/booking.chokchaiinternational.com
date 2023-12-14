@@ -94,25 +94,54 @@ function workstatus(int $status = null, string $text = null, array $optional = [
   $ci->load->database();
 
   # code...
-
+$fonsize = "12px";
   switch ($status) {
     case 1:
-      $result = '<span class="badge badge-primary"> ' . $text . ' </span>';
+      $result = '<span class="badge badge-secondary" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
       break;
     case 2:
-      $result = '<span class="badge badge-warning"> ' . $text . ' </span>';
+      $result = '<span class="badge badge-warning" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
       break;
     case 3:
-      $result = '<span class="badge badge-success"> ' . $text . ' </span>';
+      $result = '<span class="badge badge-success" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
       break;
     case 4:
-      $result = '<span class="badge badge-danger"> ' . $text . ' </span>';
+      $result = '<span class="badge badge-danger" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
       break;
     case 5:
-      $result = '<span class="badge badge-muted"> ' . $text . ' </span>';
+      $result = '<span class="badge text-dark" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
       break;
     default:
-      $result = '<span class="badge badge-primary"> ' . $text . ' </span>';
+      $result = '<span class="badge badge-secondary" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
+      break;
+  }
+
+  if ($optional['html'] == false) {
+    $result = $text;
+  }
+
+  return $result;
+}
+
+function paymentstatus(int $status = null, string $text = null, array $optional = ['html' => true])
+{
+  $ci = &get_instance();
+  $ci->load->database();
+
+  # code...
+  $fonsize = "12px";
+  switch ($status) {
+    case 6:
+      $result = '<span class="badge badge-secondary" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
+      break;
+    case 7:
+      $result = '<span class="badge badge-warning" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
+      break;
+    case 8:
+      $result = '<span class="badge badge-success" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
+      break;
+    default:
+      $result = '<span class="badge badge-secondary" style="font-size:'.$fonsize.'"> ' . $text . ' </span>';
       break;
   }
 

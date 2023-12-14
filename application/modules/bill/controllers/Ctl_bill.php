@@ -66,6 +66,15 @@ class Ctl_bill extends MY_Controller
         $this->template->build('bills/index', $data);
     }
 
+    public function document()
+    {
+        $item_code = $this->input->get('code');
+        $data['bill'] = $this->mdl_bill->get_dataDoc(textNull($item_code));
+        $this->template->set_layout('lay_main');
+        $this->template->title($this->title);
+        $this->template->build('document/bill', $data);
+    }
+
     /**
      *
      * get data to datatable
@@ -122,6 +131,7 @@ class Ctl_bill extends MY_Controller
                     "display"   => $row->CUSTOMER_NAME,
                     "data"      =>  array(
                         'id'    => $row->CUSTOMER_ID,
+                        'total'    => $row->TOTAL_UNIT,
                     ),
                 );
 
@@ -132,17 +142,21 @@ class Ctl_bill extends MY_Controller
                     ),
                 );
 
+                $complete_status = workstatus($row->COMPLETE_ID,$row->COMPLETE_ALIAS);
                 $sub_data['COMPLETE'] = array(
-                    "display"   => $row->COMPLETE_ALIAS,
+                    "display"   => $complete_status,
                     "data"      =>  array(
                         'id'    => $row->COMPLETE_ID,
+                        'name'    => $row->COMPLETE_ALIAS,
                     ),
                 );
 
+                $payment_status = paymentstatus($row->PAYMENT_ID,$row->PAYMENT_ALIAS);
                 $sub_data['PAYMENT'] = array(
-                    "display"   => $row->PAYMENT_ALIAS,
+                    "display"   => $payment_status,
                     "data"      =>  array(
                         'id'    => $row->PAYMENT_ID,
+                        'name'    => $row->PAYMENT_ALIAS,
                     ),
                 );
 
@@ -246,7 +260,7 @@ class Ctl_bill extends MY_Controller
             // print_r(json_decode($_POST['item_list']));
 
 
-            $this->bill->insert_item();
+            $this->bill->create_bill();
 
             die;
             // $returns = $this->model->insert_data();

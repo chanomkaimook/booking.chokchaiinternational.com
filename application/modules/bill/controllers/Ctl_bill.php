@@ -72,7 +72,7 @@ class Ctl_bill extends MY_Controller
         $data['bill'] = $this->mdl_bill->get_dataDoc(textNull($item_code));
         $this->template->set_layout('lay_main');
         $this->template->title($this->title);
-        $this->template->build('document/bill', $data);
+        $this->template->build('bills/document_bill', $data);
     }
 
     /**

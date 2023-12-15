@@ -32,6 +32,7 @@ class Bill
     public function gen_code()
     {
         # code...
+        $prefix = "CRR";
         $yearindent = date('y');
         $year = date('Y');
         $month = date('m');
@@ -45,10 +46,10 @@ class Bill
         if ($num) {
             $numnext = (int) $num + 1;
             $numpad = str_pad($numnext, 4, '0', STR_PAD_LEFT);
-            $code = $yearindent . "" . $month . "" . $numpad;
+            $code = $prefix . $yearindent . "" . $month . "" . $numpad;
         } else {
             $numpad = "0001";
-            $code = $yearindent . "" . $month . "" . $numpad;
+            $code = $prefix . $yearindent . "" . $month . "" . $numpad;
         }
 
         $result = $code;
@@ -233,6 +234,7 @@ class Bill
         $agent_name = $request['agent_name'] ? textNull($request['agent_name']) : null;
         $agent_contact = $request['agent_contact'] ? textNull($request['agent_contact']) : null;
         $round_id = $request['round'] ? textNull($request['round']) : null;
+        $date_order = $request['date_order'] ? textNull($request['date_order']) : null;
         $bookingdate = $request['bookingdate'] ? textNull($request['bookingdate']) : null;
         $remark = $request['remark'] ? textNull($request['remark']) : null;
 
@@ -281,11 +283,11 @@ class Bill
             'customer_name'  => $customer,
             'agent_name'  => $agent_name,
             'agent_contact'  => $agent_contact,
+            'date_order'    => $date_order,
             'booking_date'  => $bookingdate,
 
             'price'     => null,
             'discount'  => null,
-            'deposit'   => null,
             'net'       => null,
 
             'remark'  => $remark,
@@ -319,11 +321,11 @@ class Bill
                 $data_insert['discount'] = $detail_bill['discount'];
             }
 
+            $deposit = 0;
             if ($detail_bill['pay']) {
                 // 
                 // create receipt
-                
-                // $data_insert['deposit'] = $detail_bill['pay'];
+                $deposit = $detail_bill['pay'];
             }
 
             if ($detail_bill['net']) {
@@ -395,7 +397,6 @@ class Bill
                 } else {
                     $item_data = $data_b_i_l;
                 }
-                print_r($item_data);
                 if ($item_data) {
                     foreach ($item_data as $key => $row) {
                         $item_new_data[] = array(
@@ -418,10 +419,25 @@ class Bill
 
             // 
             // insert bill detail
-            if($item_new_data){
+            if ($item_new_data) {
                 $data_bill = $this->ci->mdl_bill_detail->insert_data_batch($item_new_data);
             }
 
+            if ($deposit) {
+                $this->ci->load->library('receipt');
+                //
+                // หากยอดโอนมากกว่าหรือเท่ากับยอดชำระ
+                // create receipt
+                if($deposit >= $detail_bill['net']){
+                    //
+                    // สร้างใบโอน และ สร้างใบรับเงิน
+                    $this->ci->receipt->create_deposit($item_bill_id, $item_bill_code,$deposit);
+                    $this->ci->receipt->create_bill($item_bill_id, $item_bill_code,$deposit);
+
+                }else{
+                    $this->ci->receipt->create_deposit($item_bill_id, $item_bill_code,$deposit);
+                }
+            }
         }   // END if bill detail
 
         if ($this->ci->db->trans_status() === FALSE) {

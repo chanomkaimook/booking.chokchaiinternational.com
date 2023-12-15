@@ -1,9 +1,14 @@
 <div class="row">
-    <div class="form-group col-md-12">
+    <div class="form-group col-md-6">
         <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">ชื่อลูกค้า</label>
         <input type="text" class="form-control" name="customer" placeholder="ระบุ" required>
         <input type="hidden" name="customer_id">
+    </div>
+    <div class="form-group col-md-6">
+        <span class="required"><i class="mdi mdi-svg"></i></span>
+        <label class="text-capitalize">วันออกบิล</label>
+        <input type="text" class="form-control" name="date_order" placeholder="ระบุ" required>
     </div>
 </div>
 
@@ -243,8 +248,7 @@
                 fetch(url, method)
                     .then(res => res.json())
                     .then((resp) => {
-                        console.log(resp)
-                        console.log(resp.promotion.length)
+                        
                         if (resp.promotion && resp.promotion.length) {
                             let text_promotion = $('.text_promotion')
                             text_promotion.removeClass('d-none')

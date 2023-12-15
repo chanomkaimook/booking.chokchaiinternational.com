@@ -75,6 +75,12 @@
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
         })
+        $("[name=date_order]").datepicker({
+            autoclose: !0,
+            todayHighlight: !0,
+            dateFormat: 'dd/mm/yy',
+        })
+        $('[name=date_order]').datepicker("setDate", new Date() );
 
         $(".touchspin").TouchSpin({
             min: 1,

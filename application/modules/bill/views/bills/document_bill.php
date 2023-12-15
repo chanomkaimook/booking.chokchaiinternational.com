@@ -6,9 +6,15 @@
 
             <div class="mb-1 mb-md-0">
                 <div class="d-flex gap-2">
-                    <div class="tool-btn">
-                        <button type="button" class="btn-add btn"><?= mb_ucfirst($this->lang->line('_form_btn_add')) ?></button>
-                    </div>
+                    <?php
+                    if ($bill['COMPLETE_ID'] < 3) :  // waite & checking
+                    ?>
+                        <div class="tool-btn">
+                            <button type="button" class="btn-add-receipt btn">ออกใบเสร็จรับเงิน</button>
+                        </div>
+                    <?php elseif ($bill['COMPLETE_ID'] == 3) : ?>
+                        <div class="">asdas</div>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="">
@@ -25,156 +31,41 @@
             <div class="card-box">
                 <div class="template">
 
-                    <div >
-                        <style>
-                            body .card-box {
-                                background: rgb(204, 204, 204);
-                            }
+                    <div>
+                        <?php include('style_document.php'); ?>
+                        <?php
+                        $code = textNull($bill['CODE']);
+                        // $code = get_status_alias(2);
+                        // $code = complete('checking');
 
-                            /* @page {
-                                background: white;
-                                size: A4;
-                                display: block;
-                                margin: 0 auto;
-                                padding: 50px 35px;
-                                margin-bottom: 0.5cm;
-                                box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
-                            } */
+                        $y = date('Y', strtotime($bill['DATE_ORDER'])) + 543;
+                        $dm = date('d/m/', strtotime($bill['DATE_ORDER']));
+                        $date_order = $dm . $y;
 
-                            page[size="A4"] {
-                                background: white;
-                                width: 21cm;
-                                height: 29.7cm;
-                                display: block;
-                                margin: 0 auto;
-                                padding: 50px 35px;
-                                margin-bottom: 0.5cm;
-                                box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
-                            }
+                        $customer_id = textNull($bill['CUSTOMER_ID']);
+                        $customer_name = textNull($bill['CUSTOMER_NAME']);
+                        $customer_address = "";
+                        $agent_name = textNull($bill['AGENT_NAME']);
+                        $agent_contact = textNull($bill['AGENT_CONTACT']);
+                        $agent_email = "";
 
-                            @page {
-                                size: "A4"
-                            }
+                        $doc_item_remark = "หมายเหตุ: 1. ตะลอนฟาร์มโชคชัย <br>2. ราคานี้รวมภาษีมูลค่าเพิ่ม 7% แล้ว";
 
-                            @media print {
-                                page[size="A4"] {
-                                    /* width: 100%; */
-                                    
-                                    margin:0;
-                                    box-shadow: 0;
-                                }
+                        // sort item on bill detail (bd)
+                        $item_i = [];
+                        $item_p = [];
+                        if ($bill_detail) {
+                            $item_i = array_keys(array_column($bill_detail, 'ITEM_ID'), true);
+                            $item_p = array_keys(array_column($bill_detail, 'PROMOTION_ID'), true);
+                        }
 
-                                #document {
-                                    width:18cm;
+                        $price = textMoney($bill['PRICE']);
+                        $discount = textMoney($bill['DISCOUNT']);
+                        $deposit = textMoney($bill['DEPOSIT']);
+                        $net = textMoney($bill['NET']);
 
-                                }
-
-                            }
-
-                            /* 
-                            |
-                            | Header
-                            |
-                            */
-                            .page_header {
-                                text-align: center;
-                                width: 100%;
-                            }
-
-                            .page_header .logo img {
-                                width: 4cm;
-                            }
-
-                            /* 
-                            |
-                            | Body
-                            |
-                            */
-                            .page_body {
-                                width: 100%;
-                            }
-
-                            .page_body .pb_head .pb_head_cus {
-                                width: 70%;
-                            }
-
-                            .page_body .pb_head .pb_head_doc {
-                                width: 30%;
-                            }
-
-                            /* 
-                            |
-                            | Item
-                            |
-                            */
-                            .page_item {
-                                width: 100%;
-                            }
-
-                            .page_item tr {
-                                text-align: center
-                            }
-
-                            .page_item tbody tr {
-                                vertical-align: top;
-                            }
-
-                            .page_item tbody tr td:nth-child(2) {
-                                text-align: left
-                            }
-
-                            .page_item tbody tr td .doc_remark {
-                                position: absolute;
-                                bottom: 2px;
-                            }
-
-
-
-                            .page_item_total {
-                                width: 100%;
-                            }
-
-                            .page_item_total tr {
-                                text-align: center
-                            }
-
-                            .page_item_total tr th:last-child() {
-                                text-align: right
-                            }
-
-
-
-                            /* 
-                            |
-                            | Footer
-                            |
-                            */
-                            .page_footer {
-                                width: 100%;
-                            }
-
-                            .page_footer tr {
-                                text-align: center
-                            }
-
-
-                            .point_condition {
-                                text-align: left;
-                                padding: 10px 4px;
-                                font-size: 11px;
-                                font-weight: normal;
-                            }
-
-                            table tr td,
-                            table tr th {
-                                padding: 0px 4px;
-                            }
-
-                            p {
-                                margin-bottom: 6px;
-                            }
-                        </style>
-
+                        $staff = whois($bill['USER_STARTS']);
+                        ?>
                         <page size="A4" id="document">
                             <div class="page_header">
 
@@ -208,18 +99,18 @@
                                 -->
                                 <tr class="pb_head">
                                     <td rowspan="4" class="pb_head_cus">
-                                        <p><b>เรียน/Attention : <span class="pb_head_cus_name">aasd</span></b></p>
-                                        <p><span class="pb_head_cus_address">asdasda asdasdasdasdads asda</span></b></p>
-                                        <p>ผู้ประสานงาน : <span class="pb_head_agent">asdasda asdasdasdasdadsasda</span></b></p>
-                                        <p>Email : <span class="pb_head_agentcontact">asdasda asdasdasdasdadsasda</span></b></p>
+                                        <p><b>เรียน/Attention : <?= $customer_name; ?></b></p>
+                                        <!-- <p> <?= $customer_address; ?></b></p> -->
+                                        <p>ผู้ประสานงาน : <?= $agent_name . " (" . $agent_contact . ") "; ?></b></p>
+                                        <p>Email : <?= $agent_email; ?></b></p>
                                     </td>
                                     <td>
-                                        <p><b>เลขที่/No :</b><span class="pb_head_doc_code"></span></p>
+                                        <p><b>เลขที่/No :</b><?= $code; ?></p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p><b>วันที่/Date :</b><span class="pb_head_doc_code"></span></p>
+                                        <p><b>วันที่/Date :</b><?= $date_order; ?></p>
                                     </td>
                                 </tr>
                                 <tr>
@@ -256,18 +147,51 @@
                                     </tr>
                                 </thead>
                                 <tbody style="height:7cm">
+                                    <?php
+                                    // 
+                                    // sort item on bill detail (bd)
+                                    // 
+                                    if ($item_i) {
+                                        $item_html = "";
+                                        $item_number = "";
+                                        $item_name = "";
+                                        $item_qty = "";
+                                        $item_price = "";
+                                        $item_net = "";
+
+                                        $number_item = 1;
+                                        foreach ($item_i as $key => $key_db) {
+                                            $item_number .= "<p>" . $number_item . "</p>";
+                                            $item_name .= "<p>" . $bill_detail[$key_db]['DESCRIPTION'] . "</p>";
+                                            $item_qty .= "<p>" . $bill_detail[$key_db]['QUANTITY'] . "</p>";
+                                            $item_price .= "<p>" . textMoney($bill_detail[$key_db]['PRICE']) . "</p>";
+                                            $item_net .= "<p>" . textMoney($bill_detail[$key_db]['NET']) . "</p>";
+
+                                            $number_item++;
+                                        }
+
+                                        if ($item_p) {
+                                            foreach ($item_p as $key => $key_db) {
+                                                $item_name .= "<p>" . $bill_detail[$key_db]['DESCRIPTION'] . "</p>";
+                                                $item_qty .= "<p>" . $bill_detail[$key_db]['QUANTITY'] . "</p>";
+                                                $item_price .= "<p>" . textMoney($bill_detail[$key_db]['PRICE_UNIT']) . "</p>";
+                                                $item_net .= "<p>" . textMoney($bill_detail[$key_db]['DISCOUNT']) . "</p>";
+                                            }
+                                        }
+                                    }
+                                    ?>
                                     <tr>
-                                        <td>1</td>
+                                        <td><?= $item_number; ?></td>
                                         <td style="position:relative">
-                                            บัตรนั่งรถ
+                                            <?= $item_name; ?>
                                             <p class="doc_remark">
                                                 หมายเหตุ: 1. ตะลอนฟาร์มโชคชัย <br>
                                                 2. ราคานี้รวมภาษีมูลค่าเพิ่ม 7% แล้ว
                                             </p>
                                         </td>
-                                        <td>25</td>
-                                        <td>120.00</td>
-                                        <td>3,000.00</td>
+                                        <td><?= $item_qty; ?></td>
+                                        <td><?= $item_price; ?></td>
+                                        <td><?= $item_net; ?></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -278,32 +202,32 @@
                                             <?= textNull($q_setting->CN_CONDITION); ?>
                                         </th>
                                         <th width="13%">รวมเงิน</th>
-                                        <th width="13%">3000</th>
+                                        <th width="13%"><?php echo $price; ?></th>
                                     </tr>
                                     <tr>
                                         <th>ส่วนลด</th>
-                                        <th>1500</th>
+                                        <th><?= $discount; ?></th>
                                     </tr>
                                     <tr>
 
                                         <th>Deposit</th>
-                                        <th>1500</th>
+                                        <th><?= $deposit; ?></th>
                                     </tr>
                                     <tr>
 
                                         <th>คงเหลือ</th>
-                                        <th>1500</th>
+                                        <th><?= $net; ?></th>
                                     </tr>
                                 </thead>
                             </table>
                             <table border="1" class="page_footer">
                                 <tr>
                                     <td>
-                                        <p>ผู้เสนอราคา : ...........................</p>
-                                        <p class="page_footer_sign">นางสาวชลันธร จงใจลาน</p>
+                                        <p>ผู้เสนอราคา : ..........................................................</p>
+                                        <p class="page_footer_sign"><?= $staff; ?></p>
                                     </td>
                                     <td style="padding:40px 0px">
-                                        <p>ลูกค้า : ...........................</p>
+                                        <p>ลูกค้า : ..........................................................</p>
                                     </td>
                                 </tr>
                             </table>

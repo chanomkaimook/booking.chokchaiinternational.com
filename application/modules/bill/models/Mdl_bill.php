@@ -92,23 +92,6 @@ class Mdl_bill extends CI_Model
         }
     }
 
-    public function get_dataDoc(int $id = null, array $optionnal = null, string $type = "result")
-    {
-        # code...
-        $sql = (object) $this->get_sqldoc($id, $optionnal, $type);
-        if ($this->fildstatus) {
-            $sql->where($this->table . '.' . $this->fildstatus, 1);
-        }
-
-        $query = $sql->get();
-
-        if ($id) {
-            return $query->row();
-        } else {
-            return $query->$type();
-        }
-    }
-
     //  *
     //  * CRUD
     //  * read
@@ -261,7 +244,9 @@ class Mdl_bill extends CI_Model
 
         // insert passing on library bill only
         if ($data_insert && is_array($data_insert)) {
-            $data_insert['booking_user'] = $this->userlogin;
+            if($data_insert['booking_date']){
+                $data_insert['booking_user'] = $this->userlogin;
+            }
             $data_insert['user_starts'] = $this->userlogin;
             $this->db->insert($this->table, $data_insert);
             $new_id = $this->db->insert_id();
@@ -421,80 +406,6 @@ class Mdl_bill extends CI_Model
         $hidden_end = "";
 
         $sql = $this->db->from($this->table);
-
-        if (textNull($request['hidden_datestart'])) {
-            $hidden_start = textNull($request['hidden_datestart']);
-        }
-        if (textNull($request['hidden_dateend'])) {
-            $hidden_end = textNull($request['hidden_dateend']);
-        }
-
-        if ($hidden_start && $hidden_end) {
-            $sql->where('date(' . $this->table . '.date_starts) >=', $hidden_start);
-            $sql->where('date(' . $this->table . '.date_starts) <=', $hidden_end);
-        }
-
-        if ($id) {
-            $sql->where($this->table . '.id', $id);
-        }
-
-        if ($optionnal['select']) {
-            $sql->select($optionnal['select']);
-        }
-
-        if ($optionnal['where'] && count($optionnal['where'])) {
-            foreach ($optionnal['where'] as $column => $value) {
-                $sql->where($column, $value);
-            }
-        }
-
-        if ($optionnal['order_by'] && count($optionnal['order_by'])) {
-            foreach ($optionnal['order_by'] as $column => $value) {
-                $sql->order_by($column, $value);
-            }
-        } else {
-            $sql->order_by($this->table . '.id', 'desc');
-        }
-
-        if ($optionnal['group_by'] && count($optionnal['group_by'])) {
-            foreach ($optionnal['group_by'] as $column) {
-                $sql->group_by($column);
-            }
-        }
-
-        if ($type != "row") {
-            if ($optionnal['limit']) {
-                $sql->limit($optionnal['limit']);
-            } else {
-
-                if (isset($request['start']) && isset($request['length'])) {
-                    $sql->limit($request['length'], $request['start']);
-                } else {
-                    // $sql->limit(10, 0);
-                }
-            }
-        }
-
-        return $sql;
-    }
-
-    /**
-     * query
-     *
-     * @param integer|null $id
-     * @param array $optionnal
-     * @param string $type
-     * @return void
-     */
-    function get_sqldoc(int $id = null, array $optionnal = null, string $type = 'result')
-    {
-        $request = $_REQUEST;
-
-        $hidden_start = "";
-        $hidden_end = "";
-
-        $sql = $this->db->from($this->table)
-        ->join($this->tabledetail,$this->table.'.id='.$this->tabledetail.'.bill_id','left');
 
         if (textNull($request['hidden_datestart'])) {
             $hidden_start = textNull($request['hidden_datestart']);

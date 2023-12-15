@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_page extends CI_Model
+class Mdl_deposit extends CI_Model
 
 {
-    private $table = "blank";
-    private $offview = "status_offview";
+    private $table = "deposit";
+    private $offview = "";
     private $fildstatus = "status";
 
     public function __construct()
@@ -157,7 +157,7 @@ class Mdl_page extends CI_Model
             $array_text_error = $array_to_find;
         } else {
             $array_text_error = array(
-                'item_name'       => 'ชื่อ',
+                'code'       => 'code',
             );
         }
 
@@ -221,36 +221,13 @@ class Mdl_page extends CI_Model
 
         $request = $_POST;
 
-        $item_name = textNull($data_insert['name']) ? $data_insert['name'] : $request['item_name'];
-        $array_chk_dup = array(
-            'name' => $item_name,
-            'status' => 1
-        );
+        $item_name = textNull($data_insert['code']) ? $data_insert['code'] : $request['code'];
 
-        if ($return = $this->check_value_valid($array_chk_dup)) {
-            return $return;
-        }
-
-        if ($return = $this->check_dup($array_chk_dup, $item_name)) {
-            return $return;
-        }
-
+        // pass to library receipt only
         if ($data_insert && is_array($data_insert)) {
             $data_insert['user_starts'] = $this->userlogin;
             $this->db->insert($this->table, $data_insert);
             $new_id = $this->db->insert_id();
-        } else {
-
-            if ($item_name) {
-                $data = array(
-                    'name'          => $item_name,
-
-                    'user_starts'  => $this->userlogin,
-                );
-
-                $this->db->insert($this->table, $data);
-                $new_id = $this->db->insert_id();
-            }
         }
 
         if ($new_id) {
@@ -262,7 +239,8 @@ class Mdl_page extends CI_Model
                 'error'     => 0,
                 'txt'       => 'ทำรายการสำเร็จ',
                 'data'      => array(
-                    'id'    => $new_id
+                    'id'    => $new_id,
+                    'code'  => $item_name
                 )
             );
         }

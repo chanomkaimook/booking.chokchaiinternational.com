@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_page extends CI_Model
+class Mdl_receipt extends CI_Model
 
 {
-    private $table = "blank";
-    private $offview = "status_offview";
+    private $table = "receipt";
+    private $offview = "";
     private $fildstatus = "status";
 
     public function __construct()
@@ -157,7 +157,7 @@ class Mdl_page extends CI_Model
             $array_text_error = $array_to_find;
         } else {
             $array_text_error = array(
-                'item_name'       => 'ชื่อ',
+                'code'       => 'code',
             );
         }
 
@@ -221,9 +221,9 @@ class Mdl_page extends CI_Model
 
         $request = $_POST;
 
-        $item_name = textNull($data_insert['name']) ? $data_insert['name'] : $request['item_name'];
+        $item_name = textNull($data_insert['code']) ? $data_insert['code'] : $request['code'];
         $array_chk_dup = array(
-            'name' => $item_name,
+            'code' => $item_name,
             'status' => 1
         );
 
@@ -243,7 +243,7 @@ class Mdl_page extends CI_Model
 
             if ($item_name) {
                 $data = array(
-                    'name'          => $item_name,
+                    'code'          => $item_name,
 
                     'user_starts'  => $this->userlogin,
                 );
@@ -262,7 +262,8 @@ class Mdl_page extends CI_Model
                 'error'     => 0,
                 'txt'       => 'ทำรายการสำเร็จ',
                 'data'      => array(
-                    'id'    => $new_id
+                    'id'    => $new_id,
+                    'code'  => $item_name
                 )
             );
         }

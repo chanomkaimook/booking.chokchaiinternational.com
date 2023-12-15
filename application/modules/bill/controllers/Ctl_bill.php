@@ -68,8 +68,34 @@ class Ctl_bill extends MY_Controller
 
     public function document()
     {
+        $optional = [];
+        $optional_detail = [];
         $item_code = $this->input->get('code');
-        $data['bill'] = $this->mdl_bill->get_dataDoc(textNull($item_code));
+        $data = [];
+
+        if ($item_code) {
+            $optional['where'] = array(
+                'bill.code'  => $item_code
+            );
+            $data['bill'] = $this->mdl_bill->get_data(null, $optional,'row_array');
+
+            $optional_detail['where'] = array(
+                'bill_detail.bill_code'  => $item_code
+            );
+            
+        } else {
+            $item_id = $this->input->get('id');
+            $data['bill'] = $this->mdl_bill->get_data(textNull($item_id),null,'row_array');
+
+            $optional_detail['where'] = array(
+                'bill_detail.bill_id'  => textNull($item_id)
+            );   
+        }
+        $data['bill_detail'] = $this->mdl_bill_detail->get_data(null, $optional_detail,'result_array');
+        /* echo "<pre>";
+        print_r($data['bill']);
+        print_r($data['bill_detail']);
+        die; */
         $this->template->set_layout('lay_main');
         $this->template->title($this->title);
         $this->template->build('bills/document_bill', $data);
@@ -142,7 +168,7 @@ class Ctl_bill extends MY_Controller
                     ),
                 );
 
-                $complete_status = workstatus($row->COMPLETE_ID,$row->COMPLETE_ALIAS);
+                $complete_status = workstatus($row->COMPLETE_ID, $row->COMPLETE_ALIAS);
                 $sub_data['COMPLETE'] = array(
                     "display"   => $complete_status,
                     "data"      =>  array(
@@ -151,7 +177,7 @@ class Ctl_bill extends MY_Controller
                     ),
                 );
 
-                $payment_status = paymentstatus($row->PAYMENT_ID,$row->PAYMENT_ALIAS);
+                $payment_status = paymentstatus($row->PAYMENT_ID, $row->PAYMENT_ALIAS);
                 $sub_data['PAYMENT'] = array(
                     "display"   => $payment_status,
                     "data"      =>  array(
@@ -258,12 +284,7 @@ class Ctl_bill extends MY_Controller
 
             // print_r($_POST);
             // print_r(json_decode($_POST['item_list']));
-
-
-            $this->bill->create_bill();
-
-            die;
-            // $returns = $this->model->insert_data();
+            $returns = $this->bill->create_bill();
             echo json_encode($returns);
         }
     }

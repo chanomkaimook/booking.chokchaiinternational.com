@@ -43,52 +43,42 @@
                     targets: last_columntable
                 },
                 {
-                    "targets": [0,1],
+                    "targets": [2, 3, 4],
                     "className": "truncate"
                 },
             ],
             columns: [{
                     "data": "CODE",
+                    "width": "60px",
                     "render": function(data, type, row, meta) {
                         let code = data
-                        let url_doc_bill = new URL(path(url_moduleControl+'/document'),domain)
-                        url_doc_bill.searchParams.append('code',code)
-
-                        code = `<a href=${url_doc_bill} target=_blank class="text-info">
-                        #${data}
-                        </a> `
-
                         if (!code) {
                             code = ""
                         }
-                        return "<b>" + code + "</b>"
+                        return "<b>#" + code + "</b>"
                     }
                 },
                 {
-                    "data": "CUSTOMER.display",
-                    "width": "100",
+                    "data": "NAME",
+                    "width": "",
                     "createdCell": function(td, cellData, rowData, row, col) {
                         $(td).css('min-width', '150px')
+                    },
+                    "render": function(data, type, row, meta) {
+
+                        let task = `${data}`
+                        if (row.CODE) {
+                            task += `<a href=# data-target="#modal_ticket" class="text-info" data-toggle="modal" data-code="${row.CODE}">#${row.CODE}</a> `
+                        }
+
+                        return task
                     }
                 },
                 {
-                    "data": "CUSTOMER.data.total",
+                    "data": "WORKSTATUS.display",
                 },
                 {
-                    "data": {
-                        _: "BOOKING.display",
-                        sort: 'BOOKING.timestamp'
-                    }   
-                },
-                {
-                    "data": {
-                        _: 'PAYMENT.display', // default show
-                    }
-                },
-                {
-                    "data": {
-                        _: 'COMPLETE.display', // default show
-                    }
+                    "data": "STATUS.display",
                 },
                 {
                     "data": {
@@ -104,17 +94,20 @@
                 {
                     "data": "ID",
                     "render": function(data, type, row, meta) {
-                        let url_doc_bill = new URL(path(url_moduleControl+'/document'),domain)
-                        url_doc_bill.searchParams.append('code',row.CODE)
-
-                        let btn_view = `<a href="${url_doc_bill}" target=_blank class="text-capitalize dropdown-item" ><i class="mdi mdi-magnify mr-2 text-info font-18 vertical-middle"></i>${table_column_view[setlang]}</a>`
+                        let btn_view = `<a data-id="${data}" class="btn-view text-capitalize dropdown-item" href="#" data-code="${row.CODE}" ><i class="mdi mdi-magnify mr-2 text-info font-18 vertical-middle"></i>${table_column_view[setlang]}</a>`
+                        let btn_edit = `<a data-id="${data}" class="btn-edit text-capitalize dropdown-item" href="#"><i class="mdi mdi-wrench mr-2 text-warning font-18 vertical-middle"></i>${table_column_edit[setlang]}</a>`
                         let btn_del = `<a data-id="${data}" class="btn-del text-capitalize dropdown-item" href="#" ><i class="mdi mdi-delete mr-2 text-danger font-18 vertical-middle"></i>${table_column_del[setlang]}</a>`
+
+                        if (row.STATUS.data.id == 1) {
+                            btn_edit = ''
+                        }
 
                         let table_action = `
                                 <div class="btn-group dropdown">
                                     <a href="javascript: void(0);" class="table-action-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-horizontal"></i></a>
                                     <div class="dropdown-menu dropdown-menu-right">
                                         ${btn_view}
+                                        ${btn_edit}
                                         ${btn_del}
                                     </div>
                                 </div>

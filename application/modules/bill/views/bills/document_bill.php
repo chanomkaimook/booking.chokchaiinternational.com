@@ -12,7 +12,10 @@
                         <div class="tool-btn">
                             <button type="button" class="btn-add-receipt btn">ออกใบเสร็จรับเงิน</button>
                         </div>
-                    <?php elseif ($bill['COMPLETE_ID'] == 3) : ?>
+                    <?php
+                    elseif ($bill['COMPLETE_ID'] == 3) :
+
+                    ?>
                         <div class="">asdas</div>
                     <?php endif; ?>
                 </div>

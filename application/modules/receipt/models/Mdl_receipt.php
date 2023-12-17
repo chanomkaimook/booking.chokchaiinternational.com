@@ -277,54 +277,24 @@ class Mdl_receipt extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null)
+    public function update_data($data_update = null, $id = null)
     {
         $result = false;
-        $item_id = $this->input->post('item_id');
+        $item_id = $id ? $id : $this->input->post('item_id');
 
         if ($item_id) {
             $request = $_POST;
-            
-            $item_name = textNull($data_update['name']) ? $data_update['name'] : $request['item_name'];
-            $array_chk_dup = array(
-                'name' => $item_name,
-                'status' => 1,
-                'id !=' => $item_id,
-            );
-
-            if ($return = $this->check_value_valid($array_chk_dup)) {
-                return $return;
-            }
-            
-            if ($return = $this->check_dup($array_chk_dup, $item_name)) {
-                return $return;
-            }
 
             if ($data_update && is_array($data_update)) {
+                $data_update['date_update'] = date('Y-m-d H:i:s');
                 $data_update['user_update'] = $this->userlogin;
+
                 $this->db->where('id', $item_id);
                 $this->db->update($this->table, $data_update);
-            } else {
-                $item_name = textNull($this->input->post('item_name'));
 
-                $data = array(
-                    'name'          => $item_name,
-
-                    'date_update'  => date('Y-m-d H:i:s'),
-                    'user_update'  => $this->userlogin,
-                );
-
-                if ($this->offview) {
-                    $status_offview = textNull($this->input->post('status_offview'));
-                    $data['status_offview'] = $status_offview;
-                }
-
-                $this->db->where('id', $item_id);
-                $this->db->update($this->table, $data);
+                // keep log
+                log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
             }
-
-            // keep log
-            log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
 
             $result = array(
                 'error'     => 0,

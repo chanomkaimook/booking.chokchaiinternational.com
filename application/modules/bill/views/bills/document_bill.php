@@ -1,5 +1,4 @@
 <div class="content">
-    <input type="hidden" id="hidden_task_id">
     <!-- Start Content-->
     <div class="container-fluid">
         <div class="section-tool d-flex flex-column flex-md-row justify-content-between">
@@ -7,17 +6,18 @@
             <div class="mb-1 mb-md-0">
                 <div class="d-flex gap-2">
                     <?php
-                    if ($bill['COMPLETE_ID'] < 3) :  // waite & checking
+                    if ($bill['PAYMENT_ID'] != 8) :  // 8=success
                     ?>
                         <div class="tool-btn">
-                            <button type="button" class="btn-add-receipt btn">ออกใบเสร็จรับเงิน</button>
+                            <button type="button" class="btn-add-receipt btn">ออกใบกำกับย่อ</button>
                         </div>
                     <?php
-                    elseif ($bill['COMPLETE_ID'] == 3) :
-
+                    endif;
                     ?>
-                        <div class="">asdas</div>
-                    <?php endif; ?>
+                    <div class="sector_billvat">
+                    </div>
+                    <div class="sector_receipt">
+                    </div>
                 </div>
             </div>
             <div class="">
@@ -69,6 +69,12 @@
 
                         $staff = whois($bill['USER_STARTS']);
                         ?>
+
+                        <input type="hidden" id="data-bill_id" value="<?= $bill['ID']; ?>">
+                        <input type="hidden" id="data-bill_code" value="<?= $bill['CODE']; ?>">
+                        <input type="hidden" id="data-date_order" value="<?= $bill['DATE_ORDER']; ?>">
+                        <input type="hidden" id="data-bill_booking" value="<?= $bill['BOOKING_DATE']; ?>">
+
                         <page size="A4" id="document">
                             <div class="page_header">
 
@@ -247,4 +253,378 @@
     </div> <!-- end container-fluid -->
 
 </div> <!-- end content -->
+<!-- Modal -->
+<?php require_once('component/modal_formbillvat.php') ?>
+<?php require_once('component/modal_receipt.php') ?>
+<!-- End Modal -->
+
+<script>
+    $(document).ready(function() {
+
+        let dataid = ""
+
+        $("input[name=date_order_show]").datepicker({
+            autoclose: !0,
+            todayHighlight: !0,
+            format: 'dd/mm/yyyy',
+        })
+
+        $("input[name=date_receipt_show]").datepicker({
+            autoclose: !0,
+            todayHighlight: !0,
+            format: 'dd/mm/yyyy',
+        })
+
+        let modal_dp_name = '#modal_billvat'
+        let modal_dp_view = modal_dp_name + ' .modal-body-view'
+        let modal_dp_form = modal_dp_name + ' .modal-body-form'
+
+        // get data billvat and receipt
+        get_allbill()
+
+        $(document).on('click', '.btn-add-receipt', function(e) {
+            e.preventDefault()
+            modalActive_deposit('add')
+        })
+        $(document).on('click', '.sector_billvat button', function(e) {
+            e.preventDefault()
+
+            dataid = $(this).attr('data-depositid')
+            async_get_deposit(dataid)
+                .then((resp) => {
+                    modalActive_deposit('view', resp)
+                })
+        })
+        $(document).on('click', '#modal_billvat .btn-edit', function(e) {
+            e.preventDefault()
+
+            async_get_deposit(dataid)
+                .then((resp) => {
+                    modalActive_deposit('edit', resp)
+                })
+        })
+
+        // 
+        // event receipt
+        // 
+        $(document).on('click', '.sector_receipt button', function(e) {
+            e.preventDefault()
+
+            dataid = $(this).attr('data-receiptid')
+            async_get_receipt(dataid)
+                .then((resp) => {
+                    modalActive_receipt('view', resp)
+                })
+        })
+        $(document).on('click', '#modal_receipt .btn-edit', function(e) {
+            e.preventDefault()
+
+            modalActive_receipt('edit')
+        })
+
+
+        // 
+        // ############
+        // Function Receipt
+        // ############
+        // 
+        function modalActive_receipt(action = 'view', data = []) {
+
+            let modal_rc_name = '#modal_receipt'
+            let header = "เลขที่ใบเสร็จ "+data.CODE
+            $(modal_rc_name).find('.modal_text_header').html(header)
+
+            switch (action) {
+                case 'view':
+
+                    let new_date_order = ''
+                    if (data.DATE_ORDER) {
+                        let date_order = data.DATE_ORDER
+                        $(modal_rc_name)
+                            .find('[name=date_receipt_show]').datepicker("setDate", new Date(date_order));
+
+                        let set_date_order = data.DATE_ORDER.split("-")
+                        new_date_order = set_date_order[2] + "/" + set_date_order[1] + "/" + set_date_order[0]
+                    }
+
+                    $(modal_rc_name)
+                        .find('[name=frm_receipt_hidden_id]').val(data.ID).end()
+                        .find('[name=receipt_remark]').text(data.REMARK).end()
+
+                    $('.modal-body-form')
+                        .find('.code').text(data.CODE).end()
+                        .find('.price_novat').text(data.PRICE_NOVAT).end()
+                        .find('.vat').text(data.VAT).end()
+                        .find('.net').text(data.NET).end()
+                        .find('.codetext').text(data.CODETEXT).end()
+                        .find('.booking_date').text(new_date_order).end()
+                        .find('.remark_receipt').text(data.REMARK).end()
+                        .find('.user_active').text(data.USER_ACTIVE).end()
+                        .find('.date_active').text(data.DATE_ACTIVE).end()
+
+                    break
+                case 'edit':
+
+                    
+                    break
+                default:
+                    break
+            }
+
+            $(modal_rc_name).modal()
+
+            modalLayout_receipt(action)
+
+        }
+
+        // 
+        // ############
+        // Function Deposit
+        // ############
+        // 
+        function modalActive_deposit(action = 'view', data = []) {
+            let header = 'สร้างใบรับโอนเงิน'
+            if (action == 'add') {
+                $(modal_dp_name).find('.modal_text_header').html(header)
+            } else {
+                header = 'ใบรับโอนเงิน'
+                $(modal_dp_name).find('.modal_text_header').html(header)
+            }
+
+            switch (action) {
+                case 'view':
+
+                    let new_date_order = ''
+                    if (data.DATE_ORDER) {
+                        let set_date_order = data.DATE_ORDER.split("-")
+                        new_date_order = set_date_order[2] + "/" + set_date_order[1] + "/" + set_date_order[0]
+                    }
+
+                    $(modal_dp_name)
+                        .find('[name=frm_deposit_hidden_id]').val(data.ID).end()
+
+                    $(modal_dp_view)
+                        .find('.codetext').text(data.CODETEXT).end()
+                        .find('.date_order').text(new_date_order).end()
+                        .find('.deposit').text(data.DEPOSIT).end()
+                        .find('.remark_deposit').text(data.REMARK).end()
+                        .find('.user_active').text(data.USER_ACTIVE).end()
+                        .find('.date_active').text(data.DATE_ACTIVE).end()
+
+                    break
+                case 'edit':
+
+                    if (data.DATE_ORDER) {
+                        let date_order = data.DATE_ORDER
+                        $(modal_dp_form)
+                            .find('[name=date_order_show]').datepicker("setDate", new Date(date_order));
+                    }
+
+                    $(modal_dp_form)
+                        .find('[name=codetext]').val(data.CODETEXT).end()
+                        .find('[name=deposit]').val(data.DEPOSIT).end()
+                        .find('[name=remark]').val(data.REMARK).end()
+                    break
+                case 'add':
+                    let date_order = $("#data-date_order").val()
+                    $('[name=date_order_show]').datepicker("setDate", new Date(date_order));
+
+                    break
+                default:
+                    break
+            }
+
+            $(modal_dp_name).modal()
+
+            modalLayout_deposit(action)
+
+        }
+
+        function modalLayout_receipt(action = 'view') {
+            let modal_name = "#modal_receipt"
+            let btn_edit = $(modal_name).find('.btn-edit')
+            let btn_submit = $(modal_name).find('button[type=submit]')
+
+            let modal_rc_view = "#modal_receipt .modal-body-form"
+
+            if (action == 'view') {
+                $(modal_rc_view).find('.codetext').removeClass('d-none')
+                $(modal_rc_view).find('button.btn-update-codetext').addClass('d-none')
+                
+                $(modal_rc_view).find('.remark_receipt').removeClass('d-none')
+                $(modal_rc_view).find('[name=receipt_remark]').addClass('d-none')
+                
+                $(modal_rc_view).find('.booking_date').removeClass('d-none')
+                $(modal_rc_view).find('[name=date_receipt_show]').addClass('d-none')
+
+                btn_edit.show()
+                btn_submit.hide()
+            } else {
+                $(modal_rc_view).find('.codetext').addClass('d-none')
+                $(modal_rc_view).find('button.btn-update-codetext').removeClass('d-none')
+               
+                $(modal_rc_view).find('.remark_receipt').addClass('d-none')
+                $(modal_rc_view).find('[name=receipt_remark]').removeClass('d-none')
+                
+                $(modal_rc_view).find('.booking_date').addClass('d-none')
+                $(modal_rc_view).find('[name=date_receipt_show]').removeClass('d-none')
+
+                btn_edit.hide()
+                btn_submit.show()
+            }
+        }
+
+        function modalLayout_deposit(action = 'view') {
+            let btn_edit = $(modal_dp_name).find('.btn-edit')
+            let btn_submit = $(modal_dp_name).find('button[type=submit]')
+
+            if (action == 'view') {
+                $(modal_dp_view).removeClass('d-none')
+                $(modal_dp_form).addClass('d-none')
+
+                btn_edit.show()
+                btn_submit.hide()
+            } else {
+                $(modal_dp_view).addClass('d-none')
+                $(modal_dp_form).removeClass('d-none')
+
+                btn_edit.hide()
+                btn_submit.show()
+            }
+        }
+    })
+
+    function get_allbill(id = null) {
+        async_allbill()
+        async function async_allbill() {
+            let a = new Promise((resolve, reject) => {
+                resolve(get_deposit(id))
+
+                resolve(get_receipt(id))
+            })
+        }
+
+        return true
+    }
+
+    function get_deposit(id = null) {
+        async_get_deposit(id)
+            .then((resp) => {
+                if (resp) {
+
+                    step_billvat()
+
+                    async function step_billvat() {
+                        let v = ""
+                        let result = new Promise((resolve, reject) => {
+                            resp.forEach(function(item, index) {
+                                v += creat_html_billvat(item.ID, item.CODETEXT, item.USER_UPDATE, item.DATE_UPDATE)
+                                resolve($('.sector_billvat').html(v))
+                            })
+                        })
+
+                    }
+
+                }
+            })
+    }
+
+    function get_receipt(id = null) {
+        async_get_receipt(id)
+            .then((resp) => {
+                if (resp) {
+
+                    step_receipt()
+
+                    async function step_receipt() {
+                        let r = ""
+                        let result = new Promise((resolve, reject) => {
+                            resp.forEach(function(item, index) {
+                                r += creat_html_receipt(item.ID, item.CODETEXT)
+                                resolve($('.sector_receipt').html(r))
+
+                                resolve($('.tool-btn').addClass('d-none'))
+                            })
+                        })
+
+                    }
+
+                }
+            })
+    }
+
+    function creat_html_billvat(id = null, codetext = null, classname = "btn-warning", userupdate = null) {
+        let text = "ยังไม่ระบุเลขใบกำกับ"
+
+        if (codetext) {
+            text = codetext
+            classname = "btn-secondary"
+        }
+
+        let useractive = ""
+        if (userupdate) {
+            useractive = `(แก้ไข)`
+        }
+
+        let html = `<button type="button" class="btn ${classname} mr-1" data-depositid="${id}" >${useractive} ${text}</button>`
+        return html
+    }
+
+    function creat_html_receipt(id = null, codetext = null, classname = "btn-warning", userupdate = null) {
+        let text = "ยังไม่ระบุเลขใบกำกับ"
+
+        if (codetext) {
+            text = codetext
+            classname = "btn-info"
+        }
+
+        let useractive = ""
+        if (userupdate) {
+            useractive = `(แก้ไข)`
+        }
+
+        let html = `<button type="button" class="btn ${classname}" data-receiptid="${id}" >${useractive} ${text}</button>`
+        return html
+    }
+
+    //  *
+    //  * CRUD
+    //  * read
+    //  * 
+    //  * get data
+    //  *
+    async function async_get_deposit(id = null) {
+        let url = new URL(path(url_moduleControl + '/get_deposit'), domain)
+        if (id) {
+            url.searchParams.append('id', id)
+        } else {
+            let bill_id = $('#data-bill_id').val();
+            if (bill_id) {
+                url.searchParams.append('bill_id', bill_id)
+            }
+        }
+
+        let response = await fetch(url)
+        let result = await response.json()
+
+        return result
+    }
+    async function async_get_receipt(id = null) {
+        let url = new URL(path(url_moduleControl + '/get_receipt'), domain)
+        if (id) {
+            url.searchParams.append('id', id)
+        } else {
+            let bill_id = $('#data-bill_id').val();
+            if (bill_id) {
+                url.searchParams.append('bill_id', bill_id)
+            }
+        }
+
+        let response = await fetch(url)
+        let result = await response.json()
+
+        return result
+    }
+</script>
+
 <?php require_once('application/views/partials/e_script_print.php'); ?>

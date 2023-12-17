@@ -69,7 +69,7 @@ class Ctl_bill extends MY_Controller
     public function document()
     {
         $optional = [];
-        $optional_detail = [];
+        $optional_joinbill = [];
         $item_code = $this->input->get('code');
         $data = [];
 
@@ -77,25 +77,33 @@ class Ctl_bill extends MY_Controller
             $optional['where'] = array(
                 'bill.code'  => $item_code
             );
-            $data['bill'] = $this->mdl_bill->get_data(null, $optional,'row_array');
+            $data['bill'] = $this->mdl_bill->get_data(null, $optional, 'row_array');
 
-            $optional_detail['where'] = array(
-                'bill_detail.bill_code'  => $item_code
+            $optional_joinbill['where'] = array(
+                'bill_code'  => $item_code
             );
-            
+
+            // $optional_deposit = $optional_joinbill;
         } else {
             $item_id = $this->input->get('id');
-            $data['bill'] = $this->mdl_bill->get_data(textNull($item_id),null,'row_array');
+            $data['bill'] = $this->mdl_bill->get_data(textNull($item_id), null, 'row_array');
 
-            $optional_detail['where'] = array(
-                'bill_detail.bill_id'  => textNull($item_id)
-            );   
+            $optional_joinbill['where'] = array(
+                'bill_id'  => textNull($item_id)
+            );
+
+            // $optional_deposit = $optional_joinbill;
         }
-        $data['bill_detail'] = $this->mdl_bill_detail->get_data(null, $optional_detail,'result_array');
-        /* echo "<pre>";
-        print_r($data['bill']);
-        print_r($data['bill_detail']);
-        die; */
+        // $optional_deposit['order_by'] = array('id'=>'asc');
+
+        $data['bill_detail'] = $this->mdl_bill_detail->get_data(null, $optional_joinbill, 'result_array');
+
+        // $this->load->model('deposit/mdl_deposit');
+        // $data['bill_deposit'] = $this->mdl_deposit->get_data(null, $optional_deposit, 'result_array');
+
+        // $this->load->model('receipt/mdl_receipt');
+        // $data['bill_receipt'] = $this->mdl_receipt->get_data(null, $optional_joinbill, 'result_array');
+
         $this->template->set_layout('lay_main');
         $this->template->title($this->title);
         $this->template->build('bills/document_bill', $data);
@@ -271,6 +279,112 @@ class Ctl_bill extends MY_Controller
         echo json_encode($result);
     }
 
+    public function get_deposit()
+    {
+        $request = $_REQUEST;
+        $item_id = $request['id'];
+        $this->load->model('deposit/mdl_deposit');
+
+        if ($item_id) {
+            $data = $this->mdl_deposit->get_dataShow($item_id);
+            //
+            // add data user active
+            if ($data) {
+                if ($data->USER_UPDATE) {
+                    $user_active = whois($data->USER_UPDATE);
+                    $date_active = toThaiDateTimeString($data->DATE_UPDATE, 'datetime');
+                } else {
+                    $user_active = whois($data->USER_STARTS);
+                    $date_active = toThaiDateTimeString($data->DATE_STARTS, 'datetime');
+                }
+
+                $data->USER_ACTIVE = $user_active;
+                $data->DATE_ACTIVE = $date_active;
+            }
+        } else {
+            if ($bill_id = $request['bill_id']) {
+                $optional['where'] = array(
+                    'bill_id'   => $bill_id
+                );
+                $optional['order_by'] = array('id' => 'asc');
+                $data = $this->mdl_deposit->get_dataShow(null, $optional);
+                //
+                // add data user active
+                if ($data) {
+                    foreach ($data as $key => $row) {
+
+                        if ($row->USER_UPDATE) {
+                            $user_active = whois($row->USER_UPDATE);
+                            $date_active = toThaiDateTimeString($row->DATE_UPDATE, 'datetime');
+                        } else {
+                            $user_active = whois($row->USER_STARTS);
+                            $date_active = toThaiDateTimeString($row->DATE_STARTS, 'datetime');
+                        }
+
+                        $data[$key]->USER_ACTIVE = $user_active;
+                        $data[$key]->DATE_ACTIVE = $date_active;
+                    }
+                }
+            }
+        }
+
+        $result = $data;
+        echo json_encode($result);
+    }
+
+    public function get_receipt()
+    {
+        $request = $_REQUEST;
+        $item_id = $request['id'];
+        $this->load->model('receipt/mdl_receipt');
+
+        if ($item_id) {
+            $data = $this->mdl_receipt->get_dataShow($item_id);
+            //
+            // add data user active
+            if ($data) {
+                if ($data->USER_UPDATE) {
+                    $user_active = whois($data->USER_UPDATE);
+                    $date_active = toThaiDateTimeString($data->DATE_UPDATE, 'datetime');
+                } else {
+                    $user_active = whois($data->USER_STARTS);
+                    $date_active = toThaiDateTimeString($data->DATE_STARTS, 'datetime');
+                }
+
+                $data->USER_ACTIVE = $user_active;
+                $data->DATE_ACTIVE = $date_active;
+            }
+        } else {
+            if ($bill_id = $request['bill_id']) {
+                $optional['where'] = array(
+                    'bill_id'   => $bill_id
+                );
+                $optional['order_by'] = array('id' => 'asc');
+                $data = $this->mdl_receipt->get_dataShow(null, $optional);
+                //
+                // add data user active
+                if ($data) {
+                    foreach ($data as $key => $row) {
+
+                        if ($row->USER_UPDATE) {
+                            $user_active = whois($row->USER_UPDATE);
+                            $date_active = toThaiDateTimeString($row->DATE_UPDATE, 'datetime');
+                        } else {
+                            $user_active = whois($row->USER_STARTS);
+                            $date_active = toThaiDateTimeString($row->DATE_STARTS, 'datetime');
+                        }
+
+                        $data[$key]->USER_ACTIVE = $user_active;
+                        $data[$key]->DATE_ACTIVE = $date_active;
+                    }
+                }
+            }
+        }
+
+        $result = $data;
+        echo json_encode($result);
+    }
+
     //  *
     //  * CRUD
     //  * insert
@@ -289,6 +403,18 @@ class Ctl_bill extends MY_Controller
         }
     }
 
+    public function insert_deposit()
+    {
+        # code...
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+
+            $this->load->library('receipt');
+
+            $returns = $this->receipt->create_deposit();
+            echo json_encode($returns);
+        }
+    }
+
     //  *
     //  * CRUD
     //  * update
@@ -301,6 +427,30 @@ class Ctl_bill extends MY_Controller
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
 
             $returns = $this->model->update_data();
+            echo json_encode($returns);
+        }
+    }
+
+    public function update_deposit()
+    {
+        # code...
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+
+            $this->load->library('receipt');
+
+            $returns = $this->receipt->update_deposit();
+            echo json_encode($returns);
+        }
+    }
+
+    public function update_receipt()
+    {
+        # code...
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+
+            $this->load->library('receipt');
+
+            $returns = $this->receipt->update_receipt();
             echo json_encode($returns);
         }
     }

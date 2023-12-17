@@ -55,7 +55,7 @@ class Receipt
                         $billmain = $row->BILLMAIN;
 
                         $numbersub = (int)$row->BILLSUB;
-                        
+
                         if ($numbersub < 9999) {
                             $next = 0;
 
@@ -97,7 +97,7 @@ class Receipt
      * @param string|null $deposit = deposit
      * @return void
      */
-    public function create_deposit(int $id = null, string $codebill = null,$deposit = null)
+    public function create_deposit(int $id = null, string $codebill = null, $deposit = null)
     {
         $request = $_REQUEST;
 
@@ -109,6 +109,7 @@ class Receipt
         $id = $id ? $id : $request['id'];
         $codebill = $codebill ? $codebill : textNull($request['codebill']);
         $deposit = $deposit ? $deposit : textNull($request['deposit']);
+        $codetext = textNull($request['codetext']);
 
         if (!$id) {
             $result = array(
@@ -124,12 +125,13 @@ class Receipt
             );
             $bill = $this->ci->mdl_bill->get_data(null, $optional, 'row_array');
             $bill = array_change_key_case($bill, CASE_LOWER);
+            $net = $bill['net'];
             if (!$codebill) {
                 $codebill = $bill['CODE'];
             }
 
             $bill_id = $bill['id'];
-            $date_order = textNull($bill['date_order']) ? textNull($bill['date_order']) : textNull($request['date_order']);
+            $date_order = textNull($request['date_order']) ? textNull($request['date_order']) : textNull($bill['date_order']);
             $remark = textNull($request['deposit_remark']) ? textNull($request['deposit_remark']) : null;
 
 
@@ -142,11 +144,29 @@ class Receipt
                 'remark'        => $remark,
             );
 
+            if ($codetext) {
+                $data_insert['codetext'] = $codetext;
+            }
+
             $this->ci->db->trans_begin();
 
             // 
             // insert bill
             $bill = $this->ci->mdl_deposit->insert_data($data_insert);
+
+            //
+            // ตรวจสอบยอดเงินโอน
+            // สร้างใบรับเงิน หากยอดเงินโอนครบ หรือมากกว่า
+            $sql_deposit = $this->ci->db->select('sum(deposit) as total_deposit')
+                ->from('deposit')
+                ->where('bill_id', $bill_id)
+                ->where('status', 1)
+                ->get();
+            $r = $sql_deposit->row();
+            $total_deposit = textNull($r->total_deposit);
+            if ($total_deposit && $total_deposit >= $net) {
+                $this->create_bill($bill_id, $codebill, $deposit);
+            }
 
             if ($this->ci->db->trans_status() === FALSE) {
                 $this->ci->db->trans_rollback();
@@ -165,6 +185,52 @@ class Receipt
     }
 
     /**
+     * update deposit
+     *
+     * @param int $id = id deposit
+     * @return void
+     */
+    function update_deposit($id = null)
+    {
+        $result = null;
+        $request = $_REQUEST;
+
+        $result = array(
+            'error' => 1,
+            'txt'   => 'ไม่มีการทำรายการ'
+        );
+
+        if (!$id) {
+            $id = $request['item_id'];
+        }
+        if ($id) {
+            $codetext = textNull($request['codetext']);
+            $dateorder = textNull($request['date_order']);
+            $deposit = textNull($request['deposit']);
+            $remark = textNull($request['deposit_remark']);
+
+            if ($codetext && $deposit) {
+                $data_update = array(
+                    'codetext' => $codetext,
+                    'date_order' => $dateorder,
+                    'deposit' => $deposit,
+                    'remark' => $remark,
+                );
+                $r = $this->ci->mdl_deposit->update_data($data_update, $id);
+
+                $result = array(
+                    'error' => $r['error'],
+                    'txt'   => $r['txt'],
+                    'data'  => $data_update
+                );
+            }
+        }
+
+
+        return $result;
+    }
+
+    /**
      * create bill
      *
      * @return array
@@ -177,7 +243,7 @@ class Receipt
      * @param string|null $deposit = deposit
      * @return void
      */
-    public function create_bill(int $id = null, string $codebill = null,$deposit = null)
+    public function create_bill(int $id = null, string $codebill = null, $deposit = null)
     {
         $result = array(
             'error' => 1,
@@ -215,6 +281,24 @@ class Receipt
             $vat = textNull($bill['vat']);
             $net = textNull($bill['net']);
 
+            //
+            // get data deposit 
+            $array_codetext = [];
+            $codetext = "";
+            $optional_deposit['where'] = array(
+                'bill_id'  => $id
+            );
+            $q_deposit = $this->ci->mdl_deposit->get_data(null, $optional_deposit, 'result_array');
+            if ($q_deposit) {
+                foreach ($q_deposit as $key => $r_deposit) {
+                    $array_codetext[] = $r_deposit['CODETEXT'];
+                }
+
+                if ($array_codetext) {
+                    asort($array_codetext);
+                    $codetext = implode(",", $array_codetext);
+                }
+            }
 
             $data_insert = array(
                 'code'      => $code['code'],
@@ -232,11 +316,17 @@ class Receipt
                 'vat'   => $vat,
                 'net'   => $net,
             );
+            if ($codetext) {
+                $data_insert['codetext'] = $codetext;
+            }
             $this->ci->db->trans_begin();
 
             // 
             // insert bill
             $bill = $this->ci->mdl_receipt->insert_data($data_insert);
+
+            // update bill status
+            $this->ci->bill->update_bill($id);
 
             if ($this->ci->db->trans_status() === FALSE) {
                 $this->ci->db->trans_rollback();
@@ -252,8 +342,46 @@ class Receipt
         }
 
         return $result;
-
-        // $customer = $request['customer'] ? textNull($request['customer']) : null;
     }
 
+    /**
+     * update receipt
+     *
+     * @param int $id = id receipt
+     * @return void
+     */
+    function update_receipt($id = null)
+    {
+        $result = null;
+        $request = $_REQUEST;
+
+        $result = array(
+            'error' => 1,
+            'txt'   => 'ไม่มีการทำรายการ'
+        );
+
+        if (!$id) {
+            $id = $request['item_id'];
+        }
+        
+        if ($id) {
+            
+            $date_order = textNull($request['date_order']);
+            $remark = textNull($request['receipt_remark']);
+
+            $data_update = array(
+                'date_order'    => $date_order,
+                'remark'        => $remark
+            );
+
+            $r = $this->ci->mdl_receipt->update_data($data_update, $id);
+
+            $result = array(
+                'error' => $r['error'],
+                'txt'   => $r['txt'],
+                'data'  => $data_update
+            );
+        }
+        return $result;
+    }
 }

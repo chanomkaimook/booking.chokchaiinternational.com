@@ -21,7 +21,8 @@ class Bill
                 'information/mdl_round',
                 'mdl_settings',
                 'bill/mdl_bill',
-                'bill/mdl_bill_detail'
+                'bill/mdl_bill_detail',
+                'deposit/mdl_deposit'
             )
         );
 
@@ -426,17 +427,8 @@ class Bill
             if ($deposit) {
                 $this->ci->load->library('receipt');
                 //
-                // หากยอดโอนมากกว่าหรือเท่ากับยอดชำระ
-                // create receipt
-                if($deposit >= $detail_bill['net']){
-                    //
-                    // สร้างใบโอน และ สร้างใบรับเงิน
-                    $this->ci->receipt->create_deposit($item_bill_id, $item_bill_code,$deposit);
-                    $this->ci->receipt->create_bill($item_bill_id, $item_bill_code,$deposit);
-
-                }else{
-                    $this->ci->receipt->create_deposit($item_bill_id, $item_bill_code,$deposit);
-                }
+                // สร้างใบรับโอน
+                $this->ci->receipt->create_deposit($item_bill_id, $item_bill_code, $deposit);
             }
         }   // END if bill detail
 
@@ -517,6 +509,53 @@ class Bill
                 'complete_status' => $complete_status,
             );
         }
+
+        return $result;
+    }
+
+    function update_bill($id = null)
+    {
+        $result = null;
+
+        if (!$id) {
+            $request = $_REQUEST;
+            $id = $request['item_id'];
+        }
+        if ($id) {
+            $optional['select'] = "sum(deposit) as total_deposit";
+            $optional['where'] = array(
+                'bill_id'   => $id,
+                'status'    => 1
+            );
+            $q_deposit = $this->ci->mdl_deposit->get_data(null, $optional, 'row_array');
+            if ($q_deposit) {
+                $deposit = $q_deposit['total_deposit'];
+            }
+
+            $q_net = $this->ci->mdl_bill->get_data($id, null);
+            if ($q_net) {
+                $net = $q_net->NET;
+            }
+
+            $datastatus = $this->get_status_bill($deposit, $net);
+
+            if ($datastatus) {
+                $data_update = array(
+                    'payment_id' => $datastatus['payment_id'],
+                    'payment_alias' => $datastatus['payment_status'],
+                    'complete_id' => $datastatus['complete_id'],
+                    'complete_alias' => $datastatus['complete_status'],
+                );
+                $this->ci->mdl_bill->update_bill($data_update, $id);
+
+                $result = array(
+                    'error' => 0,
+                    'txt'   => 'ทำรายการสำเร็จ',
+                    'data'  => $datastatus
+                );
+            }
+        }
+
 
         return $result;
     }

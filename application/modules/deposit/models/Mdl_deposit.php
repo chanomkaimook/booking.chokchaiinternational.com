@@ -157,7 +157,9 @@ class Mdl_deposit extends CI_Model
             $array_text_error = $array_to_find;
         } else {
             $array_text_error = array(
-                'code'       => 'code',
+                'codetext'       => 'เลขใบกำกับอย่างย่อ',
+                'date_order'    => 'วันที่รับโอน',
+                'deposit'       => 'ยอดเงินโอน'
             );
         }
 
@@ -254,54 +256,41 @@ class Mdl_deposit extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null)
+    public function update_data($data_update = null, $id = null)
     {
         $result = false;
-        $item_id = $this->input->post('item_id');
+        $item_id = $id ? $id : $this->input->post('item_id');
 
         if ($item_id) {
             $request = $_POST;
-            
-            $item_name = textNull($data_update['name']) ? $data_update['name'] : $request['item_name'];
+
+            $codetext = textNull($data_update['codetext']) ? $data_update['codetext'] : $request['codetext'];
+            $date_order = textNull($data_update['date_order']) ? $data_update['date_order'] : $request['date_order'];
+            $deposit = textNull($data_update['deposit']) ? $data_update['deposit'] : $request['deposit'];
             $array_chk_dup = array(
-                'name' => $item_name,
-                'status' => 1,
-                'id !=' => $item_id,
+                'codetext' => $codetext,
+                'date_order' => $date_order,
+                'deposit' => $deposit,
             );
 
             if ($return = $this->check_value_valid($array_chk_dup)) {
                 return $return;
             }
-            
-            if ($return = $this->check_dup($array_chk_dup, $item_name)) {
+
+            /* if ($return = $this->check_dup($array_chk_dup, $item_name)) {
                 return $return;
-            }
+            } */
 
             if ($data_update && is_array($data_update)) {
+                $data_update['date_update'] = date('Y-m-d H:i:s');
                 $data_update['user_update'] = $this->userlogin;
+
                 $this->db->where('id', $item_id);
                 $this->db->update($this->table, $data_update);
-            } else {
-                $item_name = textNull($this->input->post('item_name'));
 
-                $data = array(
-                    'name'          => $item_name,
-
-                    'date_update'  => date('Y-m-d H:i:s'),
-                    'user_update'  => $this->userlogin,
-                );
-
-                if ($this->offview) {
-                    $status_offview = textNull($this->input->post('status_offview'));
-                    $data['status_offview'] = $status_offview;
-                }
-
-                $this->db->where('id', $item_id);
-                $this->db->update($this->table, $data);
+                // keep log
+                log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
             }
-
-            // keep log
-            log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
 
             $result = array(
                 'error'     => 0,

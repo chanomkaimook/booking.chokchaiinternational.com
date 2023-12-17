@@ -276,10 +276,10 @@ class Mdl_bill extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null)
+    public function update_data($data_update = null,$id=null)
     {
         $result = false;
-        $item_id = $this->input->post('item_id');
+        $item_id = $id ? $id : $this->input->post('item_id');
 
         if ($item_id) {
             $request = $_POST;
@@ -329,6 +329,33 @@ class Mdl_bill extends CI_Model
                 )
             );
         }
+        return $result;
+    }
+
+    /**
+     * update data to bill
+     *
+     * @param array $data = data to update
+     * @return void
+     */
+    public function update_bill($data = null,$id=null)
+    {
+        $result = null;
+
+        if($data && $id){
+            $this->db->where('id',$id);
+            $this->db->update($this->table,$data);
+            
+            $result = array(
+                'error'     => 0,
+                'txt'       => 'ทำรายการสำเร็จ',
+                'data'      => $data
+            );
+
+            // keep log
+            log_data(array('update bill ' . $this->table, 'update', $this->db->last_query()));
+        }
+
         return $result;
     }
 

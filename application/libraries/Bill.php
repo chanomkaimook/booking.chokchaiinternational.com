@@ -83,7 +83,7 @@ class Bill
                 'bill_id'   => $id
             );
             $b = $this->ci->mdl_bill->get_data($id);
-            $bd = $this->ci->mdl_bill_detail->get_data(null,$optional);
+            $bd = $this->ci->mdl_bill_detail->get_data(null, $optional);
 
             if ($b) {
                 $b->item_list = $bd;
@@ -222,6 +222,18 @@ class Bill
 
             if ($request['pay']) {
                 $pay = $request['pay'];
+            } else {
+                if ($id = $request['item_id']) {
+                    $optional['select'] = "sum(deposit) as total_deposit";
+                    $optional['where'] = array(
+                        'bill_id'   => $id,
+                        'status'    => 1
+                    );
+                    $q_deposit = $this->ci->mdl_deposit->get_data(null, $optional, 'row_array');
+                    if ($q_deposit) {
+                        $pay = $q_deposit['total_deposit'];
+                    }
+                }
             }
 
             // calculate VAT
@@ -257,6 +269,226 @@ class Bill
             $result['complete_status'] = $r_status['complete_status'];
             $result['promotion'] = $promotion;
             $result['item_data_list'] = $item_data_list;
+        }
+
+        return $result;
+    }
+
+    /**
+     * update bill
+     *
+     * @param integer|null $id = bill id
+     * @return array
+     */
+    public function update_billdata(int $id = null)
+    {
+        $request = $_REQUEST;
+
+        $item_id = $request['item_id'] ? textNull($request['item_id']) : textNull($id);
+        $customer = $request['customer'] ? textNull($request['customer']) : null;
+        $customer_id = $request['customer_id'] ? textNull($request['customer_id']) : null;
+        $agent_name = $request['agent_name'] ? textNull($request['agent_name']) : null;
+        $agent_contact = $request['agent_contact'] ? textNull($request['agent_contact']) : null;
+        $round_id = $request['round'] ? textNull($request['round']) : null;
+        $date_order = $request['date_order'] ? textNull($request['date_order']) : null;
+        $bookingdate = $request['bookingdate'] ? textNull($request['bookingdate']) : null;
+        $remark = $request['remark'] ? textNull($request['remark']) : null;
+
+        $item_list = $request['item_list'] ? $request['item_list'] : null;
+
+        $result = array(
+            'error' => 1,
+            'txt'        => 'ไม่มีการทำรายการ'
+        );
+
+        if (!$customer) {
+            $result = array(
+                'error' => 1,
+                'txt'        => 'ไม่พบชื่อลูกค้า'
+            );
+            return $result;
+        } else {
+
+            // 
+            // add customer auto
+            if (!$customer_id) {
+                $data_insert_customer = array(
+                    'name'          => $customer,
+                );
+                $result_customer = $this->ci->mdl_customer->insert_data($data_insert_customer);
+                if ($result_customer['error'] != 0) {
+                    $optional['where'] = $data_insert_customer;
+                    $r_customer = $this->ci->mdl_customer->get_data(null, $optional, 'row');
+
+                    $customer_id = $r_customer->ID;
+                } else {
+                    if ($result_customer['data']['id']) {
+                        $customer_id = $result_customer['data']['id'];
+                    }
+                }
+            }
+        }
+
+        //
+        // array data to insert
+        $data_update = array(
+            'customer_id'  => $customer_id,
+            'customer_name'  => $customer,
+            'agent_name'  => $agent_name,
+            'agent_contact'  => $agent_contact,
+            'date_order'    => $date_order,
+            'booking_date'  => $bookingdate,
+
+            'price'     => null,
+            'discount'  => null,
+            'net'       => null,
+
+            'remark'  => $remark,
+        );
+
+        //
+        // detail price bill
+        //
+        $detail_bill = $this->get_cartData();
+
+        if ($detail_bill) {
+            if ($detail_bill['payment_status']) {
+                $data_update['payment_id'] = $detail_bill['payment_id'];
+                $data_update['payment_alias'] = $detail_bill['payment_status'];
+            }
+            if ($detail_bill['complete_status']) {
+                $data_update['complete_id'] = $detail_bill['complete_id'];
+                $data_update['complete_alias'] = $detail_bill['complete_status'];
+            }
+
+            if ($detail_bill['price']) {
+                $data_update['price'] = $detail_bill['price'];
+            }
+
+            if ($detail_bill['discount']) {
+                $data_update['discount'] = $detail_bill['discount'];
+            }
+
+            $deposit = 0;
+            if ($detail_bill['pay']) {
+                // 
+                // create receipt
+                $deposit = $detail_bill['pay'];
+            }
+
+            if ($detail_bill['net']) {
+                $data_update['net'] = $detail_bill['net'];
+            }
+
+            if ($detail_bill['price_novat']) {
+                $data_update['price_novat'] = $detail_bill['price_novat'];
+            }
+
+            if ($detail_bill['vat']) {
+                $data_update['vat'] = $detail_bill['vat'];
+            }
+
+            if ($detail_bill['vatnum']) {
+                $data_update['vatnum'] = $detail_bill['vatnum'];
+            }
+
+            if ($detail_bill['unit']) {
+                $data_update['total_unit'] = $detail_bill['unit'];
+            }
+        }
+        //
+        // bill Round
+        //
+        if ($round_id) {
+            if ($row_round = $this->ci->mdl_round->get_data($round_id)) {
+
+                $data_update['round_id'] = $round_id;
+
+                $round_name = $row_round->NAME;
+                $time_start = $row_round->TIME_START;
+                $time_end = $row_round->TIME_END;
+
+                if ($row_round->NAME) {
+                    $round_name = $row_round->NAME;
+                    $data_update['round_name'] = $round_name;
+                }
+                if ($row_round->TIME_START) {
+                    $time_start = $row_round->TIME_START;
+                    $data_update['time_start'] = $time_start;
+                }
+                if ($row_round->TIME_END) {
+                    $time_end = $row_round->TIME_END;
+                    $data_update['time_end'] = $time_end;
+                }
+            }
+        }
+
+        // 
+        // update bill
+        $this->ci->db->trans_begin();
+
+        $data_bill = $this->ci->mdl_bill->update_data($data_update, $item_id);
+        $item_new_data = [];
+
+        $item_bill_id = $data_bill['data']['id'];
+        $item_bill_code = $data_bill['data']['code'];
+
+        $item_data = [];
+
+        $item_data_list = $request['item_data'];
+        if ($detail_bill['item_data_list']) {
+            $data_b_i_l = $detail_bill['item_data_list'];
+
+            if (is_string($data_b_i_l)) {
+                $item_data = json_decode($data_b_i_l);
+            } else {
+                $item_data = $data_b_i_l;
+            }
+
+            if ($item_data) {
+                foreach ($item_data as $key => $row) {
+                    $item_new_data[] = array(
+                        'bill_id'           => $item_bill_id,
+                        'bill_code'         => $item_bill_code,
+
+                        'item_id'           => $row['item_id'],
+                        'promotion_id'      => $row['promotion_id'],
+                        'description'       => $row['description'],
+                        'price_unit'        => $row['price_unit'],
+                        'quantity'          => $row['quantity'],
+                        'price'             => $row['price'],
+                        'discount'          => $row['discount'],
+                        'net'               => $row['net'],
+                        'p_id_use'          => $row['p_id_use'],
+                    );
+                }
+            }
+
+            //
+            // delete old item
+            $bill = $this->get_bill($item_id);
+            if ($bill['data']->item_list) {
+                $this->ci->db->delete('bill_detail', array('bill_id' => $item_id));
+            }
+            // 
+            // insert bill detail
+            if ($item_new_data) {
+                $data_bill = $this->ci->mdl_bill_detail->insert_data_batch($item_new_data);
+            }
+        }
+
+        if ($this->ci->db->trans_status() === FALSE) {
+            $this->ci->db->trans_rollback();
+        } else {
+            $this->ci->db->trans_commit();
+
+            $result = array(
+                'error' => 0,
+                'txt'   => 'ทำรายการสำเร็จ',
+                'data'  => array(
+                    'id'    => $item_bill_id,
+                )
+            );
         }
 
         return $result;

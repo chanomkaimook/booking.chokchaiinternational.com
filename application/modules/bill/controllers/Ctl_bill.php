@@ -68,10 +68,14 @@ class Ctl_bill extends MY_Controller
 
     public function document()
     {
+        $data = [];
+        $optional['order_by'] = array('id' => 'asc');
+        $data['round'] = $this->mdl_round->get_dataShow(null, $optional);
+
         $optional = [];
         $optional_joinbill = [];
         $item_code = $this->input->get('code');
-        $data = [];
+        
 
         if ($item_code) {
             $optional['where'] = array(
@@ -101,7 +105,7 @@ class Ctl_bill extends MY_Controller
         $deposit = "";
         $this->load->model('deposit/mdl_deposit');
         $optional_deposit['select'] = "sum(deposit) as total_deposit";
-        
+
         $q_deposit = $this->mdl_deposit->get_datashow(null, $optional_deposit, 'row_array');
         if ($q_deposit) {
             $deposit = $q_deposit['total_deposit'];
@@ -298,7 +302,7 @@ class Ctl_bill extends MY_Controller
         $item_id = $request['id'];
 
         $data = [];
-        if($item_id){
+        if ($item_id) {
             $data = $this->bill->get_bill($item_id);
         }
 
@@ -499,8 +503,6 @@ class Ctl_bill extends MY_Controller
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
 
-            // print_r($_POST);
-            // print_r(json_decode($_POST['item_list']));
             $returns = $this->bill->create_bill();
             echo json_encode($returns);
         }
@@ -528,8 +530,9 @@ class Ctl_bill extends MY_Controller
     {
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
-
-            $returns = $this->model->update_data();
+            // print_r($_POST);
+            // print_r(json_decode($_POST['item_list']));die;
+            $returns = $this->bill->update_billdata();
             echo json_encode($returns);
         }
     }

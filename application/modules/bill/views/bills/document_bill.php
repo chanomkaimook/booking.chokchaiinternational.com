@@ -367,7 +367,7 @@
             $(document).on('click', '.btn-edit', function(e) {
                 e.preventDefault()
 
-                let dataid = $(this).attr('#data-bill_id')
+                let dataid = $('#data-bill_id').val()
                 async_get_quotation(dataid)
                     .then((resp) => {
                         if (resp.data) {
@@ -375,7 +375,7 @@
                         }
                     })
 
-                $('#frm_quotation').find('[name=frm_quotation_hidden_id]').val(dataid)
+                $('#frm').find('[name=frm_hidden_id]').val(dataid)
             })
 
             // 
@@ -418,17 +418,18 @@
                             console.log(item.ITEM_ID)
                             add_html_list_item()
 
-    
-                            $("[name=item_list]:last").val(item.ITEM_ID)
+                            // get input data
+                            let tr_id = $('#list_item [name=item_list]:last').parents('tr').attr('data-row')
+
+                            $("#list_item tr[data-row="+tr_id+"]")
+                            .find("[name=item_list]").val(item.ITEM_ID).end()
+                            .find("[name=item_qty]").val(item.QUANTITY).end()
+                            .find(".price").text(item.PRICE_UNIT).end()
+                            .find(".net").text(item.NET).end()
                         }
                     })
-                    /* data.item_list.forEach(function(item, index) {
-                        if(item.ITEM_ID){
-                            console.log(item.ITEM_ID)
-                            
-                        }
-                    }) */
-                    
+
+                    $.ready(cal_item_list())
                     
                 }
 

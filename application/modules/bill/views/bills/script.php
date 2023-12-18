@@ -99,20 +99,7 @@
                     }
                 })
 
-                if ($('[name=bookingdate]').val()) {
-                    var dateTypeVar = $('[name=bookingdate]').datepicker('getDate');
-                    data.push({
-                        'name': 'bookingdate',
-                        'value': $.datepicker.formatDate('yy-mm-dd', dateTypeVar)
-                    })
-                }
-                if ($('[name=date_order]').val()) {
-                    var dateTypeVar = $('[name=date_order]').datepicker('getDate');
-                    data.push({
-                        'name': 'date_order',
-                        'value': $.datepicker.formatDate('yy-mm-dd', dateTypeVar)
-                    })
-                }
+
 
                 // 
                 // argument for get_cartData
@@ -132,34 +119,94 @@
                     let func
 
                     if (item_id) {
-                        func = async_update_data(item_id, data)
+
+                        if ($('[name=bookingdate]').val()) {
+                            let booking = $('[name=bookingdate]').val();
+                            set_booking = booking.split("/")
+                            let new_booking = set_booking[2] + "-" + set_booking[1] + "-" + set_booking[0]
+
+                            data.push({
+                                'name': 'bookingdate',
+                                'value': new_booking,
+                            })
+                        }
+                        if ($('[name=date_order]').val()) {
+                            let date_order = $('[name=date_order]').val();
+                            set_date_order = date_order.split("/")
+                            let new_date_order = set_date_order[2] + "-" + set_date_order[1] + "-" + set_date_order[0]
+
+                            data.push({
+                                'name': 'date_order',
+                                'value': new_date_order,
+                            })
+                        }
+
+                        async_update_data(item_id, data)
+                            .then((resp) => {
+                                if (resp.error == 1) {
+                                    swalalert('error', resp.txt, {
+                                        auto: false
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        type: 'success',
+                                        title: 'สำเร็จ',
+                                        text: resp.txt,
+                                        timer: swal_autoClose,
+                                    }).then((result) => {
+                                        modalHide()
+                                    })
+                                }
+                            });
+
+                        resolve(
+                            modalLoading_clear()
+                        )
+
                     } else {
-                        func = async_insert_data(data)
+
+                        if ($('[name=bookingdate]').val()) {
+                            var dateTypeVar = $('[name=bookingdate]').datepicker('getDate');
+                            data.push({
+                                'name': 'bookingdate',
+                                'value': $.datepicker.formatDate('yy-mm-dd', dateTypeVar)
+                            })
+                        }
+                        if ($('[name=date_order]').val()) {
+                            var dateTypeVar = $('[name=date_order]').datepicker('getDate');
+                            $('[name=date_order]').datepicker({
+                                format: 'yy-mm-dd'
+                            })
+                            data.push({
+                                'name': 'date_order',
+                                'value': $.datepicker.formatDate('yy-mm-dd', dateTypeVar)
+                            })
+                        }
+
+                        async_insert_data(data)
+                            .then((resp) => {
+                                if (resp.error == 1) {
+                                    swalalert('error', resp.txt, {
+                                        auto: false
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        type: 'success',
+                                        title: 'สำเร็จ',
+                                        text: resp.txt,
+                                        timer: swal_autoClose,
+                                    }).then((result) => {
+
+                                        dataReload()
+
+                                    })
+                                }
+                            });
+
+                        resolve(
+                            modalLoading_clear()
+                        )
                     }
-
-                    func
-                        .then((resp) => {
-                            if (resp.error == 1) {
-                                swalalert('error', resp.txt, {
-                                    auto: false
-                                })
-                            } else {
-                                Swal.fire({
-                                    type: 'success',
-                                    title: 'สำเร็จ',
-                                    text: resp.txt,
-                                    timer: swal_autoClose,
-                                }).then((result) => {
-
-                                    dataReload()
-
-                                })
-                            }
-                        });
-
-                    resolve(
-                        modalLoading_clear()
-                    )
                 })
 
             }
@@ -242,7 +289,7 @@
         //  * add DOM loading when modal to show
         //  *
         $(modal).on('show.bs.modal', function() {
-            modalLoading()
+            // modalLoading()
         })
         //  =========================
         //  =========================
@@ -463,15 +510,15 @@
         // clear element
         $('.text_promotion').addClass('d-none')
         $('.text_promotion div').empty()
-        $(modal)    
-        .find('[name=item_net]').val('').end()
-        .find('.total_price').html('').end()
-        .find('.total_discount').html('').end()
-        .find('.total_net').html('').end()
-        .find('.total_pay').html('').end()
-        .find('.total_unit').html('').end()
-        .find('.status_payment').html('').end()
-        .find('#list_item tbody').html('').end()
+        $(modal)
+            .find('[name=item_net]').val('').end()
+            .find('.total_price').html('').end()
+            .find('.total_discount').html('').end()
+            .find('.total_net').html('').end()
+            .find('.total_pay').html('').end()
+            .find('.total_unit').html('').end()
+            .find('.status_payment').html('').end()
+            .find('#list_item tbody').html('').end()
     }
 
     //  *

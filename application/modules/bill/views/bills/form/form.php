@@ -186,59 +186,35 @@
         // 
 
         // 
-        // calculate price list
+        // promotion
         // 
-        function cal_item_list() {
-            list = $('#list_item tbody').find('tr')
+        /* function get_promotion(id = null, item_data = null) {
+            if (id && item_data) {
+                let url = new URL(path('promotion/ctl_page/get_proitem'), domain)
 
-            if (list.length) {
-                let price
-                let total
-                let total_unit = 0
-                let net = 0.00
+                let body = new FormData();
+                body.append('id', id)
+                body.append('item_data', JSON.stringify(item_data))
 
-                let totalprice = 0.00
-                let total_price = 0.00
-                let totaldiscount = 0.00
-                let total_discount = 0.00
-                let discount = 0.00
-
-                let item_data = []
-                let deposit = $(modal).find('input[name=deposit]').val()
-
-                $.each(list, function(index, item) {
-                    id = $(item).find('select[name=item_list]').val()
-                    price = $(item).find('select[name=item_list] option:selected').attr('data-price')
-                    total = $(item).find('input[name=item_qty]').val()
-
-                    if (price && total) {
-                        totalprice = price * total
-
-                        $(item).find('td.price').text(price)
-                        $(item).find('td.net').text(formatMoney(totalprice))
-                        total_unit = total_unit + parseInt(total)
-
-                        item_data.push({
-                            'id': id,
-                            'price': price,
-                            'total': total,
-                        })
-                    }
-                })
-
-                //
-                // get detail bill price
-                if (item_data.length) {
-                    get_cartData(deposit, item_data)
+                let method = {
+                    'method': 'post',
+                    'body': body,
                 }
-
-            } else {
-
-                reset_detail()
+                fetch(url, method)
+                    .then(res => res.json())
+                    .then((resp) => {
+                        console.log(resp)
+                    })
             }
-        }
 
-        async function get_cartData(deposit = null, item_data = null) {
+        } */
+
+
+
+    })
+
+    async function get_cartData(deposit = null, item_data = null) {
+        $(function() {
             if (item_data) {
                 let url = new URL(path('bill/ctl_bill/get_cartData'), domain)
 
@@ -295,71 +271,31 @@
                         $('.status_payment').text(resp.payment_status)
                     })
             }
+        })
 
-        }
+    }
 
-        // 
-        // reset detail bill
-        // 
-        function reset_detail() {
-            $('.text_promotion').addClass('d-none')
-            $('.text_promotion div').empty()
+    async function fetch_dataItem() {
+        let url = new URL(path('bill/ctl_item/get_dataDisplay'), domain)
+        const response = await fetch(url)
+        const result = await response.json()
+        return result;
+    }
 
-            $('.total_pay').empty()
-            $('.total_price').empty()
-            $('.total_discount').empty()
-            $('.total_net').empty()
-            $('.total_unit').empty()
-            $('.status_payment').empty()
-        }
+    //	format number and float (.00) return string!! 
+    function formatMoney(number, decPlaces, decSep, thouSep) {
+        decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
+            decSep = typeof decSep === "undefined" ? "." : decSep;
+        thouSep = typeof thouSep === "undefined" ? "," : thouSep;
+        var sign = number < 0 ? "-" : "";
+        var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
+        var j = (j = i.length) > 3 ? j % 3 : 0;
 
-        // 
-        // promotion
-        // 
-        /* function get_promotion(id = null, item_data = null) {
-            if (id && item_data) {
-                let url = new URL(path('promotion/ctl_page/get_proitem'), domain)
-
-                let body = new FormData();
-                body.append('id', id)
-                body.append('item_data', JSON.stringify(item_data))
-
-                let method = {
-                    'method': 'post',
-                    'body': body,
-                }
-                fetch(url, method)
-                    .then(res => res.json())
-                    .then((resp) => {
-                        console.log(resp)
-                    })
-            }
-
-        } */
-
-
-        async function fetch_dataItem() {
-            let url = new URL(path('bill/ctl_item/get_dataDisplay'), domain)
-            const response = await fetch(url)
-            const result = await response.json()
-            return result;
-        }
-
-        //	format number and float (.00) return string!! 
-        function formatMoney(number, decPlaces, decSep, thouSep) {
-            decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-                decSep = typeof decSep === "undefined" ? "." : decSep;
-            thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-            var sign = number < 0 ? "-" : "";
-            var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-            var j = (j = i.length) > 3 ? j % 3 : 0;
-
-            return sign +
-                (j ? i.substr(0, j) + thouSep : "") +
-                i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-                (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
-        }
-    })
+        return sign +
+            (j ? i.substr(0, j) + thouSep : "") +
+            i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+            (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+    }
 
     function input_int_only() {
         let inputInt = d.querySelectorAll('input.int_only')
@@ -410,5 +346,80 @@
         item_html = `<tr data-row="${number}">${item}</tr>`
 
         return item_html
+    }
+
+    // 
+    // calculate price list
+    // 
+    function cal_item_list() {
+
+        $(function() {
+            list = $('#list_item tbody').find('tr')
+
+            if (list.length) {
+                let price
+                let total
+                let total_unit = 0
+                let net = 0.00
+
+                let totalprice = 0.00
+                let total_price = 0.00
+                let totaldiscount = 0.00
+                let total_discount = 0.00
+                let discount = 0.00
+
+                let item_data = []
+                let deposit = $(modal).find('input[name=deposit]').val()
+
+                $.each(list, function(index, item) {
+                    id = $(item).find('select[name=item_list]').val()
+                    price = $(item).find('select[name=item_list] option:selected').attr('data-price')
+                    total = $(item).find('input[name=item_qty]').val()
+
+                    if (price && total) {
+                        totalprice = price * total
+
+                        $(item).find('td.price').text(price)
+                        $(item).find('td.net').text(formatMoney(totalprice))
+                        total_unit = total_unit + parseInt(total)
+
+                        item_data.push({
+                            'id': id,
+                            'price': price,
+                            'total': total,
+                        })
+                    }
+                })
+
+                //
+                // get detail bill price
+                if (item_data.length) {
+                    get_cartData(deposit, item_data)
+                }
+
+            } else {
+
+                reset_detail()
+            }
+
+        })
+
+    }
+
+    // 
+    // reset detail bill
+    // 
+    function reset_detail() {
+        $(function() {
+            $('.text_promotion').addClass('d-none')
+            $('.text_promotion div').empty()
+
+            $('.total_pay').empty()
+            $('.total_price').empty()
+            $('.total_discount').empty()
+            $('.total_net').empty()
+            $('.total_unit').empty()
+            $('.status_payment').empty()
+        })
     }
 </script>

@@ -239,12 +239,12 @@ class Mdl_bill extends CI_Model
         if ($return = $this->check_dup($array_chk_dup, $code)) {
             return $return;
         }
-        
-        
+
+
 
         // insert passing on library bill only
         if ($data_insert && is_array($data_insert)) {
-            if($data_insert['booking_date']){
+            if ($data_insert['booking_date']) {
                 $data_insert['booking_user'] = $this->userlogin;
             }
             $data_insert['user_starts'] = $this->userlogin;
@@ -276,58 +276,48 @@ class Mdl_bill extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null,$id=null)
+    public function update_data($data_update = null, $id = null)
     {
         $result = false;
         $item_id = $id ? $id : $this->input->post('item_id');
 
         if ($item_id) {
             $request = $_POST;
-            if ($return = $this->check_value_valid($request)) {
-                return $return;
+            $chk = $request;
+
+            if ($data_update) {
+                $chk = $data_update;
             }
 
-            $array_chk_dup = array(
-                'name' => $request['item_name'],
-                'status' => 1,
-                'id !=' => $item_id,
-            );
-            if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+            if ($return = $this->check_value_valid($chk)) {
                 return $return;
             }
 
             if ($data_update && is_array($data_update)) {
+                if ($data_update['booking_date']) {
+                    $data_update['booking_user'] = $this->userlogin;
+                }
+                $data_update['user_update'] = $this->userlogin;
+                $data_update['date_update'] = date('Y-m-d H:i:s');
+
                 $this->db->where('id', $item_id);
                 $this->db->update($this->table, $data_update);
-            } else {
-                $item_name = textNull($this->input->post('item_name'));
 
-                $data = array(
-                    'name'          => $item_name,
+                $option['select'] = "ID,CODE";
+                $bill = (object)$this->get_data($item_id, $option);
 
-                    'date_update'  => date('Y-m-d H:i:s'),
-                    'user_update'  => $this->userlogin,
+                // keep log
+                log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
+
+                $result = array(
+                    'error'     => 0,
+                    'txt'       => 'ทำรายการสำเร็จ',
+                    'data'      => array(
+                        'id'    => $bill->ID,
+                        'code'  => $bill->CODE
+                    )
                 );
-
-                if ($this->offview) {
-                    $status_offview = textNull($this->input->post('status_offview'));
-                    $data['status_offview'] = $status_offview;
-                }
-
-                $this->db->where('id', $item_id);
-                $this->db->update($this->table, $data);
             }
-
-            // keep log
-            log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
-
-            $result = array(
-                'error'     => 0,
-                'txt'       => 'ทำรายการสำเร็จ',
-                'data'      => array(
-                    'id'    => $item_id
-                )
-            );
         }
         return $result;
     }
@@ -338,14 +328,14 @@ class Mdl_bill extends CI_Model
      * @param array $data = data to update
      * @return void
      */
-    public function update_bill($data = null,$id=null)
+    public function update_bill($data = null, $id = null)
     {
         $result = null;
 
-        if($data && $id){
-            $this->db->where('id',$id);
-            $this->db->update($this->table,$data);
-            
+        if ($data && $id) {
+            $this->db->where('id', $id);
+            $this->db->update($this->table, $data);
+
             $result = array(
                 'error'     => 0,
                 'txt'       => 'ทำรายการสำเร็จ',

@@ -327,7 +327,7 @@
             )
             .then((result) => {
                 if (!result.dismiss) {
-                    let remark = result.value.trim
+                    let remark = result.value.trim()
                     confirm_delete(item_id, remark)
                 }
             })
@@ -350,7 +350,7 @@
                     if (data.error == 0) {
                         swalalert()
                     } else {
-                        swalalert('error', resp.txt, {
+                        swalalert('error', data.txt, {
                             auto: false
                         })
                     }

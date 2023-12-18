@@ -18,6 +18,9 @@
         <label class="text-capitalize">หมายเหตุ</label>
         <textarea class="form-control" name="deposit_remark" cols="30" rows="2"></textarea>
     </div>
+    <div class="form-group col-md-12">
+        <label class="text-capitalize text-danger">** หากทำการบันทึกการแก้ไข โปรดตรวจสอบใบเสร็จรับเงินด้วย</label>
+    </div>
 </div>
 <script>
     $(document).ready(function() {

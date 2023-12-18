@@ -59,6 +59,47 @@ class Bill
     }
 
     /**
+     * update deposit
+     *
+     * @param int $id = id deposit
+     * @return void
+     */
+    function get_bill($id = null)
+    {
+        $result = null;
+        $request = $_REQUEST;
+
+        $result = array(
+            'error' => 1,
+            'txt'   => 'ไม่มีการทำรายการ'
+        );
+
+        if (!$id) {
+            $id = $request['item_id'];
+        }
+        if ($id) {
+
+            $optional['where'] = array(
+                'bill_id'   => $id
+            );
+            $b = $this->ci->mdl_bill->get_data($id);
+            $bd = $this->ci->mdl_bill_detail->get_data(null,$optional);
+
+            if ($b) {
+                $b->item_list = $bd;
+
+                $result = array(
+                    'error' => 0,
+                    'txt'   => '',
+                    'data'  => $b
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * get data from cart
      *
      * POST
@@ -229,6 +270,9 @@ class Bill
     public function create_bill()
     {
         $request = $_REQUEST;
+
+        $item_bill_id = "";
+        $item_bill_code = "";
 
         $customer = $request['customer'] ? textNull($request['customer']) : null;
         $customer_id = $request['customer_id'] ? textNull($request['customer_id']) : null;
@@ -436,10 +480,18 @@ class Bill
             $this->ci->db->trans_rollback();
         } else {
             $this->ci->db->trans_commit();
-        }
-        die;
 
-        echo $code;
+            $result = array(
+                'error' => 0,
+                'txt'   => 'ทำรายการสำเร็จ',
+                'data'  => array(
+                    'id'    => $item_bill_id,
+                    'code'  => $item_bill_code,
+                )
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -522,6 +574,44 @@ class Bill
             $id = $request['item_id'];
         }
         if ($id) {
+
+            $datastatus = $this->check_status($id);
+
+            if ($datastatus) {
+                $data_update = array(
+                    'payment_id' => $datastatus['data']['payment_id'],
+                    'payment_alias' => $datastatus['data']['payment_status'],
+                    'complete_id' => $datastatus['data']['complete_id'],
+                    'complete_alias' => $datastatus['data']['complete_status'],
+                );
+                $this->ci->mdl_bill->update_bill($data_update, $id);
+
+                $result = array(
+                    'error' => 0,
+                    'txt'   => 'ทำรายการสำเร็จ',
+                    'data'  => $datastatus
+                );
+            }
+        }
+
+
+        return $result;
+    }
+
+    /**
+     * check status bill
+     *
+     * @param integer|null $id = bill id
+     * @return void
+     */
+    function check_status(int $id = null)
+    {
+        $result = array(
+            'error' => 1,
+            'txt'   => 'ไม่มีการทำรายการ'
+        );
+
+        if ($id) {
             $optional['select'] = "sum(deposit) as total_deposit";
             $optional['where'] = array(
                 'bill_id'   => $id,
@@ -539,23 +629,12 @@ class Bill
 
             $datastatus = $this->get_status_bill($deposit, $net);
 
-            if ($datastatus) {
-                $data_update = array(
-                    'payment_id' => $datastatus['payment_id'],
-                    'payment_alias' => $datastatus['payment_status'],
-                    'complete_id' => $datastatus['complete_id'],
-                    'complete_alias' => $datastatus['complete_status'],
-                );
-                $this->ci->mdl_bill->update_bill($data_update, $id);
-
-                $result = array(
-                    'error' => 0,
-                    'txt'   => 'ทำรายการสำเร็จ',
-                    'data'  => $datastatus
-                );
-            }
+            $result = array(
+                'error' => 0,
+                'txt'   => 'ทำรายการสำเร็จ',
+                'data'  => $datastatus
+            );
         }
-
 
         return $result;
     }

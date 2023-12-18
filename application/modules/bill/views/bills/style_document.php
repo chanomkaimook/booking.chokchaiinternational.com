@@ -1,19 +1,44 @@
 <style>
+    * {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+    }
+
+    @media print {
+
+
+        div.A4 {
+            margin-top: 4cm !important;
+            width: 21cm;
+            height: 29.7cm;
+
+            scale: 1.3;
+
+            background-color: red !important;
+            border: 1px solid #111;
+        }
+
+        /* div.A4[layout="portrait"] {
+            width: 29.7cm;
+            height: 21cm;
+            border: 1px solid #111 !important;
+        } */
+
+        table tr td,
+        table tr th {
+            padding: initial;
+        }
+
+        p {
+            margin-bottom: initial;
+        }
+    }
+
     body .card-box {
         background: rgb(204, 204, 204);
     }
 
-    /* @page {
-                                background: white;
-                                size: A4;
-                                display: block;
-                                margin: 0 auto;
-                                padding: 50px 35px;
-                                margin-bottom: 0.5cm;
-                                box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
-                            } */
-
-    page[size="A4"] {
+    div.A4 {
         background: white;
         width: 21cm;
         height: 29.7cm;
@@ -125,34 +150,5 @@
 
     p {
         margin-bottom: 6px;
-    }
-
-    @page {
-        size: "A4"
-    }
-
-    @media print {
-        #document {
-            width: 18cm;
-
-        }
-
-        /* page[size="A4"] {
-                                    
-                                    margin:0;
-                                    box-shadow: 0;
-                                } */
-        /*  page[size="A4"] {
-                                    
-                                    margin:0;
-                                    box-shadow: 0;
-                                }
-
-                                #document {
-                                    width:18cm;
-
-                                } */
-
-
     }
 </style>

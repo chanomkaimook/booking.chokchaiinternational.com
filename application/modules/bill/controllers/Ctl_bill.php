@@ -83,7 +83,7 @@ class Ctl_bill extends MY_Controller
                 'bill_code'  => $item_code
             );
 
-            // $optional_deposit = $optional_joinbill;
+            $optional_deposit = $optional_joinbill;
         } else {
             $item_id = $this->input->get('id');
             $data['bill'] = $this->mdl_bill->get_data(textNull($item_id), null, 'row_array');
@@ -92,14 +92,21 @@ class Ctl_bill extends MY_Controller
                 'bill_id'  => textNull($item_id)
             );
 
-            // $optional_deposit = $optional_joinbill;
+            $optional_deposit = $optional_joinbill;
         }
         // $optional_deposit['order_by'] = array('id'=>'asc');
 
         $data['bill_detail'] = $this->mdl_bill_detail->get_data(null, $optional_joinbill, 'result_array');
 
-        // $this->load->model('deposit/mdl_deposit');
-        // $data['bill_deposit'] = $this->mdl_deposit->get_data(null, $optional_deposit, 'result_array');
+        $deposit = "";
+        $this->load->model('deposit/mdl_deposit');
+        $optional_deposit['select'] = "sum(deposit) as total_deposit";
+        
+        $q_deposit = $this->mdl_deposit->get_datashow(null, $optional_deposit, 'row_array');
+        if ($q_deposit) {
+            $deposit = $q_deposit['total_deposit'];
+        }
+        $data['total_deposit'] = $deposit;
 
         // $this->load->model('receipt/mdl_receipt');
         // $data['bill_receipt'] = $this->mdl_receipt->get_data(null, $optional_joinbill, 'result_array');
@@ -279,6 +286,26 @@ class Ctl_bill extends MY_Controller
         echo json_encode($result);
     }
 
+    //  *
+    //  * CRUD
+    //  * read
+    //  * 
+    //  * get data for bill and item
+    //  *
+    public function get_bill()
+    {
+        $request = $_REQUEST;
+        $item_id = $request['id'];
+
+        $data = [];
+        if($item_id){
+            $data = $this->bill->get_bill($item_id);
+        }
+
+        $result = $data;
+        echo json_encode($result);
+    }
+
     public function get_deposit()
     {
         $request = $_REQUEST;
@@ -385,6 +412,82 @@ class Ctl_bill extends MY_Controller
         echo json_encode($result);
     }
 
+    public function get_rc_codetext()
+    {
+        $codetext = "";
+        $result = array(
+            'error' => 1,
+            'txt'   => "ไม่มีการทำรายการ",
+        );
+
+        $request = $_REQUEST;
+        $item_id = $request['bill_id'];
+        if ($item_id) {
+
+            $optional['where'] = array(
+                'bill_id'   => $item_id
+            );
+            $optional['order_by'] = array(
+                'id'   => 'asc'
+            );
+            $data = $this->mdl_deposit->get_dataShow(null, $optional);
+
+            if ($data) {
+                $net = 0;
+                $deposit = 0;
+                $ar_codetext = [];
+
+                $data_bill = $this->mdl_bill->get_data($item_id);
+                if ($data_bill) {
+                    $net = $data_bill->NET;
+                }
+
+                foreach ($data as $key => $row) {
+                    if ($row->CODETEXT) {
+                        $ar_codetext[] =  $row->CODETEXT;
+                    }
+                    if ($row->DEPOSIT) {
+                        $deposit =  $deposit + $row->DEPOSIT;
+                    }
+                }
+
+                if (textNull($deposit) && textNull($net)) {
+                    if ($ar_codetext && (floatval($deposit) >= floatval($net))) {
+
+                        $codetext = implode(",", $ar_codetext);
+                        $result = array(
+                            'error' => 0,
+                            'txt'   => "ทำรายการสำเร็จ",
+                            'data'  => array(
+                                'codetext'  => $codetext
+                            )
+                        );
+                    } else {
+                        $result = array(
+                            'error' => 1,
+                            'txt'   => "ยอดโอนไม่ถูกต้อง",
+                            'data'  => array(
+                                'payment'   => $deposit,
+                                'net'       => $net
+                            )
+                        );
+                    }
+                } else {
+                    $result = array(
+                        'error' => 1,
+                        'txt'   => "ยอดโอนไม่ถูกต้อง",
+                        'data'  => array(
+                            'payment'   => $deposit,
+                            'net'       => $net
+                        )
+                    );
+                }
+            }
+        }
+
+        echo json_encode($result);
+    }
+
     //  *
     //  * CRUD
     //  * insert
@@ -455,19 +558,20 @@ class Ctl_bill extends MY_Controller
         }
     }
 
-
     //  *
     //  * CRUD
     //  * delete
     //  * 
     //  * delete data
     //  *
-    public function delete_data()
+    public function delete_deposit()
     {
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
 
-            $returns = $this->model->delete_data();
+            $this->load->library('receipt');
+
+            $returns = $this->receipt->delete_deposit();
             echo json_encode($returns);
         }
     }

@@ -19,6 +19,7 @@
     <div class="form-group col-md-6">
         <label class="text-capitalize">เลขที่ใบกำกับอย่างย่อ</label>
         <h5 class="card-text codetext"></h5>
+        <input type="text" class="form-control d-none" name="rc_codetext" placeholder="ระบุ" readonly="readonly">
         <button type="button" class="btn btn-success btn-sm btn-update-codetext">ดึงเลขใบกำกับย่อ</button>
     </div>
     <div class="form-group col-md-6">
@@ -72,6 +73,8 @@
                             text: resp.txt,
                             timer: swal_autoClose,
                         }).then((result) => {
+                            get_receipt()
+
                             modalReceiptHide()
                         })
                     }

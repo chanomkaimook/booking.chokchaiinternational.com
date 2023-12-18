@@ -120,6 +120,7 @@ class Receipt
         }
 
         if ($id) {
+
             $optional['where'] = array(
                 'id' => $id
             );
@@ -133,7 +134,6 @@ class Receipt
             $bill_id = $bill['id'];
             $date_order = textNull($request['date_order']) ? textNull($request['date_order']) : textNull($bill['date_order']);
             $remark = textNull($request['deposit_remark']) ? textNull($request['deposit_remark']) : null;
-
 
             $data_insert = array(
                 'bill_id'       => $bill_id,
@@ -157,15 +157,24 @@ class Receipt
             //
             // ตรวจสอบยอดเงินโอน
             // สร้างใบรับเงิน หากยอดเงินโอนครบ หรือมากกว่า
-            $sql_deposit = $this->ci->db->select('sum(deposit) as total_deposit')
-                ->from('deposit')
-                ->where('bill_id', $bill_id)
-                ->where('status', 1)
-                ->get();
-            $r = $sql_deposit->row();
-            $total_deposit = textNull($r->total_deposit);
-            if ($total_deposit && $total_deposit >= $net) {
-                $this->create_bill($bill_id, $codebill, $deposit);
+            $optionalr['where'] = array(
+                'bill_id' => $bill_id
+            );
+            $check_receipt = $this->ci->mdl_receipt->get_dataShow(null, $optionalr, 'row');
+            if (!$check_receipt) {
+                $sql_deposit = $this->ci->db->select('sum(deposit) as total_deposit')
+                    ->from('deposit')
+                    ->where('bill_id', $bill_id)
+                    ->where('status', 1)
+                    ->get();
+                $r = $sql_deposit->row();
+                $total_deposit = textNull($r->total_deposit);
+                if ($total_deposit && $total_deposit >= $net) {
+                    $this->create_bill($bill_id, $codebill, $deposit);
+                }
+            } else {
+                // update bill status
+                $this->ci->bill->update_bill($bill_id);
             }
 
             if ($this->ci->db->trans_status() === FALSE) {
@@ -218,6 +227,18 @@ class Receipt
                 );
                 $r = $this->ci->mdl_deposit->update_data($data_update, $id);
 
+                // clear codetext receipt auto
+                $r_dp = $this->ci->mdl_deposit->get_dataShow($id);
+                $bill_id = $r_dp->BILL_ID;
+                if ($bill_id) {
+                    $optional['where'] = array(
+                        'bill_id'   => $bill_id
+                    );
+                    $r_rc = $this->ci->mdl_receipt->get_data(null, $optional, 'row');
+                    $rc_id = $r_rc->ID;
+                    $this->clear_rc_codetext($rc_id);
+                }
+
                 $result = array(
                     'error' => $r['error'],
                     'txt'   => $r['txt'],
@@ -226,8 +247,75 @@ class Receipt
             }
         }
 
+        return $result;
+    }
+
+    function delete_deposit($id = null)
+    {
+        $result = null;
+        $request = $_REQUEST;
+
+        $result = array(
+            'error' => 1,
+            'txt'   => 'ไม่มีการทำรายการ'
+        );
+
+        if (!$id) {
+            $id = $request['item_id'];
+        }
+        if ($id) {
+
+            $this->ci->db->trans_begin();
+
+            $this->ci->mdl_deposit->delete_data();
+
+            // clear codetext receipt auto
+            $r_dp = $this->ci->mdl_deposit->get_data($id);
+            $bill_id = $r_dp->BILL_ID;
+            if ($bill_id) {
+                $optional['where'] = array(
+                    'bill_id'   => $bill_id
+                );
+                $r_rc = $this->ci->mdl_receipt->get_data(null, $optional, 'row');
+                $rc_id = $r_rc->ID;
+                $this->clear_rc_codetext($rc_id);
+
+                // update status bill
+                $this->ci->bill->update_bill($bill_id);
+            }
+
+
+            if ($this->ci->db->trans_status() === FALSE) {
+                $this->ci->db->trans_rollback();
+            } else {
+                $this->ci->db->trans_commit();
+
+                $result = array(
+                    'error' => 0,
+                    'txt'   => "ทำรายการสำเร็จ"
+                );
+            }
+        }
 
         return $result;
+    }
+
+    /**
+     * clear codetext
+     *
+     * @param int $id = id receipt
+     * @return void
+     */
+    function clear_rc_codetext(int $id = null)
+    {
+        if ($id) {
+            $data_update = array(
+                'codetext'  => null
+            );
+            $this->ci->mdl_receipt->update_data($data_update, $id);
+        }
+
+        return true;
     }
 
     /**
@@ -363,9 +451,9 @@ class Receipt
         if (!$id) {
             $id = $request['item_id'];
         }
-        
+
         if ($id) {
-            
+
             $date_order = textNull($request['date_order']);
             $remark = textNull($request['receipt_remark']);
 
@@ -373,6 +461,11 @@ class Receipt
                 'date_order'    => $date_order,
                 'remark'        => $remark
             );
+
+            if (textNull($request['rc_codetext'])) {
+                $codetext = textNull($request['rc_codetext']);
+                $data_update['codetext'] = $codetext;
+            }
 
             $r = $this->ci->mdl_receipt->update_data($data_update, $id);
 

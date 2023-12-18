@@ -126,8 +126,14 @@
     </div>
 </div>
 <script>
+    let table_list_body = ""
+    let select = ""
+    let input_total = `<input type="text" name="item_qty" class="form-control form-control-sm int_only" value="1" required>`
+
+    let list = ""
+
     $(document).ready(function() {
-        let select
+        select
         fetch_dataItem()
             .then((resp) => {
                 if (resp) {
@@ -141,9 +147,8 @@
                 }
             })
 
-        let input_total = `<input type="text" name="item_qty" class="form-control form-control-sm int_only" value="1" required>`
 
-        let table_list_body = $('table#list_item tbody')
+        table_list_body = $('table#list_item tbody')
 
         // 
         // Event
@@ -184,7 +189,7 @@
         // calculate price list
         // 
         function cal_item_list() {
-            let list = $('#list_item tbody').find('tr')
+            list = $('#list_item tbody').find('tr')
 
             if (list.length) {
                 let price
@@ -248,7 +253,7 @@
                 fetch(url, method)
                     .then(res => res.json())
                     .then((resp) => {
-                        
+
                         if (resp.promotion && resp.promotion.length) {
                             let text_promotion = $('.text_promotion')
                             text_promotion.removeClass('d-none')
@@ -260,7 +265,7 @@
                                 await new Promise((resolve, reject) => {
                                     resolve(
                                         $.each(resp.promotion, function(index, item) {
-                                            if(item.ID != null){
+                                            if (item.ID != null) {
                                                 p += `<div class="">
                                                 <h6 class="text-info">${item.NAME} - ${formatMoney(item.DISCOUNT,0)}/คน 
                                                 ราคา ${formatMoney(item.TOTAL_DISCOUNT,0)} 
@@ -332,56 +337,6 @@
 
         } */
 
-        function add_html_list_item() {
-            let tr = create_html_list_item()
-            table_list_body.append(tr)
-
-            input_int_only()
-
-        }
-
-        function input_int_only() {
-            let inputInt = d.querySelectorAll('input.int_only')
-            inputInt.forEach(function(item, index) {
-                item.addEventListener("keyup", function() {
-                    if (!this.value) {
-                        // this.value = 1
-                    } else {
-                        this.value = this.value.replace(/[^0-9]/g, '');
-                    }
-                })
-            })
-        }
-
-        function create_html_list_item() {
-            // identify row
-            let number = table_list_body.find('tr:last').attr('data-row')
-            if (!number) {
-                number = 1
-            } else {
-                number = parseInt(number) + 1
-            }
-
-            let btn = `<button data-row="${number}" type="button" class="btn btn-danger btn-sm btn-del-item"><i class="far fa-trash-alt"></i></button>`
-
-            let item_html
-
-            item = `
-                <td>${btn}</td>
-                <td class="text-left">
-                    <select name="item_list" class="form-control form-control-sm">
-                        <option value="" disabled selected >เลือกสินค้า</option>
-                        ${select}
-                    </select>
-                </td>
-                <td>${input_total}</td>
-                <td class="price" ></td>
-                <td class="net" ></td>
-            `
-            item_html = `<tr data-row="${number}">${item}</tr>`
-
-            return item_html
-        }
 
         async function fetch_dataItem() {
             let url = new URL(path('bill/ctl_item/get_dataDisplay'), domain)
@@ -405,4 +360,55 @@
                 (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
         }
     })
+
+    function input_int_only() {
+        let inputInt = d.querySelectorAll('input.int_only')
+        inputInt.forEach(function(item, index) {
+            item.addEventListener("keyup", function() {
+                if (!this.value) {
+                    // this.value = 1
+                } else {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                }
+            })
+        })
+    }
+
+    function add_html_list_item() {
+        let tr = create_html_list_item()
+        table_list_body.append(tr)
+
+        input_int_only()
+
+    }
+
+    function create_html_list_item() {
+        // identify row
+        let number = table_list_body.find('tr:last').attr('data-row')
+        if (!number) {
+            number = 1
+        } else {
+            number = parseInt(number) + 1
+        }
+
+        let btn = `<button data-row="${number}" type="button" class="btn btn-danger btn-sm btn-del-item"><i class="far fa-trash-alt"></i></button>`
+
+        let item_html
+
+        item = `
+                <td>${btn}</td>
+                <td class="text-left">
+                    <select name="item_list" class="form-control form-control-sm">
+                        <option value="" disabled selected >เลือกสินค้า</option>
+                        ${select}
+                    </select>
+                </td>
+                <td>${input_total}</td>
+                <td class="price" ></td>
+                <td class="net" ></td>
+            `
+        item_html = `<tr data-row="${number}">${item}</tr>`
+
+        return item_html
+    }
 </script>

@@ -276,10 +276,10 @@ class Mdl_page extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null)
+    public function update_data($data_update = null,int $id=null)
     {
         $result = false;
-        $item_id = $this->input->post('item_id');
+        $item_id = $id ? $id : textNull($this->input->post('item_id'));
 
         if ($item_id) {
             $request = $_POST;
@@ -419,8 +419,16 @@ class Mdl_page extends CI_Model
         }
 
         if ($hidden_start && $hidden_end) {
-            $sql->where('date(' . $this->table . '.date_starts) >=', $hidden_start);
-            $sql->where('date(' . $this->table . '.date_starts) <=', $hidden_end);
+            // $sql->where('date(' . $this->table . '.date_starts) >=', $hidden_start);
+            // $sql->where('date(' . $this->table . '.date_starts) <=', $hidden_end);
+
+            $sql->where(
+                '(date(' . $this->table . '.date_starts) >= "'.$hidden_start.'" and
+                date(' . $this->table . '.date_starts) <= "'.$hidden_end.'")
+                or 
+                (date(' . $this->table . '.date_update) >= "'.$hidden_start.'" and
+                date(' . $this->table . '.date_update) <= "'.$hidden_end.'")
+        ',null,false);
         }
 
         if ($id) {

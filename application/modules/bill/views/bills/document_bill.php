@@ -15,7 +15,8 @@
                 </div>
             </div>
             <div class="">
-                <button type="button" class="btn-edit btn btn-warning">แก้ไขใบเสนอราคา</button>
+                <span class="sector_button-edit">
+                </span>
                 <button type="button" class="btn-print btn btn-pink" onclick="printDiv('document')"><i class="fas fa-print"></i> Print</button>
             </div>
 
@@ -267,6 +268,7 @@
 
             let dataid = ""
             $('.tool-btn').html(creat_html_addreceipt())
+            $('.sector_button-edit').html(creat_html_btnEdit())
 
             $("input[name=date_order_show]").datepicker({
                 autoclose: !0,
@@ -364,10 +366,11 @@
             // 
             // quotation
             // 
-            $(document).on('click', '.btn-edit', function(e) {
+            $(document).on('click', '.sector_button-edit .btn-edit', function(e) {
                 e.preventDefault()
 
                 let dataid = $('#data-bill_id').val()
+
                 async_get_quotation(dataid)
                     .then((resp) => {
                         if (resp.data) {
@@ -384,7 +387,6 @@
             // ############
             // 
             function modalActive_quotation(action = 'view', data = []) {
-                console.log(data)
                 let modal_q_name = '#modal_view',
                     itemcode = data.CODE ? data.CODE : $('#data-bill_code').text()
                 let header = "ใบเสนอราคา " + itemcode
@@ -414,23 +416,13 @@
                 if (data.item_list) {
                     data.item_list.forEach(function(item, index) {
                         // console.log(item)
-                        if(item.ITEM_ID){
-                            console.log(item.ITEM_ID)
+                        if (item.ITEM_ID) {
                             add_html_list_item()
 
-                            // get input data
-                            let tr_id = $('#list_item [name=item_list]:last').parents('tr').attr('data-row')
 
-                            $("#list_item tr[data-row="+tr_id+"]")
-                            .find("[name=item_list]").val(item.ITEM_ID).end()
-                            .find("[name=item_qty]").val(item.QUANTITY).end()
-                            .find(".price").text(item.PRICE_UNIT).end()
-                            .find(".net").text(item.NET).end()
+                            $("[name=item_list]:last").val(item.ITEM_ID)
                         }
                     })
-
-                    $.ready(cal_item_list())
-                    
                 }
 
             }
@@ -641,15 +633,13 @@
             async_get_addreceipt(id)
                 .then((resp) => {
                     if (resp) {
-                        if (resp) {
-                            if (resp.PAYMENT_ID != 8) {
-                                $('.tool-btn').removeClass('d-none')
-                            } else {
-                                $('.tool-btn').addClass('d-none')
-                            }
+                        if (resp.PAYMENT_ID != 8) {
+                            $('.tool-btn').removeClass('d-none')
                         } else {
                             $('.tool-btn').addClass('d-none')
                         }
+                    } else {
+                        $('.tool-btn').addClass('d-none')
                     }
                 })
         }
@@ -664,7 +654,7 @@
         function get_deposit(id = null) {
             async_get_deposit(id)
                 .then((resp) => {
-                    if (resp) {
+                    if (resp.length) {
 
                         step_billvat()
 
@@ -679,6 +669,8 @@
 
                         }
 
+                    }else{
+                        $('.sector_billvat').empty()
                     }
                 })
         }
@@ -686,8 +678,7 @@
         function get_receipt(id = null) {
             async_get_receipt(id)
                 .then((resp) => {
-                    if (resp) {
-
+                    if (resp.length) {
                         step_receipt()
 
                         async function step_receipt() {
@@ -697,12 +688,21 @@
                                     r += creat_html_receipt(item.ID, item.CODETEXT, item.USER_UPDATE, item.CODE)
                                     resolve($('.sector_receipt').html(r))
                                 })
+                                $('.sector_button-edit').addClass('d-none')
                             })
 
                         }
 
+                    } else {
+                        $('.sector_button-edit').removeClass('d-none')
+                        $('.sector_button-edit button').removeClass('d-none')
                     }
                 })
+        }
+
+        function creat_html_btnEdit() {
+            let html = `<button type="button" class="btn-edit btn btn-warning d-none">แก้ไขใบเสนอราคา</button>`
+            return html
         }
 
         function creat_html_billvat(id = null, codetext = null, userupdate = null) {
@@ -890,37 +890,6 @@
                     })
             }
 
-        }
-
-        //  *
-        //  * Form
-        //  * reset
-        //  * 
-        //  * reset data all form
-        //  *
-        function resetForm_quotation() {
-            let modal = "#modal_quotation"
-
-            let form = document.querySelectorAll("#frm_quotation")
-
-            form.forEach((item, key) => {
-                document.getElementsByTagName('form')[key].reset();
-            })
-
-            $(modal).find('.modal_text_header').html('')
-
-            // clear element
-            $('.text_promotion').addClass('d-none')
-            $('.text_promotion div').empty()
-            $(modal)
-                .find('[name=item_net]').val('').end()
-                .find('.total_price').html('').end()
-                .find('.total_discount').html('').end()
-                .find('.total_net').html('').end()
-                .find('.total_pay').html('').end()
-                .find('.total_unit').html('').end()
-                .find('.status_payment').html('').end()
-                .find('#list_item tbody').html('').end()
         }
     </script>
 

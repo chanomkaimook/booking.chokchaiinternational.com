@@ -218,3 +218,16 @@ function yearRange_fromDate(string $dateset = null)
 
   return $result;
 }
+
+function convertdate_fromDB(string $date = null)
+{
+  $result = "";
+
+  if($date){
+    $t = explode("-",$date);
+
+    $result = $t[2]."/".$t[1]."/".$t[0];
+  }
+
+  return $result;
+}

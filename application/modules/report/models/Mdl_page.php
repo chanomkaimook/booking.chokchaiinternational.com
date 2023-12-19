@@ -4,8 +4,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Mdl_page extends CI_Model
 
 {
-    private $table = "blank";
-    private $offview = "status_offview";
+    private $table = "bill";
+    private $offview = "";
     private $fildstatus = "status";
 
     public function __construct()
@@ -409,7 +409,9 @@ class Mdl_page extends CI_Model
         $hidden_start = "";
         $hidden_end = "";
 
-        $sql = $this->db->from($this->table);
+        $sql = $this->db->from($this->table)
+        ->join('deposit',$this->table.'.id=deposit.bill_id','left')
+        ->join('receipt',$this->table.'.id=receipt.bill_id','left');
 
         if (textNull($request['hidden_datestart'])) {
             $hidden_start = textNull($request['hidden_datestart']);

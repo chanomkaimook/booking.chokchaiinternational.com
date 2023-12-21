@@ -13,10 +13,6 @@ error_reporting(E_ALL & ~E_NOTICE);
 # // check permit admin or master admin
 # check_admin()
 # 
-# // check permit by paramiter is path or menu name (nav menu bar)
-# can()
-# 
-
 # // check role roles_name_list & roles_id_list
 # check_role()
 #
@@ -24,9 +20,10 @@ error_reporting(E_ALL & ~E_NOTICE);
 # check_permit()
 #
 # // check permit menu_name_list for nav menu bar
-# check_menu()
+# check_permit_groupmenu()
+# check_permit_menu()
 #
-# // check permit all 
+# // check permit & role all
 # check_data()
 #
 
@@ -36,6 +33,11 @@ error_reporting(E_ALL & ~E_NOTICE);
 # // check permit admin only
 # check_adminRole()
 #
+
+# Menu
+# // check permit by paramiter is path or menu name (nav menu bar)
+# can()
+# 
 
 /**
  * check role data
@@ -199,9 +201,9 @@ function method_find_checkarray($name = null, int $staff_id = null, string $key_
           //
           // check permit in role
           //
-          if ($query = query_permit($value, $text_permit_id)) {
+          /* if ($query = query_permit($value, $text_permit_id)) {
             $result = true;
-          }
+          } */
         }
       }
     } else {
@@ -213,9 +215,9 @@ function method_find_checkarray($name = null, int $staff_id = null, string $key_
         //
         // check permit in role
         //
-        if ($query = query_permit($name, $text_permit_id)) {
+        /* if ($query = query_permit($name, $text_permit_id)) {
           $result = true;
-        }
+        } */
       }
     }
   }
@@ -350,20 +352,23 @@ function can($name = null, array $dataarray = null)
     $dataarray = $ci->permit->get_dataPermitSet($staff_id);
   }
 
-  if (is_array($name)) {
-    // loop
-    foreach ($name as $value) {
-      if ($result != true) {
-        if (method_can($value, $dataarray)) {
-          $result = true;
+  if ($name) {
+    if (is_array($name)) {
+      // loop
+      foreach ($name as $value) {
+        if ($result != true) {
+          if (method_can($value, $dataarray)) {
+            $result = true;
+          }
         }
       }
-    }
-  } else {
-    if (method_can($name, $dataarray)) {
-      $result = true;
+    } else {
+      if (method_can($name, $dataarray)) {
+        $result = true;
+      }
     }
   }
+
 
   return $result;
 }
@@ -397,8 +402,7 @@ function method_can(string $name = null, array $dataarray = null)
       // value = menu
       //
       // TODO 
-      // - check_menu
-      // - if result check_menu = false it's go to check_role
+      // - check_role
 
       $value = (string) $value[0];
 
@@ -456,7 +460,7 @@ function check_permit_groupmenu($array = null)
     $ci = &get_instance();
 
     $ci->load->library('Permit');
-    
+
     $result = false;
 
     $staff_id = userlogin();

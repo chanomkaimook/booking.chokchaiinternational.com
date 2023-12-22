@@ -26,7 +26,7 @@
 
 
 <div class="row">
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
         <label class="text-capitalize">รอบจอง</label>
         <select id="round" name="round" class="form-control">
             <option value="" disabled selected>ระบุ</option>
@@ -44,14 +44,42 @@
         <input type="text" id="demo3" name="demo3" class="touchspin int_only">
     </div> -->
 
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
         <label class="text-capitalize">วันจองเข้าชม</label>
         <input type="text" class="form-control" name="bookingdate" placeholder="ระบุ">
     </div>
-    <div class="form-group col-md-4">
-        <label class="text-capitalize">ยอดเงินโอน</label>
+</div>
+
+<div class="row">
+    <div class="form-group col-md-3">
+        <label class="text-capitalize">ยอดเงินมัดจำ</label>
         <input type="text" class="form-control int_only" name="deposit" placeholder="ระบุตัวเลข">
     </div>
+    <div class="form-group col-md-3">
+        <label class="text-capitalize">ธนาคารที่โอนเงิน</label>
+        <select id="bank" name="bank" class="form-control">
+            <option value="" selected>ระบุ</option>
+            <?php
+            if ($bank) {
+                foreach ($bank as $row) {
+                    echo "<option value=\"$row->ID\">$row->NAME</option>";
+                }
+            }
+            ?>
+        </select>
+    </div>
+    <div class="form-group col-md-3">
+        <label class="text-capitalize">วันโอน</label>
+        <input type="text" class="form-control" name="deposit_date" placeholder="ระบุ">
+    </div>
+    <div class="form-group col-md-3">
+        <label class="text-capitalize">วันที่ลง POS</label>
+        <input type="text" class="form-control" name="pos_date" placeholder="ระบุ">
+    </div>
+</div>
+
+<div class="row">
+
 </div>
 
 <div class="row section_item">

@@ -22,23 +22,32 @@
 <!-- end page title -->
 
 <script>
-$(document).ready(function(){
-    let menu = $('.nav-second-level li.mm-active a')
-    let main = $('.metismenu > li.mm-active span:first')
-    let menuShow = menu.attr('data-show')
+    $(document).ready(function() {
+        let menu = $('.nav-second-level li.mm-active a')
+        let main = $('.metismenu > li.mm-active span:first')
+        let menuShow = menu.attr('data-show')
 
-    if(menuShow){
-        document.getElementsByClassName('breadcrumb-item')[0].innerHTML = 'Backend'
-        document.getElementsByClassName('breadcrumb-item')[1].innerHTML = main.text()
-        document.getElementsByClassName('breadcrumb-item')[2].innerHTML = menu.text()
-        document.getElementsByClassName('page-title')[0].innerHTML = menuShow
-    }
-})
+        if (menuShow) {
+            document.getElementsByClassName('breadcrumb-item')[0].innerHTML = 'Backend'
+            document.getElementsByClassName('breadcrumb-item')[1].innerHTML = main.text()
+            document.getElementsByClassName('breadcrumb-item')[2].innerHTML = menu.text()
+            document.getElementsByClassName('page-title')[0].innerHTML = menuShow
+        } else {
+            if ($("[name=theme-page-title]").val()) {
+                document.getElementsByClassName('page-title')[0].innerHTML = $("[name=theme-page-title]").val()
+            }
+
+            if ($("[name=theme-breadcrumb]").val()) {
+                document.getElementsByClassName('breadcrumb-item')[0].innerHTML = 'Backend'
+                document.getElementsByClassName('breadcrumb-item')[1].innerHTML = $("[name=theme-breadcrumb]").eq(0).val()
+                document.getElementsByClassName('breadcrumb-item')[2].innerHTML = $("[name=theme-breadcrumb]").eq(1).val()
+            }
+        }
+    })
 
 
     document.getElementsByClassName('breadcrumb-item')[0].innerHTML = '.'
     document.getElementsByClassName('breadcrumb-item')[1].innerHTML = '.'
     document.getElementsByClassName('breadcrumb-item')[2].innerHTML = '.'
     document.getElementsByClassName('page-title')[0].innerHTML = '.'
-
 </script>

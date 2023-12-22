@@ -52,7 +52,6 @@
         let form_time_end = '#time_end'
 
         $(document).on('change',form_time_start,function(){
-            console.log('change')
             let item_value = $(this).val()
             if(item_value){
                 $(form_time_end).find('option').each(function(index,item){

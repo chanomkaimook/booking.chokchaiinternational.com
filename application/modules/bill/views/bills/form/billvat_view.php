@@ -8,7 +8,7 @@
         <h5 class="card-text date_order"></h5>
     </div>
     <div class="form-group col-md-6">
-        <label class="text-capitalize">ยอดโอน</label>
+        <label class="text-capitalize">ยอดเงินมัดจำ</label>
         <h5 class="card-text deposit"></h5>
     </div>
     <div class="form-group col-md-12">

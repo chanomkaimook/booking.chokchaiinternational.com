@@ -132,14 +132,16 @@ class Receipt
             }
 
             $bill_id = $bill['id'];
-            $date_order = textNull($request['date_order']) ? textNull($request['date_order']) : textNull($bill['date_order']);
+            $deposit_date = textNull($request['deposit_date']) ? textNull($request['deposit_date']) : date('Y-m-d');
+            $pos_date = textNull($request['pos_date']) ? textNull($request['pos_date']) : date('Y-m-d');
             $remark = textNull($request['deposit_remark']) ? textNull($request['deposit_remark']) : null;
 
             $data_insert = array(
                 'bill_id'       => $bill_id,
                 'bill_code'     => $codebill,
 
-                'date_order'    => $date_order,
+                'deposit_date'    => $deposit_date,
+                'pos_date'      => $pos_date,
                 'deposit'       => $deposit,
                 'remark'        => $remark,
             );

@@ -17,7 +17,7 @@
             <div class="">
                 <span class="sector_button-edit">
                 </span>
-                <button type="button" class="btn-print btn btn-pink" onclick="printDiv('document')"><i class="fas fa-print"></i> Print</button>
+                <button type="button" class="btn-print btn btn-primary" onclick="printDiv('document')"><i class="fas fa-print"></i> Print</button>
             </div>
 
         </div>
@@ -212,21 +212,21 @@
                                             <?= textNull($q_setting->CN_CONDITION); ?>
                                         </th>
                                         <th width="13%">รวมเงิน</th>
-                                        <th width="13%"><?php echo $price; ?></th>
+                                        <th width="13%" class="text_price"><?php echo $price; ?></th>
                                     </tr>
                                     <tr>
                                         <th>ส่วนลด</th>
-                                        <th><?= $discount; ?></th>
+                                        <th class="text_discount"><?= $discount; ?></th>
                                     </tr>
                                     <tr>
 
                                         <th>Deposit</th>
-                                        <th><?= $deposit; ?></th>
+                                        <th class="text_deposit"><?= $deposit; ?></th>
                                     </tr>
                                     <tr>
 
                                         <th>คงเหลือ</th>
-                                        <th><?= $net; ?></th>
+                                        <th class="text_net"><?= $net; ?></th>
                                     </tr>
                                 </thead>
                             </table>
@@ -366,7 +366,7 @@
             // 
             // quotation
             // 
-            $(document).on('click', '.sector_button-edit .btn-edit', function(e) {
+            $(document).on('click', '.sector_button-edit .btn-edit-quotation', function(e) {
                 e.preventDefault()
 
                 let dataid = $('#data-bill_id').val()
@@ -379,6 +379,17 @@
                     })
 
                 $('#frm').find('[name=frm_hidden_id]').val(dataid)
+
+                // script.php
+                edit_data(dataid)
+                $(form_name).find(form_hidden_id).val(dataid)
+            })
+            $(document).on('click', '.sector_button-edit .btn-del', function(e) {
+                e.preventDefault()
+
+                let dataid = $('#data-bill_id').val()
+                cancel_bill(dataid)
+
             })
 
             // 
@@ -419,8 +430,11 @@
                         if (item.ITEM_ID) {
                             add_html_list_item()
 
-
                             $("[name=item_list]:last").val(item.ITEM_ID)
+                            $("[name=item_qty]:last").val(item.QUANTITY)
+
+                            // from "form/form.php"
+                            cal_item_list()
                         }
                     })
                 }
@@ -487,11 +501,11 @@
             // ############
             // 
             function modalActive_deposit(action = 'view', data = []) {
-                let header = 'สร้างใบรับโอนเงิน'
+                let header = 'สร้างใบรับเงินมัดจำ'
                 if (action == 'add') {
                     $(modal_dp_name).find('.modal_text_header').html(header)
                 } else {
-                    header = 'ใบรับโอนเงิน'
+                    header = 'ใบรับเงินมัดจำ'
                     $(modal_dp_name).find('.modal_text_header').html(header)
                 }
 
@@ -615,7 +629,9 @@
         })
 
         function get_allbill(id = null) {
+
             async_allbill()
+
             async function async_allbill() {
                 let a = new Promise((resolve, reject) => {
                     resolve(get_addreceipt(id))
@@ -624,15 +640,34 @@
 
                     resolve(get_receipt(id))
                 })
+
+                let deposit = new Promise((resolve, reject) => {
+                    resolve(update_deposit(id))
+                })
             }
 
             return true
+        }
+
+        function update_deposit(id = null) {
+            async_update_deposit(id)
+                .then((resp) => {
+                    if (resp) {
+                        $('.text_deposit').text(resp)
+                    }
+                })
         }
 
         function get_addreceipt(id = null) {
             async_get_addreceipt(id)
                 .then((resp) => {
                     if (resp) {
+
+                        if (resp.COMPLETE_ID == 4) {
+                            clear_tool()
+                            return false
+                        }
+                        // 8=success,4=cancel
                         if (resp.PAYMENT_ID != 8) {
                             $('.tool-btn').removeClass('d-none')
                         } else {
@@ -659,23 +694,32 @@
                         step_billvat()
 
                         async function step_billvat() {
-                            let v = ""
+                            let t = "มัดจำ "
+                            let v = " "
                             let result = new Promise((resolve, reject) => {
+
+                                num = 0
                                 resp.forEach(function(item, index) {
-                                    v += creat_html_billvat(item.ID, item.CODETEXT, item.USER_UPDATE)
-                                    resolve($('.sector_billvat').html(v))
+                                    if(num){
+                                        t = "ชำระหน้าฟาร์ม "
+                                    }
+                                    t = t+item.DEPOSIT
+                                    v += creat_html_billvat(item.ID, t, item.USER_UPDATE)
+                                    num++
                                 })
+                                resolve($('.sector_billvat').html(v))
                             })
 
                         }
 
-                    }else{
+                    } else {
                         $('.sector_billvat').empty()
                     }
                 })
         }
 
         function get_receipt(id = null) {
+            let btn_show = ''
             async_get_receipt(id)
                 .then((resp) => {
                     if (resp.length) {
@@ -685,23 +729,43 @@
                             let r = ""
                             let result = new Promise((resolve, reject) => {
                                 resp.forEach(function(item, index) {
+                                    btn_show = item.CODETEXT
                                     r += creat_html_receipt(item.ID, item.CODETEXT, item.USER_UPDATE, item.CODE)
                                     resolve($('.sector_receipt').html(r))
                                 })
-                                $('.sector_button-edit').addClass('d-none')
-                            })
 
+                                if (btn_show) {
+
+                                    btn_edit_open(false)
+                                } else {
+                                    btn_edit_open()
+                                }
+                            })
                         }
 
                     } else {
-                        $('.sector_button-edit').removeClass('d-none')
-                        $('.sector_button-edit button').removeClass('d-none')
+                        btn_edit_open()
                     }
                 })
         }
 
+        function btn_edit_open(type = true) {
+
+            let sec_button_edit = $('.sector_button-edit')
+            let button_edit = $('.sector_button-edit button')
+            if (type == true) {
+                sec_button_edit.removeClass('d-none')
+                button_edit.removeClass('d-none')
+            } else {
+                sec_button_edit.addClass('d-none')
+                button_edit.addClass('d-none')
+            }
+        }
+
         function creat_html_btnEdit() {
-            let html = `<button type="button" class="btn-edit btn btn-warning d-none">แก้ไขใบเสนอราคา</button>`
+            let html = `<button type="button" class="btn-edit-quotation btn btn-warning d-none mr-2">แก้ไขใบเสนอราคา</button>`
+            html += `<button type="button" class="btn-del btn btn-danger d-none mr-2">ยกเลิก</button>`
+
             return html
         }
 
@@ -747,6 +811,18 @@
         //  * 
         //  * get data
         //  *
+        async function async_update_deposit() {
+            let url = new URL(path(url_moduleControl + '/update_deposit_price'), domain)
+            let bill_id = $('#data-bill_id').val()
+            if (bill_id) {
+                url.searchParams.append('id', bill_id)
+            }
+
+            let response = await fetch(url)
+            let result = await response.json()
+
+            return result
+        }
         async function async_get_quotation() {
             let url = new URL(path(url_moduleControl + '/get_bill'), domain)
             let bill_id = $('#data-bill_id').val()
@@ -890,6 +966,84 @@
                     })
             }
 
+        }
+
+        //  *
+        //  * CRUD
+        //  * update
+        //  * 
+        //  * cancel data
+        //  *
+        async function async_cancel_bill(item_id = null, remark = null) {
+            let url = new URL(path(url_moduleControl + '/cancel_bill'), domain)
+
+            var data = new FormData()
+            data.append('item_id', item_id)
+            data.append('item_remark', remark)
+
+            let method = {
+                'method': 'post',
+                'body': data
+            }
+
+            let response = await fetch(url, method)
+            let result = await response.json()
+
+            return result
+        }
+
+        //  *
+        //  * Form
+        //  * update
+        //  * 
+        //  * confirm to cancel data
+        //  * #swal_setConfirmInput() = e_navbar.php
+        //  *
+        function cancel_bill(item_id) {
+            Swal.fire(
+                    swal_setConfirmInput()
+                    // swal_setConfirm()
+                )
+                .then((result) => {
+                    if (!result.dismiss) {
+                        let remark = result.value.trim()
+                        confirm_cancel_bill(item_id, remark)
+                    }
+                })
+            $('.swal2-textarea').focus()
+        }
+
+        //  *
+        //  * Form
+        //  * update
+        //  * 
+        //  * cancel data
+        //  *
+        function confirm_cancel_bill(item_id = null, remark = null) {
+
+            if (item_id) {
+                async_cancel_bill(item_id, remark)
+                    .then((data) => {
+
+                        if (data.error == 0) {
+                            swalalert()
+
+                            $('#modal_view').modal('hide')
+
+                            clear_tool()
+                        } else {
+                            swalalert('error', data.txt, {
+                                auto: false
+                            })
+                        }
+                    })
+            }
+
+        }
+
+        function clear_tool() {
+            $('.section-tool .d-flex').empty()
+            $('.section-tool .sector_button-edit').empty()
         }
     </script>
 

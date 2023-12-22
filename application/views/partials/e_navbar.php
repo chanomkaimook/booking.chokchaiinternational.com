@@ -227,7 +227,9 @@
                      </button>
                  </li>
              </ul>
-
+                    <input type="hidden" name="theme-page-title" value="<?= $pagetitle ? $pagetitle : 'null'; ?>">
+                    <input type="hidden" name="theme-breadcrumb" value="<?= $breadcrumb[0] ? $breadcrumb[0] : 'null'; ?>">
+                    <input type="hidden" name="theme-breadcrumb" value="<?= $breadcrumb[1] ? $breadcrumb[1] : 'null'; ?>">
 
          </div>
          <!-- end Topbar -->

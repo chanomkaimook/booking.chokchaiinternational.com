@@ -78,6 +78,7 @@
                             <li class=""><a href="<?= site_url('information/ctl_customer'); ?>" data-show="ลูกค้า">ลูกค้า</a></li>
                             <li class=""><a href="<?= site_url('information/ctl_ticket'); ?>" data-show="ประเภทลูกค้า">ประเภทลูกค้า</a></li>
                             <li class=""><a href="<?= site_url('information/ctl_division'); ?>" data-show="รุ่นลูกค้า">รุ่นลูกค้า</a></li>
+                            <li class=""><a href="<?= site_url('information/ctl_bank'); ?>" data-show="ธนาคาร">ธนาคาร</a></li>
                         </ul>
                     </li>
 

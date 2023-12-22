@@ -44,7 +44,7 @@ class Promotion
             $optional['where'] = array(
                 'item_id'   => $item_id,
             );
-            $q = $this->ci->mdl_promotion->get_data(null, $optional);
+            $q = $this->ci->mdl_promotion->get_dataShow(null, $optional);
 
             if ($q) {
                 $next = 1;

@@ -11,7 +11,7 @@
     </div>
     <div class="form-group col-md-6">
         <span class="required"><i class="mdi mdi-svg"></i></span>
-        <label class="text-capitalize">ยอดโอน</label>
+        <label class="text-capitalize">ยอดเงินมัดจำ</label>
         <input type="text" class="form-control int_only" name="deposit" placeholder="ระบุ" required>
     </div>
     <div class="form-group col-md-12">
@@ -60,6 +60,28 @@
                 })
             }
 
+            let deposit_date = $('[name=deposit_date]').val();
+            if (deposit_date) {
+                set_deposit_date = deposit_date.split("/")
+                let new_deposit_date = set_deposit_date[2] + "-" + set_deposit_date[1] + "-" + set_deposit_date[0]
+
+                data.push({
+                    'name': 'deposit_date',
+                    'value': new_deposit_date,
+                })
+            }
+
+            let pos_date = $('[name=pos_date]').val();
+            if (pos_date) {
+                set_pos_date = pos_date.split("/")
+                let new_pos_date = set_pos_date[2] + "-" + set_pos_date[1] + "-" + set_pos_date[0]
+
+                data.push({
+                    'name': 'pos_date',
+                    'value': new_pos_date,
+                })
+            }
+
             if (item_id) {
                 func = async_update_deposit(item_id, data)
             } else {
@@ -78,6 +100,9 @@
                             text: resp.txt,
                             timer: swal_autoClose,
                         }).then((result) => {
+
+                            //
+                            // document bill
                             get_allbill()
 
                             modalHide()

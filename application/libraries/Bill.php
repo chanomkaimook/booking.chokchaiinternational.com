@@ -515,6 +515,9 @@ class Bill
         $bookingdate = $request['bookingdate'] ? textNull($request['bookingdate']) : null;
         $remark = $request['remark'] ? textNull($request['remark']) : null;
 
+        $deposit_date = $request['deposit_date'] ? textNull($request['deposit_date']) : null;
+        $pos_date = $request['pos_date'] ? textNull($request['pos_date']) : null;
+
         $item_list = $request['item_list'] ? $request['item_list'] : null;
 
         $result = array(
@@ -726,6 +729,47 @@ class Bill
         return $result;
     }
 
+    function cancel_bill($id = null)
+    {
+        $result = null;
+        $request = $_REQUEST;
+
+        $result = array(
+            'error' => 1,
+            'txt'   => 'ไม่มีการทำรายการ'
+        );
+
+        if (!$id) {
+            $id = $request['item_id'];
+            $remark_delete = textNull($request['item_remark']);
+        }
+        if ($id) {
+
+            $complete_status = complete('cancel');
+            $data_update = array(
+                'complete_id'       => 4,
+                'complete_alias'   => $complete_status,
+                'remark_delete'   => $remark_delete,
+            );
+            $this->ci->db->trans_begin();
+
+            $this->ci->mdl_bill->update_bill($data_update, $id);
+
+            if ($this->ci->db->trans_status() === FALSE) {
+                $this->ci->db->trans_rollback();
+            } else {
+                $this->ci->db->trans_commit();
+
+                $result = array(
+                    'error' => 0,
+                    'txt'   => "ทำรายการสำเร็จ"
+                );
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * get status on bill
      *
@@ -866,6 +910,25 @@ class Bill
                 'txt'   => 'ทำรายการสำเร็จ',
                 'data'  => $datastatus
             );
+        }
+
+        return $result;
+    }
+
+    function get_deposit($id = null)
+    {
+        $result = "";
+
+        if ($id) {
+            $optional['select'] = "sum(deposit) as total_deposit";
+            $optional['where'] = array(
+                'bill_id'   => $id,
+                'status'    => 1
+            );
+            $q_deposit = $this->ci->mdl_deposit->get_data(null, $optional, 'row_array');
+            if ($q_deposit) {
+                $result = $q_deposit['total_deposit'];
+            }
         }
 
         return $result;

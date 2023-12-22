@@ -13,7 +13,7 @@ class Ctl_bill extends MY_Controller
     {
         parent::__construct();
         $modelname = 'mdl_bill';
-        $this->load->model(array('bill/mdl_bill', 'information/mdl_round'));
+        $this->load->model(array('bill/mdl_bill', 'information/mdl_round', 'information/mdl_bank'));
         $this->load->library(array('Bill'));
 
         $this->middleware(
@@ -38,6 +38,7 @@ class Ctl_bill extends MY_Controller
     public function index()
     {
         $optional['order_by'] = array('id' => 'asc');
+        $data['bank'] = $this->mdl_bank->get_dataShow(null, $optional);
         $data['round'] = $this->mdl_round->get_dataShow(null, $optional);
 
         $this->template->set_partial(
@@ -69,19 +70,24 @@ class Ctl_bill extends MY_Controller
     public function document()
     {
         $data = [];
+
+        // set page title
+        $data['pagetitle'] = "ใบเสนอราคา";
+        $data['breadcrumb'] = array('รายการจอง', 'ข้อมูลการจอง');
+
         $optional['order_by'] = array('id' => 'asc');
         $data['round'] = $this->mdl_round->get_dataShow(null, $optional);
 
         $optional = [];
         $optional_joinbill = [];
         $item_code = $this->input->get('code');
-        
+
 
         if ($item_code) {
             $optional['where'] = array(
                 'bill.code'  => $item_code
             );
-            $data['bill'] = $this->mdl_bill->get_data(null, $optional, 'row_array');
+            $data['bill'] = $this->mdl_bill->get_dataShow(null, $optional, 'row_array');
 
             $optional_joinbill['where'] = array(
                 'bill_code'  => $item_code
@@ -90,7 +96,7 @@ class Ctl_bill extends MY_Controller
             $optional_deposit = $optional_joinbill;
         } else {
             $item_id = $this->input->get('id');
-            $data['bill'] = $this->mdl_bill->get_data(textNull($item_id), null, 'row_array');
+            $data['bill'] = $this->mdl_bill->get_dataShow(textNull($item_id), null, 'row_array');
 
             $optional_joinbill['where'] = array(
                 'bill_id'  => textNull($item_id)
@@ -100,7 +106,7 @@ class Ctl_bill extends MY_Controller
         }
         // $optional_deposit['order_by'] = array('id'=>'asc');
 
-        $data['bill_detail'] = $this->mdl_bill_detail->get_data(null, $optional_joinbill, 'result_array');
+        $data['bill_detail'] = $this->mdl_bill_detail->get_dataShow(null, $optional_joinbill, 'result_array');
 
         $deposit = "";
         $this->load->model('deposit/mdl_deposit');
@@ -502,7 +508,7 @@ class Ctl_bill extends MY_Controller
     {
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
-
+            
             $returns = $this->bill->create_bill();
             echo json_encode($returns);
         }
@@ -549,6 +555,15 @@ class Ctl_bill extends MY_Controller
         }
     }
 
+    public function update_deposit_price()
+    {
+        # code...
+        $request = $_REQUEST;
+        $id = $request['id'];
+        $returns = $this->bill->get_deposit($id);
+        echo json_encode($returns);
+    }
+
     public function update_receipt()
     {
         # code...
@@ -575,6 +590,22 @@ class Ctl_bill extends MY_Controller
             $this->load->library('receipt');
 
             $returns = $this->receipt->delete_deposit();
+            echo json_encode($returns);
+        }
+    }
+
+    //  *
+    //  * CRUD
+    //  * delete
+    //  * 
+    //  * delete data
+    //  *
+    public function cancel_bill()
+    {
+        # code...
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+
+            $returns = $this->bill->cancel_bill();
             echo json_encode($returns);
         }
     }

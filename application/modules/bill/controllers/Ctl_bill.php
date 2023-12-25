@@ -76,6 +76,7 @@ class Ctl_bill extends MY_Controller
         $data['breadcrumb'] = array('รายการจอง', 'ข้อมูลการจอง');
 
         $optional['order_by'] = array('id' => 'asc');
+        $data['bank'] = $this->mdl_bank->get_dataShow(null, $optional);
         $data['round'] = $this->mdl_round->get_dataShow(null, $optional);
 
         $optional = [];
@@ -292,6 +293,16 @@ class Ctl_bill extends MY_Controller
         $item_id = $request['id'];
         $data = $this->model->get_data($item_id);
 
+        if ($data) {
+            $net_pure = "";
+            $deposit = $this->bill->get_deposit($item_id);
+            if ($deposit) {
+                $net_pure = floatval($data->NET) - floatval($deposit);
+            }
+
+            $data->NET_PURE = textMoney($net_pure);
+        }
+
         $result = $data;
         echo json_encode($result);
     }
@@ -422,7 +433,7 @@ class Ctl_bill extends MY_Controller
         echo json_encode($result);
     }
 
-    public function get_rc_codetext()
+    public function get_rc_codetext($bill_id = null)
     {
         $codetext = "";
         $result = array(
@@ -431,7 +442,7 @@ class Ctl_bill extends MY_Controller
         );
 
         $request = $_REQUEST;
-        $item_id = $request['bill_id'];
+        $item_id = $bill_id ? $bill_id : $request['bill_id'];
         if ($item_id) {
 
             $optional['where'] = array(
@@ -462,23 +473,34 @@ class Ctl_bill extends MY_Controller
                 }
 
                 if (textNull($deposit) && textNull($net)) {
-                    if ($ar_codetext && (floatval($deposit) >= floatval($net))) {
+                    if ($data_bill->COMPLETE_ID != 4) { // 4= cancel
+                        if ($ar_codetext && (floatval($deposit) >= floatval($net))) {
 
+                            $codetext = implode(",", $ar_codetext);
+                            $result = array(
+                                'error' => 0,
+                                'txt'   => "ทำรายการสำเร็จ",
+                                'data'  => array(
+                                    'codetext'  => $codetext
+                                )
+                            );
+                        } else {
+                            $result = array(
+                                'error' => 1,
+                                'txt'   => "ยอดโอนไม่ถูกต้อง",
+                                'data'  => array(
+                                    'payment'   => $deposit,
+                                    'net'       => $net
+                                )
+                            );
+                        }
+                    } else {
                         $codetext = implode(",", $ar_codetext);
                         $result = array(
                             'error' => 0,
                             'txt'   => "ทำรายการสำเร็จ",
                             'data'  => array(
                                 'codetext'  => $codetext
-                            )
-                        );
-                    } else {
-                        $result = array(
-                            'error' => 1,
-                            'txt'   => "ยอดโอนไม่ถูกต้อง",
-                            'data'  => array(
-                                'payment'   => $deposit,
-                                'net'       => $net
                             )
                         );
                     }
@@ -508,7 +530,7 @@ class Ctl_bill extends MY_Controller
     {
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
-            
+
             $returns = $this->bill->create_bill();
             echo json_encode($returns);
         }

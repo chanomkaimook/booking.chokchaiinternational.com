@@ -66,7 +66,7 @@
                         $price = textMoney($bill['PRICE']);
                         $discount = textMoney($bill['DISCOUNT']);
                         $deposit = textMoney($total_deposit);
-                        $net = textMoney($bill['NET']);
+                        $net = textMoney(floatval($bill['NET']) - floatval($total_deposit)) ;
 
                         $staff = whois($bill['USER_STARTS']);
                         ?>
@@ -281,6 +281,16 @@
                 todayHighlight: !0,
                 format: 'dd/mm/yyyy',
             })
+            $("input[name=deposit_date]").datepicker({
+                autoclose: !0,
+                todayHighlight: !0,
+                format: 'dd/mm/yyyy',
+            })
+            $("input[name=pos_date]").datepicker({
+                autoclose: !0,
+                todayHighlight: !0,
+                format: 'dd/mm/yyyy',
+            })
             $("input[name=bookingdate]").datepicker({
                 autoclose: !0,
                 todayHighlight: !0,
@@ -409,7 +419,10 @@
                     .find('[name=agent_contact]').val(data.AGENT_CONTACT).end()
                     .find('[name=round]').val(data.ROUND_ID).end()
                     .find('[name=remark]').text(data.REMARK).end()
+                    .find('#bank').attr('disabled', 'disabled').end()
                     .find('[name=deposit]').attr('disabled', 'disabled').end()
+                    .find('[name=deposit_date]').attr('disabled', 'disabled').end()
+                    .find('[name=pos_date]').attr('disabled', 'disabled').end()
 
                 if (data.BOOKING_DATE) {
                     let booking = data.BOOKING_DATE
@@ -513,9 +526,14 @@
                     case 'view':
 
                         let new_date_order = ''
-                        if (data.DATE_ORDER) {
-                            let set_date_order = data.DATE_ORDER.split("-")
+                        if (data.DEPOSIT_DATE) {
+                            let set_date_order = data.DEPOSIT_DATE.split("-")
                             new_date_order = set_date_order[2] + "/" + set_date_order[1] + "/" + set_date_order[0]
+                        }
+                        let new_date_pos = ''
+                        if (data.POS_DATE) {
+                            let set_date_pos = data.POS_DATE.split("-")
+                            new_date_pos = set_date_pos[2] + "/" + set_date_pos[1] + "/" + set_date_pos[0]
                         }
 
                         $(modal_dp_name)
@@ -523,7 +541,9 @@
 
                         $(modal_dp_view)
                             .find('.codetext').text(data.CODETEXT).end()
-                            .find('.date_order').text(new_date_order).end()
+                            .find('.deposit_date').text(new_date_order).end()
+                            .find('.pos_date').text(new_date_pos).end()
+                            .find('.bank').text(data.BANK_NAME).end()
                             .find('.deposit').text(data.DEPOSIT).end()
                             .find('.remark_deposit').text(data.REMARK).end()
                             .find('.user_active').text(data.USER_ACTIVE).end()
@@ -532,16 +552,22 @@
                         break
                     case 'edit':
 
-                        if (data.DATE_ORDER) {
-                            let date_order = data.DATE_ORDER
+                        if (data.DEPOSIT_DATE) {
+                            let date_order = data.DEPOSIT_DATE
                             $(modal_dp_form)
-                                .find('[name=date_order_show]').datepicker("setDate", new Date(date_order));
+                                .find('[name=deposit_date]').datepicker("setDate", new Date(date_order));
+                        }
+                        if (data.POS_DATE) {
+                            let pos_date = data.POS_DATE
+                            $(modal_dp_form)
+                                .find('[name=pos_date]').datepicker("setDate", new Date(pos_date));
                         }
 
                         $(modal_dp_form)
                             .find('[name=codetext]').val(data.CODETEXT).end()
                             .find('[name=deposit]').val(data.DEPOSIT).end()
-                            .find('[name=remark]').val(data.REMARK).end()
+                            .find('[name=deposit_remark]').val(data.REMARK).end()
+                            .find('#bank').val(data.BANK_ID).end()
                         break
                     case 'add':
                         $(modal_dp_name).find('[name=frm_deposit_hidden_id]').val('')
@@ -650,11 +676,9 @@
         }
 
         function update_deposit(id = null) {
-            async_update_deposit(id)
+            async_get_price_deposit(id)
                 .then((resp) => {
-                    if (resp) {
-                        $('.text_deposit').text(resp)
-                    }
+                    $('.text_deposit').text(resp)
                 })
         }
 
@@ -662,6 +686,9 @@
             async_get_addreceipt(id)
                 .then((resp) => {
                     if (resp) {
+                        //
+                        // update net
+                        $('.text_net').text(resp.NET_PURE)
 
                         if (resp.COMPLETE_ID == 4) {
                             clear_tool()
@@ -811,7 +838,7 @@
         //  * 
         //  * get data
         //  *
-        async function async_update_deposit() {
+        async function async_get_price_deposit() {
             let url = new URL(path(url_moduleControl + '/update_deposit_price'), domain)
             let bill_id = $('#data-bill_id').val()
             if (bill_id) {
@@ -958,6 +985,7 @@
                             $('#modal_billvat').modal('hide')
 
                             get_allbill()
+
                         } else {
                             swalalert('error', data.txt, {
                                 auto: false
@@ -1042,7 +1070,10 @@
         }
 
         function clear_tool() {
-            $('.section-tool .d-flex').empty()
+            // $('.section-tool .d-flex').empty()
+            $('.section-tool .tool-btn').remove('')
+            // $('.section-tool .sector_billvat').remove('')
+
             $('.section-tool .sector_button-edit').empty()
         }
     </script>

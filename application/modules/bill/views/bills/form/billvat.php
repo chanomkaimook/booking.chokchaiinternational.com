@@ -4,7 +4,9 @@
         <label class="text-capitalize">เลขที่ใบกำกับอย่างย่อ</label>
         <input type="text" class="form-control" name="codetext" placeholder="ระบุ" required>
     </div>
-    <div class="form-group col-md-6">
+</div>
+
+<!-- <div class="form-group col-md-6">
         <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">วันที่ออกใบ</label>
         <input type="text" class="form-control" name="date_order_show" placeholder="ระบุ" required>
@@ -13,7 +15,38 @@
         <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">ยอดเงินมัดจำ</label>
         <input type="text" class="form-control int_only" name="deposit" placeholder="ระบุ" required>
+    </div> -->
+
+
+<div class="row">
+    <div class="form-group col-md-6">
+        <label class="text-capitalize">ยอดเงินมัดจำ</label>
+        <input type="text" class="form-control int_only" name="deposit" placeholder="ระบุตัวเลข">
     </div>
+    <div class="form-group col-md-6">
+        <label class="text-capitalize">ธนาคารที่โอนเงิน</label>
+        <select id="bank" name="bank" class="form-control">
+            <option value="" selected>ระบุ</option>
+            <?php
+            if ($bank) {
+                foreach ($bank as $row) {
+                    echo "<option value=\"$row->ID\">$row->NAME</option>";
+                }
+            }
+            ?>
+        </select>
+    </div>
+    <div class="form-group col-md-6">
+        <label class="text-capitalize">วันโอน</label>
+        <input type="text" class="form-control" name="deposit_date" placeholder="ระบุ">
+    </div>
+    <div class="form-group col-md-6">
+        <label class="text-capitalize">วันที่ลง POS</label>
+        <input type="text" class="form-control" name="pos_date" placeholder="ระบุ">
+    </div>
+</div>
+
+<div class="row">
     <div class="form-group col-md-12">
         <label class="text-capitalize">หมายเหตุ</label>
         <textarea class="form-control" name="deposit_remark" cols="30" rows="2"></textarea>
@@ -49,7 +82,7 @@
                 })
             }
 
-            let date_order = $('[name=date_order_show]').val();
+            /* let date_order = $('[name=date_order_show]').val();
             if (date_order) {
                 set_date_order = date_order.split("/")
                 let new_date_order = set_date_order[2] + "-" + set_date_order[1] + "-" + set_date_order[0]
@@ -58,7 +91,7 @@
                     'name': 'date_order',
                     'value': new_date_order,
                 })
-            }
+            } */
 
             let deposit_date = $('[name=deposit_date]').val();
             if (deposit_date) {
@@ -81,6 +114,16 @@
                     'value': new_pos_date,
                 })
             }
+
+            let bank = $('#bank').val();
+            if (bank) {
+                data.push({
+                    'name': 'bank_name',
+                    'value': $('#bank option:selected').text()
+                })
+            }
+
+
 
             if (item_id) {
                 func = async_update_deposit(item_id, data)
@@ -157,6 +200,7 @@
         //  * update data 
         //  *
         async function async_update_deposit(id = null, data = []) {
+            
             let url = new URL(path(url_moduleControl + '/update_deposit'), domain)
             let body = new FormData();
             if (data.length) {

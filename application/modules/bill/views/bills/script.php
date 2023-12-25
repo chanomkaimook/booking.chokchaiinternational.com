@@ -100,6 +100,10 @@
                 })
 
 
+                data.push({
+                    'name': 'bank_name',
+                    'value': $(modal).find('#bank option:selected').text()
+                })
 
                 // 
                 // argument for get_cartData
@@ -449,16 +453,6 @@
     //  * open form edit data
     //  * #async_get_data() = script_crud.php
     //  *
-    function edit_data(item_id = 0) {
-        // item_id = 0
-        async_get_data(item_id)
-            .then((resp) => {
-                modalActive(resp, 'edit')
-            })
-            .then(() => {
-                modalLoading_clear()
-            })
-    }
 
     //  *
     //  * Form

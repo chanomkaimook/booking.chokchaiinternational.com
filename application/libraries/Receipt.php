@@ -108,6 +108,8 @@ class Receipt
 
         $id = $id ? $id : $request['id'];
         $codebill = $codebill ? $codebill : textNull($request['codebill']);
+        $bank_id = textNull($request['bank']);
+        $bank_name = textNull($request['bank_name']);
         $deposit = $deposit ? $deposit : textNull($request['deposit']);
         $codetext = textNull($request['codetext']);
 
@@ -133,14 +135,17 @@ class Receipt
 
             $bill_id = $bill['id'];
             $deposit_date = textNull($request['deposit_date']) ? textNull($request['deposit_date']) : date('Y-m-d');
-            $pos_date = textNull($request['pos_date']) ? textNull($request['pos_date']) : date('Y-m-d');
+            $pos_date = textNull($request['pos_date']) ? textNull($request['pos_date']) : null;
             $remark = textNull($request['deposit_remark']) ? textNull($request['deposit_remark']) : null;
 
             $data_insert = array(
                 'bill_id'       => $bill_id,
                 'bill_code'     => $codebill,
 
-                'deposit_date'    => $deposit_date,
+                'bank_id'       => $bank_id,
+                'bank_name'     => $bank_name,
+
+                'deposit_date'  => $deposit_date,
                 'pos_date'      => $pos_date,
                 'deposit'       => $deposit,
                 'remark'        => $remark,
@@ -216,15 +221,22 @@ class Receipt
         }
         if ($id) {
             $codetext = textNull($request['codetext']);
-            $dateorder = textNull($request['date_order']);
+            $dateorder = textNull($request['deposit_date']);
             $deposit = textNull($request['deposit']);
+            $pos_date = textNull($request['pos_date']);
+            $bank_id = textNull($request['bank']);
+            $bank_name = textNull($request['bank_name']);
             $remark = textNull($request['deposit_remark']);
 
             if ($codetext && $deposit) {
                 $data_update = array(
                     'codetext' => $codetext,
-                    'date_order' => $dateorder,
+                    'deposit_date' => $dateorder,
                     'deposit' => $deposit,
+
+                    'pos_date' => $pos_date,
+                    'bank_id' => $bank_id,
+                    'bank_name' => $bank_name,
                     'remark' => $remark,
                 );
                 $r = $this->ci->mdl_deposit->update_data($data_update, $id);
@@ -239,6 +251,9 @@ class Receipt
                     $r_rc = $this->ci->mdl_receipt->get_data(null, $optional, 'row');
                     $rc_id = $r_rc->ID;
                     $this->clear_rc_codetext($rc_id);
+
+                    // update status bill
+                    $this->ci->bill->update_bill($bill_id);
                 }
 
                 $result = array(

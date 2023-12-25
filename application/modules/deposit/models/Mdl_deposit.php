@@ -158,7 +158,7 @@ class Mdl_deposit extends CI_Model
         } else {
             $array_text_error = array(
                 'codetext'       => 'เลขใบกำกับอย่างย่อ',
-                'date_order'    => 'วันที่รับโอน',
+                'deposit_date'    => 'วันที่รับโอน',
                 'deposit'       => 'ยอดเงินโอน'
             );
         }
@@ -265,11 +265,11 @@ class Mdl_deposit extends CI_Model
             $request = $_POST;
 
             $codetext = textNull($data_update['codetext']) ? $data_update['codetext'] : $request['codetext'];
-            $date_order = textNull($data_update['date_order']) ? $data_update['date_order'] : $request['date_order'];
+            $deposit_date = textNull($data_update['deposit_date']) ? $data_update['deposit_date'] : $request['deposit_date'];
             $deposit = textNull($data_update['deposit']) ? $data_update['deposit'] : $request['deposit'];
             $array_chk_dup = array(
                 'codetext' => $codetext,
-                'date_order' => $date_order,
+                'deposit_date' => $deposit_date,
                 'deposit' => $deposit,
             );
 

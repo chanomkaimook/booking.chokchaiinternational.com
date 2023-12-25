@@ -46,7 +46,7 @@ function get_priceVat(float $price = null, int $vat_num = null)
   if ($vat_num && $price) {
     $price_beforevat = $price / 1.07;
     $vat = $price_beforevat * 0.07;
-    $price_aftervat = $price_beforevat + $vat_num;
+    $price_aftervat = $price_beforevat + $vat;
 
     $result = array(
       'vat'  => textFloat($vat),

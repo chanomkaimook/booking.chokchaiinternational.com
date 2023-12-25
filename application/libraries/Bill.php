@@ -755,6 +755,72 @@ class Bill
 
             $this->ci->mdl_bill->update_bill($data_update, $id);
 
+            // 
+            // if check have a receipt
+            $this->ci->load->model('receipt/mdl_receipt');
+            $optional['where'] = array(
+                'bill_id'   => $id
+            );
+            $data_receipt = $this->ci->mdl_receipt->get_dataShow(null, $optional, 'row');
+            if ($data_receipt) {
+                $receipt_id = $data_receipt->ID;
+
+                $net = 0;
+                $ar_codetext = [];
+                $codetext = "";
+                $deposit = 0;
+
+                $vat = 0.00;
+                $price_novat = 0.00;
+                $price_vat = 0.00;
+
+                // 
+                // if check have a deposit
+                $data_deposit = $this->ci->db->select('*')
+                    ->from('deposit')
+                    ->where('bill_id', $id)
+                    ->where('status', 1)
+                    ->get();
+                $q = $data_deposit->result();
+                if ($q) {
+                    foreach ($q as $row) {
+                        $ar_codetext[] = $row->CODETEXT;
+                        $deposit = $deposit + $row->DEPOSIT;
+                    }
+
+                    if ($ar_codetext) {
+                        $codetext = implode(',', $ar_codetext);
+                    }
+                }
+
+                if ($net = $deposit) {
+                    // calculate VAT
+                    $q_vat = $this->ci->mdl_settings->get_vatNum();
+                    if (!$q_vat) {
+                        $vatnum = $this->ci->config->item('vat_num');
+                    } else {
+                        $vatnum = $q_vat->VAT_NUM;
+                    }
+                    
+                    $price_withvat = get_priceVat($net, $vatnum);
+
+                    if ($price_withvat) {
+                        $vat = $price_withvat['vat'];
+                        $price_novat = $price_withvat['before_vat'];
+                        $price_vat = $price_withvat['after_vat'];
+                    }
+                }
+
+                //
+                // update receipt
+                $data_receipt_update = array(
+                    'price_novat'   => $price_novat,
+                    'vat'   => $vat,
+                    'net'   => $price_vat,
+                );
+                $this->ci->mdl_receipt->update_data($data_receipt_update, $receipt_id);
+            }
+
             if ($this->ci->db->trans_status() === FALSE) {
                 $this->ci->db->trans_rollback();
             } else {

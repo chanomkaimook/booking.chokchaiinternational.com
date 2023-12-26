@@ -220,6 +220,7 @@
                 case 'view':
                     $(modal_body_view)
                         .find('.name').text(data.NAME).end()
+                        .find('.code').text(data.CODE).end()
                         .find('.price').text(data.PRICE_DISPLAY).end()
                         .find('.ticket_name').text(data.TICKET_NAME).end()
                         .find('.division_name').text(data.DIVISION_NAME).end()
@@ -230,6 +231,7 @@
                 case 'edit':
                     $(modal_body_form)
                         .find('[name=item_name]').val(data.NAME).end()
+                        .find('[name=code]').val(data.CODE).end()
                         .find('[name=price]').val(data.PRICE).end()
                         .find('[name=ticket]').val(data.TICKET_ID).end()
                         .find('[name=division]').val(data.DIVISION_ID).end()

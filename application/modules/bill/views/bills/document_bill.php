@@ -66,7 +66,8 @@
                         $price = textMoney($bill['PRICE']);
                         $discount = textMoney($bill['DISCOUNT']);
                         $deposit = textMoney($total_deposit);
-                        $net = textMoney(floatval($bill['NET']) - floatval($total_deposit)) ;
+                        $net = textMoney(floatval($bill['NET']) - floatval($total_deposit));
+                        $net_text_convert_th = $bill['NET'] ? convertNumberToText('100.00') : null;
 
                         $staff = whois($bill['USER_STARTS']);
                         ?>
@@ -207,14 +208,19 @@
                             </table>
                             <table border="1" class="page_item_total">
                                 <thead>
+
                                     <tr>
-                                        <th rowspan="4" class="point_condition">
-                                            <?= textNull($q_setting->CN_CONDITION); ?>
+                                        <th class="point_condition text-center" style="font-size:14px">
+                                            <b><?= textNull($net_text_convert_th); ?></b>
                                         </th>
                                         <th width="13%">รวมเงิน</th>
                                         <th width="13%" class="text_price"><?php echo $price; ?></th>
                                     </tr>
+
                                     <tr>
+                                        <th rowspan="3" class="point_condition">
+                                            <?= textNull($q_setting->CN_CONDITION); ?>
+                                        </th>
                                         <th>ส่วนลด</th>
                                         <th class="text_discount"><?= $discount; ?></th>
                                     </tr>
@@ -727,10 +733,10 @@
 
                                 num = 0
                                 resp.forEach(function(item, index) {
-                                    if(num){
+                                    if (num) {
                                         t = "ชำระหน้าฟาร์ม "
                                     }
-                                    t = t+item.DEPOSIT
+                                    t = t + item.DEPOSIT
                                     v += creat_html_billvat(item.ID, t, item.USER_UPDATE)
                                     num++
                                 })

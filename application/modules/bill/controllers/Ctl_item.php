@@ -88,6 +88,7 @@ class Ctl_item extends MY_Controller
                 $sub_data = [];
 
                 $sub_data['ID'] = $row->ID;
+                $sub_data['CODE'] = textNull($row->CODE);
                 $sub_data['NAME'] = textNull($row->NAME);
 
                 $sub_data['TICKET'] = array(

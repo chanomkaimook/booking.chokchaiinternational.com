@@ -49,7 +49,7 @@
             ],
             columns: [{
                     "data": "NAME",
-                    "width": "200px",
+                    "width": "150px",
 
                     "render": function(data, type, row, meta) {
                         let code = data
@@ -63,6 +63,9 @@
                         }
                         return "<b>" + code + "</b>"
                     }
+                },
+                {
+                    "data": "CODE",
                 },
                 {
                     "data": "TICKET.display",

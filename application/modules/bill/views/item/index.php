@@ -28,6 +28,7 @@
                     <thead>
                         <tr>
                             <th>ชื่อ</th>
+                            <th>code</th>
                             <th>ประเภท</th>
                             <th>รุ่น</th>
                             <th>ราคา</th>

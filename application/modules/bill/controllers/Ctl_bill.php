@@ -127,6 +127,42 @@ class Ctl_bill extends MY_Controller
         $this->template->build('bills/document_bill', $data);
     }
 
+    public function receipt()
+    {
+        $item_code = $this->input->get('code');
+        $bill = null;
+        $item_id = null;
+
+        if ($item_code) {
+            $optional['where'] = array(
+                'bill.code'  => $item_code
+            );
+            $b = $this->mdl_bill->get_data(null, $optional, 'row_array');
+            if ($b) {
+                $item_id = $b->ID;
+                $bill = $this->bill->get_bill($item_id);
+            }
+        } else {
+            $item_id = $this->input->get('id');
+            if ($item_id) {
+                $bill = $this->bill->get_bill($item_id);
+            }
+        }
+
+        if ($item_id) {
+            $optional_receipt = array(
+                'bill_id'   => $item_id
+            );
+            $data['receipt'] = $this->mdl_deposit->get_datashow(null, $optional_receipt, 'row_array');
+        }
+
+        $data['bill'] = $bill;
+
+        $this->template->set_layout('lay_main');
+        $this->template->title($this->title);
+        $this->template->build('bills/document_receipt', $data);
+    }
+
     /**
      *
      * get data to datatable

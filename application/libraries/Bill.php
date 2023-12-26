@@ -763,62 +763,10 @@ class Bill
             );
             $data_receipt = $this->ci->mdl_receipt->get_dataShow(null, $optional, 'row');
             if ($data_receipt) {
-                $receipt_id = $data_receipt->ID;
-
-                $net = 0;
-                $ar_codetext = [];
-                $codetext = "";
-                $deposit = 0;
-
-                $vat = 0.00;
-                $price_novat = 0.00;
-                $price_vat = 0.00;
-
-                // 
-                // if check have a deposit
-                $data_deposit = $this->ci->db->select('*')
-                    ->from('deposit')
-                    ->where('bill_id', $id)
-                    ->where('status', 1)
-                    ->get();
-                $q = $data_deposit->result();
-                if ($q) {
-                    foreach ($q as $row) {
-                        $ar_codetext[] = $row->CODETEXT;
-                        $deposit = $deposit + $row->DEPOSIT;
-                    }
-
-                    if ($ar_codetext) {
-                        $codetext = implode(',', $ar_codetext);
-                    }
-                }
-
-                if ($net = $deposit) {
-                    // calculate VAT
-                    $q_vat = $this->ci->mdl_settings->get_vatNum();
-                    if (!$q_vat) {
-                        $vatnum = $this->ci->config->item('vat_num');
-                    } else {
-                        $vatnum = $q_vat->VAT_NUM;
-                    }
-                    
-                    $price_withvat = get_priceVat($net, $vatnum);
-
-                    if ($price_withvat) {
-                        $vat = $price_withvat['vat'];
-                        $price_novat = $price_withvat['before_vat'];
-                        $price_vat = $price_withvat['after_vat'];
-                    }
-                }
-
                 //
-                // update receipt
-                $data_receipt_update = array(
-                    'price_novat'   => $price_novat,
-                    'vat'   => $vat,
-                    'net'   => $price_vat,
-                );
-                $this->ci->mdl_receipt->update_data($data_receipt_update, $receipt_id);
+                // update receipt price
+                $receipt_id = $data_receipt->ID;
+                $this->keep_price_to_receipt($receipt_id, $id);
             }
 
             if ($this->ci->db->trans_status() === FALSE) {
@@ -834,6 +782,69 @@ class Bill
         }
 
         return $result;
+    }
+
+    function keep_price_to_receipt($receipt_id = null, $bill_id = null)
+    {
+        if ($receipt_id) {
+            $net = 0;
+            $ar_codetext = [];
+            $codetext = "";
+            $deposit = 0;
+
+            $vat = 0.00;
+            $price_novat = 0.00;
+            $price_vat = 0.00;
+
+            // 
+            // if check have a deposit
+            $data_deposit = $this->ci->db->select('*')
+                ->from('deposit')
+                ->where('bill_id', $bill_id)
+                ->where('status', 1)
+                ->get();
+            $q = $data_deposit->result();
+            if ($q) {
+                foreach ($q as $row) {
+                    $ar_codetext[] = $row->CODETEXT;
+                    $deposit = $deposit + $row->DEPOSIT;
+                }
+
+                if ($ar_codetext) {
+                    $codetext = implode(',', $ar_codetext);
+                }
+            }
+
+            if ($net = $deposit) {
+                // calculate VAT
+                $q_vat = $this->ci->mdl_settings->get_vatNum();
+                if (!$q_vat) {
+                    $vatnum = $this->ci->config->item('vat_num');
+                } else {
+                    $vatnum = $q_vat->VAT_NUM;
+                }
+
+                $price_withvat = get_priceVat($net, $vatnum);
+
+                if ($price_withvat) {
+                    $vat = $price_withvat['vat'];
+                    $price_novat = $price_withvat['before_vat'];
+                    $price_vat = $price_withvat['after_vat'];
+                }
+            }
+
+            //
+            // update receipt
+            $data_receipt_update = array(
+                'price_novat'   => $price_novat,
+                'vat'   => $vat,
+                'net'   => $price_vat,
+            );
+            if ($codetext) {
+                $data_receipt_update['codetext'] = $codetext;
+            }
+            $this->ci->mdl_receipt->update_data($data_receipt_update, $receipt_id);
+        }
     }
 
     /**
@@ -911,28 +922,53 @@ class Bill
     {
         $result = null;
 
+        $result = array(
+            'error' => 0,
+            'txt'   => '',
+            'data'  => ""
+        );
+
         if (!$id) {
             $request = $_REQUEST;
             $id = $request['item_id'];
         }
         if ($id) {
 
-            $datastatus = $this->check_status($id);
+            // (check bill status no cancel only)
+            $r_b = $this->ci->mdl_bill->get_dataShow($id);
+            if ($r_b && $r_b->COMPLETE_ID != 4) {
+                $datastatus = $this->check_status($id);
 
-            if ($datastatus) {
-                $data_update = array(
-                    'payment_id' => $datastatus['data']['payment_id'],
-                    'payment_alias' => $datastatus['data']['payment_status'],
-                    'complete_id' => $datastatus['data']['complete_id'],
-                    'complete_alias' => $datastatus['data']['complete_status'],
-                );
-                $this->ci->mdl_bill->update_bill($data_update, $id);
+                if ($datastatus) {
+                    $data_update = array(
+                        'payment_id' => $datastatus['data']['payment_id'],
+                        'payment_alias' => $datastatus['data']['payment_status'],
+                        'complete_id' => $datastatus['data']['complete_id'],
+                        'complete_alias' => $datastatus['data']['complete_status'],
+                    );
+                    $this->ci->mdl_bill->update_bill($data_update, $id);
 
-                $result = array(
-                    'error' => 0,
-                    'txt'   => 'ทำรายการสำเร็จ',
-                    'data'  => $datastatus
+                    $result = array(
+                        'error' => 0,
+                        'txt'   => 'ทำรายการสำเร็จ',
+                        'data'  => $datastatus
+                    );
+                }
+            } else {
+
+                // 
+                // if check have a receipt
+                $this->ci->load->model('receipt/mdl_receipt');
+                $optional['where'] = array(
+                    'bill_id'   => $id
                 );
+                $data_receipt = $this->ci->mdl_receipt->get_dataShow(null, $optional, 'row');
+                if ($data_receipt) {
+                    //
+                    // update receipt price
+                    $receipt_id = $data_receipt->ID;
+                    $this->keep_price_to_receipt($receipt_id, $id);
+                }
             }
         }
 

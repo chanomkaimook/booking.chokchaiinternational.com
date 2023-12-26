@@ -237,6 +237,7 @@ class Mdl_item extends CI_Model
             $new_id = $this->db->insert_id();
         } else {
             $item_name = textNull($this->input->post('item_name'));
+            $code = textNull($this->input->post('code'));
             $ticket_id = textNull($this->input->post('ticket'));
             $ticket_name = textNull($this->input->post('ticket_name'));
             $division_id = textNull($this->input->post('division'));
@@ -248,6 +249,7 @@ class Mdl_item extends CI_Model
             if ($item_name) {
                 $data = array(
                     'name'           => $item_name,
+                    'code'           => $code,
                     'ticket_id'      => $ticket_id,
                     'ticket_name'    => $ticket_name,
                     'division_id'    => $division_id,

@@ -13,6 +13,17 @@
         <?php
         $this->load->model('mdl_settings');
         $q_setting = $this->mdl_settings->get_data();
+echo "<pre>";
+        print_r($receipt);
+        echo "</pre>";
+        $bill_main = $receipt['BILLMAIN'];
+        $bill_sub = $receipt['BILLSUB'];
+        $bill_codetext = $receipt['CODETEXT'];
+
+        $bill_price_novat = $receipt['PRICE_NOVAT'] ? textMoney($receipt['PRICE_NOVAT']) : null;
+        $bill_vat = $receipt['VAT'] ? textMoney($receipt['VAT']) : null;
+        $bill_net = $receipt['NET'] ? textMoney($receipt['NET']) : null;
+        $net_text_convert_th = $receipt['NET'] ? convertNumberToText('100.00') : null;
 
         ?>
         <div class="">
@@ -42,7 +53,7 @@
                                             <span style="font-size:11px">0 1 3 5 5 4 3 0 0 1 7 0 2</span>
                                         </p>
                                         <p>
-                                            <b>เล่มที่ <span class="billsub">054</span></b>
+                                            <b>เล่มที่ <span class="billsub"><?= $bill_main; ?></span></b>
                                         </p>
                                     </div>
                                     <div class="col-4 justify-content-center align-self-center">
@@ -53,7 +64,7 @@
                                     <div class="col-4 text-right">
                                         <p style="font-size:11px">สาขาที่ออกใบกำกับภาษี คือ สาขาที่ 1<br>
                                         </p>
-                                        <p class="mt-2 pr-2"><b>เลขที่ <span class="billsub">2555</span></b></p>
+                                        <p class="mt-2 pr-2"><b>เลขที่ <span class="billsub"><?= $bill_sub; ?></span></b></p>
                                     </div>
                                 </div>
 
@@ -123,159 +134,48 @@
                                         <thead class="text-center">
                                             <tr>
                                                 <th>รายการ<br>Description</th>
-                                                <th>จำนวน<br>Quantity</th>
-                                                <th>ราคาต่อหน่วย<br>Unit Price</th>
-                                                <th>จำนวนเงิน<br>Amount</th>
+                                                <th width="80px">จำนวน<br>Quantity</th>
+                                                <th width="100px">ราคาต่อหน่วย<br>Unit Price</th>
+                                                <th width="120px">จำนวนเงิน<br>Amount</th>
                                             </tr>
                                         </thead>
+                                        <tbody class="page_item">
+                                            <tr style="height:4cm">
+                                                <td class="text-left">asdasd</td>
+                                                <td>aaa</td>
+                                                <td>21321</td>
+                                                <td class="text-right">*****</td>
+                                            </tr>
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
-                            <table border="1" class="page_body">
-                                <!-- 
-                                    |
-                                    | Head detail
-                                    |
-                                -->
-                                <tr class="pb_head">
-                                    <td rowspan="4" class="pb_head_cus">
-                                        <p><b>เรียน/Attention : <?= $customer_name; ?></b></p>
-                                        <!-- <p> <?= $customer_address; ?></b></p> -->
-                                        <p>ผู้ประสานงาน : <?= $agent_name . $agent_contact; ?></b></p>
-                                        <p>Email : <?= $agent_email; ?></b></p>
-                                    </td>
-                                    <td>
-                                        <p><b>เลขที่/No :</b><?= $code; ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><b>วันที่/Date :</b><?= $date_order; ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><b>TEL :</b> <?= textNull($q_setting->CN_PHONE); ?></p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><b>FAX :</b> <?= textNull($q_setting->CN_FAX); ?></p>
-                                    </td>
-                                </tr>
-
-                                <!-- 
-                                    |
-                                    | Head text show
-                                    |
-                                -->
-                                <tr>
-                                    <td colspan="2">
-                                        <p>ขอเสนอราคาและเงื่อนไขสำหรับท่านดังนี้</p>
-                                        <p>We are please to submit you the following decribed here in at price, items and terms stated :</p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <table border="1" class="page_item">
-                                <thead>
-                                    <tr>
-                                        <th width="11%">ลำดับที่<br>ITEM</th>
-                                        <th width="50%">รายการ<br>DESCRIPTION</th>
-                                        <th width="13%">จำนวน<br>QUANTITY</th>
-                                        <th width="13%">ราคาต่อหน่วย<br>PRICE</th>
-                                        <th width="13%">จำนวนเงิน<br>AMOUNT</th>
+                            <table border="0" class="w-100 font-paper page_footer">
+                                <tbody>
+                                    <tr class="text-center">
+                                        <td>ออกแทนใบกำกับภาษีอย่างย่อเลขที่ <span><?= $bill_codetext; ?></span></td>
+                                        <td width="180px" class="text-right">ราคาสินค้าได้รับยกเว้นภาษี</td>
+                                        <td width="120px" class="text-right textmoney" style="border-top:0">-</td>
                                     </tr>
-                                </thead>
-                                <tbody style="height:7cm">
-                                    <?php
-                                    // 
-                                    // sort item on bill detail (bd)
-                                    // 
-                                    if ($item_i) {
-                                        $item_html = "";
-                                        $item_number = "";
-                                        $item_name = "";
-                                        $item_qty = "";
-                                        $item_price = "";
-                                        $item_net = "";
-
-                                        $number_item = 1;
-                                        foreach ($item_i as $key => $key_db) {
-                                            $item_number .= "<p>" . $number_item . "</p>";
-                                            $item_name .= "<p>" . $bill_detail[$key_db]['DESCRIPTION'] . "</p>";
-                                            $item_qty .= "<p>" . $bill_detail[$key_db]['QUANTITY'] . "</p>";
-                                            $item_price .= "<p>" . textMoney($bill_detail[$key_db]['PRICE']) . "</p>";
-                                            $item_net .= "<p>" . textMoney($bill_detail[$key_db]['NET']) . "</p>";
-
-                                            $number_item++;
-                                        }
-
-                                        if ($item_p) {
-                                            foreach ($item_p as $key => $key_db) {
-                                                $item_name .= "<p>" . $bill_detail[$key_db]['DESCRIPTION'] . "</p>";
-                                                $item_qty .= "<p>" . $bill_detail[$key_db]['QUANTITY'] . "</p>";
-                                                $item_price .= "<p>" . textMoney($bill_detail[$key_db]['PRICE_UNIT']) . "</p>";
-                                                $item_net .= "<p>" . textMoney($bill_detail[$key_db]['DISCOUNT']) . "</p>";
-                                            }
-                                        }
-                                    }
-                                    ?>
-                                    <tr>
-                                        <td><?= $item_number; ?></td>
-                                        <td style="position:relative">
-                                            <?= $item_name; ?>
-                                            <p class="doc_remark">
-                                                หมายเหตุ: 1. ตะลอนฟาร์มโชคชัย <br>
-                                                2. ราคานี้รวมภาษีมูลค่าเพิ่ม 7% แล้ว
-                                            </p>
+                                    <tr class="text-center">
+                                        <td class="textmoney"><b><?= $net_text_convert_th; ?></b></td>
+                                        <td width="180px" class="text-right">ราคาสินค้าที่เสียภาษี</td>
+                                        <td width="120px" class="text-right textmoney"><?= $bill_price_novat; ?></td>
+                                    </tr>
+                                    <tr class="text-center">
+                                        <td rowspan="2" style="vertical-align: bottom;">ผู้รับเงิน..................................................................
+                                            <br>ใบเสร็จรับเงินนี้จะสมบูรณ์ต่อเมื่อได้รับเงินหรือเช็คผ่านการเรียกเก็บเงินแล้ว
                                         </td>
-                                        <td><?= $item_qty; ?></td>
-                                        <td><?= $item_price; ?></td>
-                                        <td><?= $item_net; ?></td>
+                                        <td width="180px" class="text-right">ภาษีมูลค่าเพิ่ม</td>
+                                        <td width="120px" class="text-right textmoney"><?= $bill_vat; ?></td>
+                                    </tr>
+                                    <tr class="text-center">
+                                        <td width="180px" class="text-right">รวมเงินทั้งสิ้น</td>
+                                        <td width="120px" class="text-right textmoney"><?= $bill_net; ?></td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <table border="1" class="page_item_total">
-                                <thead>
-
-                                    <tr>
-                                        <th class="point_condition text-center" style="font-size:14px">
-                                            <b><?= textNull($net_text_convert_th); ?></b>
-                                        </th>
-                                        <th width="13%">รวมเงิน</th>
-                                        <th width="13%" class="text_price"><?php echo $price; ?></th>
-                                    </tr>
-
-                                    <tr>
-                                        <th rowspan="3" class="point_condition">
-                                            <?= textNull($q_setting->CN_CONDITION); ?>
-                                        </th>
-                                        <th>ส่วนลด</th>
-                                        <th class="text_discount"><?= $discount; ?></th>
-                                    </tr>
-                                    <tr>
-
-                                        <th>Deposit</th>
-                                        <th class="text_deposit"><?= $deposit; ?></th>
-                                    </tr>
-                                    <tr>
-
-                                        <th>คงเหลือ</th>
-                                        <th class="text_net"><?= $net; ?></th>
-                                    </tr>
-                                </thead>
-                            </table>
-                            <table border="1" class="page_footer">
-                                <tr>
-                                    <td>
-                                        <p>ผู้เสนอราคา : ..........................................................</p>
-                                        <p class="page_footer_sign"><?= $staff; ?></p>
-                                    </td>
-                                    <td style="padding:40px 0px">
-                                        <p>ลูกค้า : ..........................................................</p>
-                                    </td>
-                                </tr>
-                            </table>
+                        
 
 
                         </div>

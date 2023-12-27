@@ -84,6 +84,13 @@
     .table-head thead{
         font-size: 11px;
     }
+    .font-paper{
+        font-size: 11px;
+    }
+    .textmoney{
+        border:1px solid #111;
+        font-size: 14px;
+    }
 
     /* 
     |
@@ -111,26 +118,24 @@
         width: 100%;
     }
 
-    .page_item tr {
+    .page_item tr td {
+        font-size:14px;
+        padding-top:2px;
         text-align: center
     }
 
-    .page_item tbody tr {
+    .page_item tr {
         vertical-align: top;
     }
 
-    .page_item tbody tr td:nth-child(2) {
-        text-align: left
-    }
-
-    .page_item tbody tr td .doc_remark {
+    .page_item tr td .doc_remark {
         position: absolute;
         bottom: 2px;
     }
 
 
 
-    .page_item_total {
+    /* .page_item_total {
         width: 100%;
     }
 
@@ -140,7 +145,7 @@
 
     .page_item_total tr th:last-child() {
         text-align: right
-    }
+    } */
 
 
 
@@ -151,10 +156,11 @@
     */
     .page_footer {
         width: 100%;
+        text-align: center;
     }
 
     .page_footer tr {
-        text-align: center
+        height:27px;
     }
 
     table tr td,

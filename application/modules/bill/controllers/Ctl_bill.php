@@ -13,7 +13,7 @@ class Ctl_bill extends MY_Controller
     {
         parent::__construct();
         $modelname = 'mdl_bill';
-        $this->load->model(array('bill/mdl_bill', 'information/mdl_round', 'information/mdl_bank'));
+        $this->load->model(array('bill/mdl_bill', 'information/mdl_round', 'information/mdl_bank','receipt/mdl_receipt'));
         $this->load->library(array('Bill'));
 
         $this->middleware(
@@ -129,9 +129,17 @@ class Ctl_bill extends MY_Controller
 
     public function receipt()
     {
-        $item_code = $this->input->get('code');
+        $data = [];
+
+        // set page title
+        $data['pagetitle'] = "ใบเสร็จรับเงิน";
+        $data['breadcrumb'] = array('รายการจอง', 'ข้อมูลการจอง');
+
         $bill = null;
         $item_id = null;
+        $optional = [];
+        $optional_joinbill = [];
+        $item_code = $this->input->get('code');
 
         if ($item_code) {
             $optional['where'] = array(
@@ -139,7 +147,7 @@ class Ctl_bill extends MY_Controller
             );
             $b = $this->mdl_bill->get_data(null, $optional, 'row_array');
             if ($b) {
-                $item_id = $b->ID;
+                $item_id = $b['ID'];
                 $bill = $this->bill->get_bill($item_id);
             }
         } else {
@@ -153,10 +161,11 @@ class Ctl_bill extends MY_Controller
             $optional_receipt = array(
                 'bill_id'   => $item_id
             );
-            $data['receipt'] = $this->mdl_deposit->get_datashow(null, $optional_receipt, 'row_array');
+            $data['receipt'] = $this->mdl_receipt->get_datashow(null, $optional_receipt, 'row_array');
         }
 
         $data['bill'] = $bill;
+        $data['bill_detail'] = $this->mdl_bill_detail->get_dataShow(null, $optional_joinbill, 'result_array');
 
         $this->template->set_layout('lay_main');
         $this->template->title($this->title);

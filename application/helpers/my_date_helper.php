@@ -45,7 +45,7 @@ function toThaiDateTimeString($date, $typereturn = null)
   $time = strtotime($date);
   $time_day = date("j", $time);
   $time_month = date("m", $time);
-  $time_year = date("Y", $time);
+  $time_year = date("Y", $time) + 543;
 
   $thai_date_return = $time_day . " " . $thai_month_arr[$time_month] . " " . $time_year;
   $thai_time_return = date('H:i:s', $time);

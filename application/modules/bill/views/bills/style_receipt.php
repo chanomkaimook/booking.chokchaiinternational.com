@@ -8,7 +8,7 @@
 
 
         div.A4half {
-            margin-top: 4cm !important;
+            margin-top: 2.2cm !important;
             width: 21cm;
             height: 14.85cm;
 
@@ -119,7 +119,7 @@
     }
 
     .page_item tr td {
-        font-size:14px;
+        font-size:12px;
         padding-top:2px;
         text-align: center
     }

@@ -13,17 +13,43 @@
         <?php
         $this->load->model('mdl_settings');
         $q_setting = $this->mdl_settings->get_data();
-echo "<pre>";
-        print_r($receipt);
-        echo "</pre>";
+        /* echo "<pre>";
+        print_r($bill);
+        echo "</pre>"; */
         $bill_main = $receipt['BILLMAIN'];
         $bill_sub = $receipt['BILLSUB'];
         $bill_codetext = $receipt['CODETEXT'];
 
+        $bill_cus_name = $bill['CUSTOMER_NAME'];
+        $bill_dateorder = toThaiDateTimeString($receipt['DATE_ORDER']);
+
         $bill_price_novat = $receipt['PRICE_NOVAT'] ? textMoney($receipt['PRICE_NOVAT']) : null;
         $bill_vat = $receipt['VAT'] ? textMoney($receipt['VAT']) : null;
         $bill_net = $receipt['NET'] ? textMoney($receipt['NET']) : null;
-        $net_text_convert_th = $receipt['NET'] ? convertNumberToText('100.00') : null;
+        $net_text_convert_th = $receipt['NET'] ? convertNumberToText($receipt['NET']) : null;
+
+        //
+        // item detail
+        $item_name = "";
+        $item_qty = "";
+        $item_priceunit = "";
+        $item_net = "";
+
+        if ($bill['COMPLETE_ID'] == 4) {
+            $item_name = "โอนจองเข้าชมฟาร์ม";
+            $item_qty = 1;
+            $item_priceunit = $bill_net;
+            $item_net = $bill_net;
+        } else {
+            if ($bill['item_list']) {
+                foreach ($bill['item_list'] as $key => $row) {
+                    $item_name .= "<p>" . $row->DESCRIPTION . "</p>";
+                    $item_qty .= "<p>" . $row->QUANTITY . "</p>";
+                    $item_priceunit .= "<p>" . $row->PRICE_UNIT . "</p>";
+                    $item_net .= "<p>" . $row->NET . "</p>";
+                }
+            }
+        }
 
         ?>
         <div class="">
@@ -75,7 +101,7 @@ echo "<pre>";
                                     <div class="d-flex">
                                         <div class="pr-1">ชื่อ</div>
                                         <div class="flex-fill justify-content-end align-self-end">
-                                            <p class="dotted"></p>
+                                            <p class="dotted"><?= $bill_cus_name; ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -83,7 +109,7 @@ echo "<pre>";
                                     <div class="d-flex">
                                         <div class="pr-1">วันที่</div>
                                         <div class="flex-fill justify-content-end align-self-end">
-                                            <p class="dotted"></p>
+                                            <p class="dotted"><?= $bill_dateorder; ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -141,10 +167,10 @@ echo "<pre>";
                                         </thead>
                                         <tbody class="page_item">
                                             <tr style="height:4cm">
-                                                <td class="text-left">asdasd</td>
-                                                <td>aaa</td>
-                                                <td>21321</td>
-                                                <td class="text-right">*****</td>
+                                                <td class="text-left"><?= $item_name; ?></td>
+                                                <td><?= $item_qty; ?></td>
+                                                <td><?= $item_priceunit; ?></td>
+                                                <td class="text-right"><?= $item_net; ?></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -175,7 +201,7 @@ echo "<pre>";
                                     </tr>
                                 </tbody>
                             </table>
-                        
+
 
 
                         </div>

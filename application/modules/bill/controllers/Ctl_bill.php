@@ -13,7 +13,7 @@ class Ctl_bill extends MY_Controller
     {
         parent::__construct();
         $modelname = 'mdl_bill';
-        $this->load->model(array('bill/mdl_bill', 'information/mdl_round', 'information/mdl_bank','receipt/mdl_receipt'));
+        $this->load->model(array('bill/mdl_bill', 'information/mdl_round', 'information/mdl_bank', 'receipt/mdl_receipt'));
         $this->load->library(array('Bill'));
 
         $this->middleware(
@@ -138,7 +138,7 @@ class Ctl_bill extends MY_Controller
         $bill = null;
         $item_id = null;
         $optional = [];
-        $optional_joinbill = [];
+
         $item_code = $this->input->get('code');
 
         if ($item_code) {
@@ -158,18 +158,59 @@ class Ctl_bill extends MY_Controller
         }
 
         if ($item_id) {
-            $optional_receipt = array(
+            $optional_receipt['where'] = array(
                 'bill_id'   => $item_id
             );
             $data['receipt'] = $this->mdl_receipt->get_datashow(null, $optional_receipt, 'row_array');
         }
 
-        $data['bill'] = $bill;
-        $data['bill_detail'] = $this->mdl_bill_detail->get_dataShow(null, $optional_joinbill, 'result_array');
+        $data['bill'] = (array)$bill['data'];
 
         $this->template->set_layout('lay_main');
         $this->template->title($this->title);
         $this->template->build('bills/document_receipt', $data);
+    }
+
+    public function export()
+    {
+        $page = $this->input->get('page');
+        if ($page) {
+
+            $data = [];
+
+            $bill = null;
+            $item_id = null;
+            $optional = [];
+
+            $item_code = $this->input->get('code');
+
+            if ($item_code) {
+                $optional['where'] = array(
+                    'bill.code'  => $item_code
+                );
+                $b = $this->mdl_bill->get_data(null, $optional, 'row_array');
+                if ($b) {
+                    $item_id = $b['ID'];
+                    $bill = $this->bill->get_bill($item_id);
+                }
+            } else {
+                $item_id = $this->input->get('id');
+                if ($item_id) {
+                    $bill = $this->bill->get_bill($item_id);
+                }
+            }
+
+            if ($item_id) {
+                $optional_receipt['where'] = array(
+                    'bill_id'   => $item_id
+                );
+                $data['receipt'] = $this->mdl_receipt->get_datashow(null, $optional_receipt, 'row_array');
+            }
+
+            $data['bill'] = (array)$bill['data'];
+
+            $this->load->view('bills/excel/receipt', $data);
+        }
     }
 
     /**

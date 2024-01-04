@@ -210,7 +210,16 @@ class Ctl_bill extends MY_Controller
             $data['bill'] = (array)$bill['data'];
             $data['q_setting'] = $this->mdl_settings->get_data();
 
-            $this->load->view('bills/excel/receipt', $data);
+            switch($page){
+                case 'bill':
+                    $path = "bills/excel/bill";
+                    break;
+                case 'receipt':
+                    $path = "bills/excel/receipt";
+                    break;
+            }
+
+            $this->load->view($path, $data);
         }
     }
 

@@ -17,6 +17,7 @@
             <div class="">
                 <span class="sector_button-edit">
                 </span>
+                <button type="button" class="btn-print btn btn-success" onclick="document_export('excel')"><i class="fas fa-file-excel"></i> Excel</button>
                 <button type="button" class="btn-print btn btn-primary" onclick="printDiv('document')"><i class="fas fa-print"></i> Print</button>
             </div>
 
@@ -97,8 +98,8 @@
                             <table border="1" class="page_header">
                                 <tr>
                                     <td class="pb_document">
-                                        <h4>ใบเสนอราคา</h4>
-                                        <h4>QUOTATION</h4>
+                                        <h4>ใบเสนอราคา / ใบแจ้งหนี้</h4>
+                                        <h4>QUOTATION / INVOICE</h4>
                                     </td>
                                 </tr>
                             </table>
@@ -407,6 +408,16 @@
                 cancel_bill(dataid)
 
             })
+            $(document).on('click', '.view-receipt', function(e) {
+                e.preventDefault()
+
+                let datacode = $('#data-bill_code').val()
+                let url = new URL(path(url_moduleControl + "/receipt"), domain)
+                url.searchParams.append('code', datacode)
+
+                window.open(url)
+
+            })
 
             // 
             // ############
@@ -416,7 +427,7 @@
             function modalActive_quotation(action = 'view', data = []) {
                 let modal_q_name = '#modal_view',
                     itemcode = data.CODE ? data.CODE : $('#data-bill_code').text()
-                let header = "ใบเสนอราคา " + itemcode
+                let header = "แก้ไข " + itemcode
                 $(modal_q_name).find('.modal_text_header').html(header)
 
                 $(modal_q_name)
@@ -659,6 +670,41 @@
                 }
             }
         })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function document_export(type) {
+            if (type == 'excel') {
+                console.log('test')
+                /* let datacode = $('#data-bill_code').val()
+                let url = new URL(path(url_moduleControl + "/export"), domain)
+                url.searchParams.append('page', 'bill')
+                url.searchParams.append('code', datacode)
+
+                window.open(url) */
+            }
+
+        }
 
         function get_allbill(id = null) {
 

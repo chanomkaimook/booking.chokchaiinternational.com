@@ -4,8 +4,7 @@
         <div class="section-tool d-flex flex-column flex-md-row justify-content-end">
 
             <div class="">
-                <span class="sector_button-edit">
-                </span>
+                <button type="button" class="btn-print btn btn-success" onclick="document_export('excel')"><i class="fas fa-file-excel"></i> Excel</button>
                 <button type="button" class="btn-print btn btn-primary" onclick="printDiv('document')"><i class="fas fa-print"></i> Print</button>
             </div>
 
@@ -52,6 +51,8 @@
         }
 
         ?>
+        <input type="hidden" id="data-bill_code" value="<?= $bill['CODE']; ?>">
+
         <div class="">
             <div class="card-box">
                 <div class="template">
@@ -215,5 +216,18 @@
         </div> <!-- end container-fluid -->
 
     </div> <!-- end content -->
+    <script>
+        function document_export(type) {
+            if (type == 'excel') {
+                let datacode = $('#data-bill_code').val()
+                let url = new URL(path(url_moduleControl + "/export"), domain)
+                url.searchParams.append('page','receipt')
+                url.searchParams.append('code', datacode)
+
+                window.open(url)
+            }
+
+        }
+    </script>
 
     <?php require_once('application/views/partials/e_script_print.php'); ?>

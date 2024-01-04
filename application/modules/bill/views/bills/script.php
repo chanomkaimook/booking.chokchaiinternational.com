@@ -439,7 +439,6 @@
     //  * add
     //  * 
     //  * open form add data
-
     //  *
     function add_data() {
         modalActive([], 'add')
@@ -453,6 +452,16 @@
     //  * open form edit data
     //  * #async_get_data() = script_crud.php
     //  *
+    function edit_data(item_id = 0) {
+        // item_id = 0
+        async_get_data(item_id)
+            .then((resp) => {
+                modalActive(resp, 'edit')
+            })
+            .then(() => {
+                modalLoading_clear()
+            })
+    }
 
     //  *
     //  * Form

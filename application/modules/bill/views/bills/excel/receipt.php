@@ -12,10 +12,19 @@ use PhpOffice\PhpSpreadsheet\Writer\Writer;
 $cl_s = "A";
 $cl_e = "F";
 $r_s = 1;
+$font_size_general = 10;
 $text_company = $q_setting->CN_NAME;
 $text_company_id = $q_setting->CN_ID;
 $text_company_address = $q_setting->CN_ADDRESS;
 $text_company_textphone = $q_setting->CN_TEXT_PHONE;
+
+$bill_code = $bill['CODE'] ? $bill['CODE'] : null;
+$bill_main = $receipt['BILLMAIN'] ? $receipt['BILLMAIN'] : null;
+$bill_submain = $receipt['BILLSUB'] ? $receipt['BILLSUB'] : null;
+$cs_name = $bill['CUSTOMER_NAME'] ? $bill['CUSTOMER_NAME'] : null;
+$bill_date = $bill['PAYMENT_ID'] == 7 ? toThaiDateTimeString($bill['DATE_ORDER']) : toThaiDateTimeString($receipt['BOOKING_DATE']);
+
+$net_text_convert_th = $receipt['NET'] ? convertNumberToText($receipt['NET']) : null;
 
 $text_doc = "ใบเสร็จรับเงิน/ใบกำกับภาษี";
 $text_doc_us = "RECEIPT / TAX INVOICE";
@@ -26,6 +35,39 @@ $write_array[] = array(
     "ราคาต่อหน่วย\nDescription",
     "จำนวนเงิน\nDescription",
 );
+
+#	array set border
+$styleBorder = [
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+            'color' => ['argb' => '00000000'],
+        ],
+    ],
+];
+
+#	array set border
+$styleBorderOut = [
+    'borders' => [
+        'outline' => [
+            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+            'color' => ['argb' => '00000000'],
+        ],
+    ],
+];
+
+#	style font bold
+$styleHeading = [
+    'font' => [
+        'bold' => true,
+        'name' => 'Arial',
+    ],
+    'alignment' => [
+        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+    ]
+];
+
 /* foreach($query as $row => $val){
 		//	number
 		$row++;
@@ -51,7 +93,10 @@ $write_array[] = array(
 						);
 	} */
 // echo $this->db->last_query();
-// echo "<pre>";print_r($receipt);echo "</pre>";die();
+/* echo "<pre>";
+print_r($bill);
+echo "</pre>";
+die(); */
 $row++;
 $last_row = $row;
 $insertrow = 1;
@@ -79,7 +124,7 @@ $drawing->setWorksheet($spreadsheet->getActiveSheet());
 #	mergeCells
 $rowexcel = $r_s;
 $spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':' . $cl_e . $rowexcel);
-$spreadsheet->getActiveSheet()->getRowDimension('1')->setRowHeight(15, "mm");
+$spreadsheet->getActiveSheet()->getRowDimension('1')->setRowHeight(14, "mm");
 
 $company = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $company->createTextRun($text_company)
@@ -114,7 +159,7 @@ $spreadsheet->getActiveSheet()->getStyle('A' . $rowexcel)->getAlignment()->setHo
 # head center
 $head_center = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $head_center->createTextRun($text_doc . "\n")
-    ->getFont()->setBold(true)->setSize(10);
+    ->getFont()->setBold(true)->setSize($font_size_general);
 $head_center->createTextRun($text_doc_us)
     ->getFont()->setSize(8);
 $spreadsheet->getActiveSheet()->getCell('C' . $rowexcel)->setValue($head_center);
@@ -132,7 +177,7 @@ $rowexcel = $rowexcel + 1;
 $book_number = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $book_number->createTextRun("เล่มที่ ")
     ->getFont()->setBold(true)->setSize(8);
-$book_number->createTextRun("054")
+$book_number->createTextRun($bill_main)
     ->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED))
     ->setSize(18);
 $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($book_number);
@@ -142,7 +187,7 @@ $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($book_numbe
 $book_number = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $book_number->createTextRun("เลขที่ ")
     ->getFont()->setBold(true)->setSize(8);
-$book_number->createTextRun("2658")
+$book_number->createTextRun($bill_submain)
     ->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED))
     ->setSize(18);
 $spreadsheet->getActiveSheet()->getCell("F" . $rowexcel)->setValue($book_number);
@@ -154,14 +199,14 @@ $spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':E' . $rowexcel)
 
 $cs_date = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $cs_date->createTextRun("ชื่อ ")
-    ->getFont()->setSize(10);
-$cs_date->createTextRun("Test Username");
+    ->getFont()->setSize($font_size_general);
+$cs_date->createTextRun($cs_name);
 // ->getFont()->setSize(14);
 $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($cs_date);
 
 $cs_date = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
-$cs_date->createTextRun("วันที่ 11 กย. 66")
-    ->getFont()->setSize(10);
+$cs_date->createTextRun("วันที่ ".$bill_date)
+    ->getFont()->setSize($font_size_general);
 $spreadsheet->getActiveSheet()->getCell("F" . $rowexcel)->setValue($cs_date);
 
 #
@@ -170,25 +215,247 @@ $rowexcel = $rowexcel + 1;
 $spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':' . $cl_e . $rowexcel);
 
 $cs_date = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
-$cs_date->createTextRun("ที่อยู่ ............................................................................................................")
-    ->getFont()->setSize(10);
-// $cs_date->createTextRun("<span style='color:red'>asdasdasd</span>");
-// ->getFont()->setSize(14);
+$cs_date->createTextRun("ที่อยู่ .........................................................................................................................................................................................")
+    ->getFont()->setSize($font_size_general);
 $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($cs_date);
 
-/* #	creat text
-	$rowexcel = $rowexcel+1;
-	$richText->createText('About this ');
-	$footer = $richText->createTextRun('document to secret for Senior officer farmchokchai');
-	$footer->getFont()->setBold(true);
-	$footer->getFont()->setItalic(true);
-	$footer->getFont()->setColor( new \PhpOffice\PhpSpreadsheet\Style\Color( \PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKGREEN ) );
-	$richText->createText(', Do not share.');
-	
-	#	mergeCells
-	$spreadsheet->getActiveSheet()->mergeCells($cl_s.$rowexcel.':'.$cl_e.$rowexcel);
-	
-	$spreadsheet->getActiveSheet()->getCell($cl_s.$rowexcel)->setValue($richText); */
+#
+# detail customer 3
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':C' . $rowexcel);
+$cs_id = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$cs_id->createTextRun("เลขที่ประจำตัวผู้เสียภาษี .....................................................")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($cs_id);
+
+$chk_corp = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$chk_corp->createTextRun("( ) สำนักงานใหญ่")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($chk_corp);
+
+$spreadsheet->getActiveSheet()->mergeCells('E' . $rowexcel . ':' . $cl_e . $rowexcel);
+$chk_branch = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$chk_branch->createTextRun("( ) สาขา ................................................")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($chk_branch);
+
+#
+# detail item
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':C' . $rowexcel);
+$spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(8, "mm");
+
+$item_head = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_head->createTextRun("รายการ\nDescription")
+    ->getFont()->setSize(8);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($item_head);
+
+$item_head = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_head->createTextRun("จำนวน\nQuantity")
+    ->getFont()->setSize(8);
+$spreadsheet->getActiveSheet()->getCell("D" . $rowexcel)->setValue($item_head);
+
+$item_head = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_head->createTextRun("ราคาต่อหน่วย\nUnit Price")
+    ->getFont()->setSize(8);
+$spreadsheet->getActiveSheet()->getCell("E" . $rowexcel)->setValue($item_head);
+
+$item_head = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_head->createTextRun("จำนวนเงิน\nAmount")
+    ->getFont()->setSize(8);
+$spreadsheet->getActiveSheet()->getCell("F" . $rowexcel)->setValue($item_head);
+
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":" . $cl_e . $rowexcel)->applyFromArray($styleHeading);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":" . $cl_e . $rowexcel)->applyFromArray($styleBorder);
+
+#
+# foreach border
+for ($i = 0; $i < 8; $i++) {
+    $rowexcel = $rowexcel + 1;
+    $spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':C' . $rowexcel);
+
+    if ($bill['PAYMENT_ID'] && $bill['PAYMENT_ID'] == 7) {    // 7=มัดจำ
+        if ($i == 0) {
+            #
+            # name
+            $item_name = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_name->createTextRun("โอนจองเข้าชมฟาร์ม")
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($item_name);
+
+            #
+            # quantity
+            $item_qty = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_qty->createTextRun("1")
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($item_qty);
+            $spreadsheet->getActiveSheet()->getStyle('D' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            #
+            # unit price
+            $item_unit_price = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_unit_price->createTextRun($receipt['NET'])
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($item_unit_price);
+            $spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            #
+            # amount
+            $item_amount = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_amount->createTextRun($receipt['NET'])
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell('F' . $rowexcel)->setValue($item_amount);
+            $spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        }
+    } else {
+        if ($bill['item_list'] && $bill['item_list'][$i]) {
+            $detail_item = $bill['item_list'][$i];
+
+            #
+            # name
+            $item_name = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_name->createTextRun($detail_item->DESCRIPTION)
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($item_name);
+
+            #
+            # quantity
+            $item_qty = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_qty->createTextRun($detail_item->QUANTITY)
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($item_qty);
+            $spreadsheet->getActiveSheet()->getStyle('D' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            #
+            # unit price
+            $item_unit_price = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_unit_price->createTextRun($detail_item->PRICE_UNIT)
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($item_unit_price);
+            $spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            #
+            # amount
+            $item_amount = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $item_amount->createTextRun($detail_item->NET)
+                ->getFont()->setSize($font_size_general);
+            $spreadsheet->getActiveSheet()->getCell('F' . $rowexcel)->setValue($item_amount);
+            $spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        }
+    }
+
+    $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":" . $cl_e . $rowexcel)->applyFromArray($styleBorder);
+}
+
+#
+# detail item summary 1
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':C' . $rowexcel);
+$spreadsheet->getActiveSheet()->mergeCells('D' . $rowexcel . ':E' . $rowexcel);
+
+$text_bill_code = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_bill_code->createTextRun("ออกแทนใบกำกับภาษีอย่างย่อเลขที่")
+    ->getFont()->setSize(8);
+$text_bill_code->createTextRun("110078,112200")
+    ->getFont()->setSize(8);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($text_bill_code);
+
+$text_summary_1 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_summary_1->createTextRun("ราคาสินค้าได้รับยกเว้นภาษี")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($text_summary_1);
+$spreadsheet->getActiveSheet()->getStyle('D' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+
+$item_summary_1 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_summary_1->createTextRun("-")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('F' . $rowexcel)->setValue($item_summary_1);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->applyFromArray($styleBorder);
+
+#
+# detail item summary 2
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':C' . $rowexcel);
+$spreadsheet->getActiveSheet()->mergeCells('D' . $rowexcel . ':E' . $rowexcel);
+
+$text_bill_thai = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_bill_thai->createTextRun($net_text_convert_th)
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($text_bill_thai);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":C" . $rowexcel)->applyFromArray($styleBorder);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+
+$text_summary_2 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_summary_2->createTextRun("ราคาสินค้าที่เสียภาษี")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($text_summary_2);
+$spreadsheet->getActiveSheet()->getStyle('D' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+
+$item_summary_2 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_summary_2->createTextRun($receipt['PRICE_NOVAT'])
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('F' . $rowexcel)->setValue($item_summary_2);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->applyFromArray($styleBorder);
+
+#
+# detail item summary 3
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':C' . $rowexcel);
+$spreadsheet->getActiveSheet()->mergeCells('D' . $rowexcel . ':E' . $rowexcel);
+
+$text_summary_3 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_summary_3->createTextRun("ภาษีมูลค่าเพิ่ม")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($text_summary_3);
+$spreadsheet->getActiveSheet()->getStyle('D' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+
+$item_summary_3 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_summary_3->createTextRun($receipt['VAT'])
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('F' . $rowexcel)->setValue($item_summary_3);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->applyFromArray($styleBorder);
+
+#
+# detail item summary 4
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':D' . $rowexcel);
+$text_sign = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_sign->createTextRun("ผู้รับเงิน ................................................................................................")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($text_sign);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+
+$text_summary_4 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_summary_4->createTextRun("รวมเงินทั้งสิ้น")
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($text_summary_4);
+$spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+
+$item_summary_4 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$item_summary_4->createTextRun($receipt['NET'])
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('F' . $rowexcel)->setValue($item_summary_4);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+$spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->applyFromArray($styleBorder);
+
+#
+# detail sign
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':' . $cl_e . $rowexcel);
+$text_sign = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$text_sign->createTextRun("ใบเสร็จรับเงินนี้จะสมบูรณ์ต่อเมื่อได้รับเงินหรือเช็คผ่านการเรียกเก็บเงินแล้ว")
+    ->getFont()->setSize(8);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($text_sign);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
 #	array set font
 $styleHead = [
@@ -240,7 +507,7 @@ $spreadsheet->getDefaultStyle()->getFont()->setSize(8);
 
 //
 //	setting
-$filename = "recipt_" . date('Y-m-d') . ".xlsx";
+$filename = "r-" . $bill_code . "-" . date('Y-m-d') . ".xlsx";
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename="' . $filename . '"');
 header('Cache-Control: max-age=0');

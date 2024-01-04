@@ -15,6 +15,10 @@
                 font-size: 24px;
             }
         }
+
+        .tool-icon .print:hover {
+            opacity: 0.5;
+        }
     </style>
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -22,9 +26,13 @@
             <form class="form-horizontal" autocomplete="off" id="frm_receipt">
                 <input type="hidden" name="frm_receipt_hidden_id">
                 <div class="modal-header">
-                    <h4 class="modal-title mt-0 modal_text_header truncate"></h4>
+                    <div class="d-flex">
+                        <i class="view-receipt mdi mdi-file-eye mdi-18px text-primary" type="button"></i>
+                        <h4 class="modal-title mt-0 modal_text_header truncate"></h4>
+                    </div>
+                    
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-
+                    
                     <div>
                         <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">ปิด</button>
                         <button type="button" class="btn-edit btn btn-warning waves-effect waves-light px-4">แก้ไข</button>

@@ -28,6 +28,8 @@ $net_text_convert_th = $receipt['NET'] ? convertNumberToText($receipt['NET']) : 
 
 $text_doc = "ใบเสนอราคา / ใบแจ้งหนี้";
 $text_doc_us = "QUOTATION / INVOICE";
+$text_bill_topic = "ขอเสนอราคาและเงื่อนไขสำหรับท่านดังนี้";
+$text_bill_topic_us = "We are please to submit you the follwing described here in at price, items and terms stated :";
 
 $write_array[] = array(
     "รายการ\nDescription",
@@ -89,10 +91,10 @@ $styleHeading = [
 ];
 
 // echo $this->db->last_query();
-/* echo "<pre>";
+echo "<pre>";
 print_r($bill);
 echo "</pre>";
-die(); */
+die();
 $row++;
 $last_row = $row;
 $insertrow = 1;
@@ -165,6 +167,7 @@ $cm_1->createTextRun("CODE12345678")
 $spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($cm_1);
 
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":" . $cl_e . $rowexcel)->applyFromArray($styleMiddle);
+$spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel . ':' . $cl_e . $rowexcel)->applyFromArray($styleBorder);
 
 #
 #	company address 2
@@ -181,6 +184,7 @@ $cm_2->createTextRun("21/08/2566")
 $spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($cm_2);
 
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":" . $cl_e . $rowexcel)->applyFromArray($styleMiddle);
+$spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel . ':' . $cl_e . $rowexcel)->applyFromArray($styleBorder);
 
 #
 #	company address 3
@@ -198,11 +202,12 @@ $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($cm_3);
 $cm_3 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $cm_3->createTextRun("TEL. : ")
     ->getFont()->setBold(true)->setSize($font_size_general);
-$cm_3->createTextRun("0002223334")
+$cm_3->createTextRun("04-493-5503")
     ->getFont()->setSize($font_size_general);
 $spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($cm_3);
 
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":" . $cl_e . $rowexcel)->applyFromArray($styleMiddle);
+$spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel . ':' . $cl_e . $rowexcel)->applyFromArray($styleBorder);
 
 #
 #	company address 4
@@ -220,12 +225,110 @@ $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($cm_4);
 $cm_4 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $cm_4->createTextRun("FAX. : ")
     ->getFont()->setBold(true)->setSize($font_size_general);
-$cm_4->createTextRun("0002223334")
+$cm_4->createTextRun("04-493-5508")
     ->getFont()->setSize($font_size_general);
 $spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($cm_4);
 
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ":" . $cl_e . $rowexcel)->applyFromArray($styleMiddle);
+$spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel . ':' . $cl_e . $rowexcel)->applyFromArray($styleBorder);
 
+#
+# text detail topic
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells($cl_s . $rowexcel . ':' . $cl_e . $rowexcel);
+$spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(14, "mm");
+$bill_topic = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$bill_topic->createTextRun($text_bill_topic . "\n" . $text_bill_topic_us)
+    ->getFont()->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($bill_topic);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel)->applyFromArray($styleMiddle);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ':' . $cl_e . $rowexcel)->applyFromArray($styleBorder);
+
+$rowexcel = $rowexcel + 1;
+$spreadsheet->getActiveSheet()->mergeCells('B' . $rowexcel . ':C' . $rowexcel);
+$spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(12, "mm");
+$tb_column_1 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$tb_column_1->createTextRun("ลำดับที่ \n ITEM")
+    ->getFont()->setBold(true)->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($tb_column_1);
+$tb_column_2 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$tb_column_2->createTextRun("รายการ \n DESCRIPTION")
+    ->getFont()->setBold(true)->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('B' . $rowexcel)->setValue($tb_column_2);
+$tb_column_3 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$tb_column_3->createTextRun("จำนวน \n QUANTITY")
+    ->getFont()->setBold(true)->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($tb_column_3);
+$tb_column_4 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$tb_column_4->createTextRun("ราคาต่อหน่วย \n PRICE")
+    ->getFont()->setBold(true)->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($tb_column_4);
+$tb_column_5 = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+$tb_column_5->createTextRun("จำนวนเงิน \n AMOUNT")
+    ->getFont()->setBold(true)->setSize($font_size_general);
+$spreadsheet->getActiveSheet()->getCell($cl_e . $rowexcel)->setValue($tb_column_5);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ':' . $cl_e . $rowexcel)->applyFromArray($styleBorder);
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ':' . $cl_e . $rowexcel)->applyFromArray($styleHeading);
+
+#
+# Detail items
+$start = $rowexcel + 1;
+
+for ($i = 0; $i < 8; $i++) {
+    $rowexcel = $rowexcel + 1;
+    $spreadsheet->getActiveSheet()->mergeCells('B' . $rowexcel . ':C' . $rowexcel);
+    $spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(8, "mm");
+
+    if ($bill['item_list'] && $bill['item_list'][$i]) {
+        $detail_item = $bill['item_list'][$i];
+
+        #
+        # number
+        $number = 1 + $i;
+        $item_number = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+        $item_number->createTextRun($number)
+            ->getFont()->setSize($font_size_general);
+        $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($item_number);
+        $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        #
+        # name
+        $item_name = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+        $item_name->createTextRun($detail_item->DESCRIPTION)
+            ->getFont()->setSize($font_size_general);
+        $spreadsheet->getActiveSheet()->getCell('B' . $rowexcel)->setValue($item_name);
+
+        #
+        # quantity
+        $item_qty = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+        $item_qty->createTextRun($detail_item->QUANTITY)
+            ->getFont()->setSize($font_size_general);
+        $spreadsheet->getActiveSheet()->getCell('D' . $rowexcel)->setValue($item_qty);
+        $spreadsheet->getActiveSheet()->getStyle('D' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        #
+        # unit price
+        $item_unit_price = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+        $item_unit_price->createTextRun($detail_item->PRICE_UNIT)
+            ->getFont()->setSize($font_size_general);
+        $spreadsheet->getActiveSheet()->getCell('E' . $rowexcel)->setValue($item_unit_price);
+        $spreadsheet->getActiveSheet()->getStyle('E' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        #
+        # amount
+        $item_amount = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+        $item_amount->createTextRun($detail_item->NET)
+            ->getFont()->setSize($font_size_general);
+        $spreadsheet->getActiveSheet()->getCell('F' . $rowexcel)->setValue($item_amount);
+        $spreadsheet->getActiveSheet()->getStyle('F' . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    }
+}
+$end = $rowexcel;
+$spreadsheet->getActiveSheet()->getStyle($cl_s . $start . ':' . $cl_e . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('B' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('D' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('E' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('F' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
 
 #
 # Style setting

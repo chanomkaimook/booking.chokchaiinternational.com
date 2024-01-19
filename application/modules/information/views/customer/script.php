@@ -111,6 +111,8 @@
             let id = $(this).attr('data-id')
             view_data(id)
 
+            view_data_address(id)
+
             $(form_name).find(form_hidden_id).val(id)
             $(form_name).find(form_button_btn_edit).attr('data-id', id)
         })
@@ -285,6 +287,20 @@
             })
     }
 
+    function view_data_address(item_id = 0) {
+        let url = new URL(path(url_moduleControl + '/get_data_address'), domain)
+        if (id) {
+            url.searchParams.append('id', id)
+        }
+
+        fetch(url)
+        .then(res=>res.json())
+        .then((resp) => {
+                console.log(resp)
+            })
+    }
+
+
     //  *
     //  * Form
     //  * add
@@ -374,7 +390,7 @@
         modalHide()
 
         if (reload == false) {
-            $(datatable_name).DataTable().ajax.reload(null,false)
+            $(datatable_name).DataTable().ajax.reload(null, false)
         } else {
             $(datatable_name).DataTable().ajax.reload()
         }

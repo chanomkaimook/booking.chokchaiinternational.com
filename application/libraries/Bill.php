@@ -17,6 +17,7 @@ class Bill
         $this->ci->load->library('Promotion');
         $this->ci->load->model(
             array(
+                'information/mdl_customer_address',
                 'information/mdl_customer',
                 'information/mdl_round',
                 'mdl_settings',
@@ -505,9 +506,12 @@ class Bill
 
         $item_bill_id = "";
         $item_bill_code = "";
-
+        // print_r($request);
+        // die;
         $customer = $request['customer'] ? textNull($request['customer']) : null;
         $customer_id = $request['customer_id'] ? textNull($request['customer_id']) : null;
+        $customer_address = $request['customer_address'] ? textNull($request['customer_address']) : null;
+        $customer_address_id = $request['customer_address_id'] ? textNull($request['customer_address_id']) : null;
         $agent_name = $request['agent_name'] ? textNull($request['agent_name']) : null;
         $agent_contact = $request['agent_contact'] ? textNull($request['agent_contact']) : null;
         $round_id = $request['round'] ? textNull($request['round']) : null;
@@ -572,6 +576,28 @@ class Bill
 
             'remark'  => $remark,
         );
+
+        $get_cus_address = "";
+
+        if ($customer_address) {
+            $optional_address['where'] = array(
+                'customer_id'   => $customer_id,
+                'address'       => $customer_address
+            );
+            $get_cus_address = $this->ci->mdl_customer_address->get_data(null,$optional_address,'row');
+        }
+
+        // check custoemr have data address
+        if ($get_cus_address) {
+            $data_insert['customer_address_id']  = $get_cus_address->ID;
+            $data_insert['customer_address_address']  = $get_cus_address->ADDRESS;
+        } else {
+            if ($customer_address) {
+                $new_id = $this->add_address($customer_id, (string)$customer_address);
+                $data_insert['customer_address_id']  = $new_id['data'];
+                $data_insert['customer_address_address']  = $customer_address;
+            }
+        }
 
         $data_insert['complete_id'] = 1;
         $data_insert['complete_alias'] = complete('pending');
@@ -1030,6 +1056,38 @@ class Bill
             $q_deposit = $this->ci->mdl_deposit->get_data(null, $optional, 'row_array');
             if ($q_deposit) {
                 $result = $q_deposit['total_deposit'];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * insert customer
+     *
+     * @param integer|null $customer_id
+     * @param string|null $customer_address
+     * @return void
+     */
+    function add_address(int $customer_id = null, string $customer_address = null)
+    {
+        $result = array(
+            'error' => 1,
+            'txt'   => 'ไม่มีการทำรายการ'
+        );
+
+        if ($customer_id && $customer_address) {
+            $data_insert = array(
+                'customer_id'   => $customer_id,
+                'address'       => $customer_address,
+            );
+            $q = $this->ci->mdl_customer_address->insert_data($data_insert);
+            if ($new_item = $q['data']['id']) {
+                $result = array(
+                    'error' => 0,
+                    'txt'   => 'ทำรายการสำเร็จ',
+                    'data'  => $new_item
+                );
             }
         }
 

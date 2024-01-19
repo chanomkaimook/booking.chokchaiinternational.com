@@ -279,7 +279,7 @@ for ($i = 0; $i < 8; $i++) {
             #
             # name
             $item_name = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
-            $item_name->createTextRun("โอนจองเข้าชมฟาร์ม")
+            $item_name->createTextRun("รับเงินมัดจำตะลอนฟาร์ม")
                 ->getFont()->setSize($font_size_general);
             $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($item_name);
 

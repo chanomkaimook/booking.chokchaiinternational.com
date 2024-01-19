@@ -23,6 +23,30 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="form-group col-md-12">
+        <div class="d-md-flex gap-1">
+            <div class="">
+                <label class="text-capitalize">ที่อยู่สำหรับออกบิล</label>
+            </div>
+            <div class="">
+                <select id="cus_id" class="form-control form-control-sm" disabled>
+                    <option value="" selected>ระบุ</option>
+                    <?php
+                    if ($address) {
+                        foreach ($address as $row) {
+                            $address = substr($row->ADDRESS,0,11);
+                            echo "<option value=\"$row->ADDRESS\">$address</option>";
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+        <textarea class="form-control" name="customer_address" cols="30" rows="2"></textarea>
+    </div>
+</div>
+
 
 
 <div class="row">
@@ -197,6 +221,9 @@
 
         $(document).on('keyup', 'input[name=customer]', function() {
             $('input[name=customer_id]').val('')
+
+            $('select#cus_id').attr('disabled','disabled')
+            $('select#cus_id').val(null)
         })
 
         // event for calculate price
@@ -212,6 +239,16 @@
         // 
         // 
         // 
+
+        $(document).on('change', 'select#cus_id', function() {
+            let selected = $(this).find('option:selected')
+
+            if(selected.val()){
+                $('[name=customer_address]').val(selected.val())
+            }else{
+                $('[name=customer_address]').val('')
+            }
+        })
 
         // 
         // promotion

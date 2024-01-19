@@ -5,15 +5,15 @@
         <input type="text" class="form-control" name="item_name" placeholder="ระบุ" value="" required>
     </div>
     <div class="form-group col-md-4">
+    <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">รหัสสินค้า</label>
-        <input type="text" class="form-control" name="code" placeholder="ระบุ" value="" >
+        <input type="text" class="form-control" name="code" placeholder="ระบุ" value="" required>
     </div>
 </div>
 <div class="row">
     <div class="form-group col-md-4">
-        <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">ชื่อตั๋ว</label>
-        <select id="ticket" name="ticket" class="form-control" required>
+        <select id="ticket" name="ticket" class="form-control">
             <option value="" disabled selected>ระบุ</option>
             <?php
             if ($ticket) {
@@ -26,9 +26,8 @@
         </select>
     </div>
     <div class="form-group col-md-4">
-        <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">รุ่น</label>
-        <select id="division" name="division" class="form-control" required>
+        <select id="division" name="division" class="form-control">
             <option value="" disabled selected>ระบุ</option>
             <?php
             if ($division) {
@@ -41,9 +40,8 @@
         </select>
     </div>
     <div class="form-group col-md-4">
-        <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">ราคาต่อหน่วย</label>
-        <input type="text" class="form-control int_only" name="price" placeholder="ระบุ" value="" required>
+        <input type="text" class="form-control int_only" name="price" placeholder="ระบุ" value="">
     </div>
 </div>
 <div class="row">

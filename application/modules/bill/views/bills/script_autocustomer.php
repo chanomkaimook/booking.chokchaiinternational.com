@@ -8,20 +8,26 @@
             fetch_dataCustomer()
                 .then(resp => {
                     let result = []
+                    let result_id = []
                     if (resp) {
                         resp.forEach(function(item, index) {
-                            result.push(item.NAME)
+                            result.push({
+                                label: item.NAME,
+                                id: item.ID
+                            })
                         })
 
                         $("[name=customer]").autocomplete({
                             source: result,
-                            /* source: [{
-                                id: 10,
-                                label: "ActionScript"
-                            }], */
                             select: function(event, ui) {
-                                $('[name=customer_id]').val('');
-                                $('[name=customer_id]').val(ui.item.id);
+                                if (ui.item.id) {
+                                    $('[name=customer_id]').val(ui.item.id);
+
+                                    // open select address
+                                    $('select#cus_id').removeAttr('disabled')
+                                    $('[name=customer_address]').val('')
+                                }
+
                             }
                         });
 

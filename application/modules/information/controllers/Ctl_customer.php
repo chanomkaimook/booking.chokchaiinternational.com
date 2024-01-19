@@ -40,7 +40,7 @@ class Ctl_customer extends MY_Controller
         $this->template->title($this->title);
         $this->template->build('customer/index');
     }
-    
+
     /**
      *
      * get data to datatable
@@ -129,14 +129,33 @@ class Ctl_customer extends MY_Controller
         $item_id = $request['id'];
         $data = $this->model->get_data($item_id);
 
-        if($data && $item_id){
-            if(is_array($data)){
+        if ($data && $item_id) {
+            if (is_array($data)) {
                 $data['STATUS_TEXT'] = status_offview($data['STATUS_OFFVIEW']);
-            }else{
+            } else {
                 $data->STATUS_TEXT = status_offview($data->STATUS_OFFVIEW);
             }
         }
         $result = $data;
+        echo json_encode($result);
+    }
+    public function get_data_address()
+    {
+        $this->load->model(array('information/mdl_customer_address'));
+
+        $result = "";
+
+        $request = $_REQUEST;
+        $item_id = $request['id'];
+        if ($item_id) {
+            $optional['where'] = array(
+                'customer_id'   => $item_id
+            );
+            $data = $this->mdl_customer_address->get_data(null,$optional);
+
+            $result = $data;
+        }
+
         echo json_encode($result);
     }
 
@@ -153,7 +172,7 @@ class Ctl_customer extends MY_Controller
 
             $returns = $this->model->insert_data();
             echo json_encode($returns);
-        } 
+        }
     }
 
     //  *
@@ -169,7 +188,7 @@ class Ctl_customer extends MY_Controller
 
             $returns = $this->model->update_data();
             echo json_encode($returns);
-        } 
+        }
     }
 
 
@@ -186,6 +205,6 @@ class Ctl_customer extends MY_Controller
 
             $returns = $this->model->delete_data();
             echo json_encode($returns);
-        } 
+        }
     }
 }

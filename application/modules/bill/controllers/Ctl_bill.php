@@ -13,7 +13,13 @@ class Ctl_bill extends MY_Controller
     {
         parent::__construct();
         $modelname = 'mdl_bill';
-        $this->load->model(array('bill/mdl_bill', 'information/mdl_round', 'information/mdl_bank', 'receipt/mdl_receipt'));
+        $this->load->model(array(
+            'bill/mdl_bill',
+            'information/mdl_round',
+            'information/mdl_bank',
+            'information/mdl_customer_address',
+            'receipt/mdl_receipt'
+        ));
         $this->load->library(array('Bill'));
 
         $this->middleware(
@@ -40,6 +46,7 @@ class Ctl_bill extends MY_Controller
         $optional['order_by'] = array('id' => 'asc');
         $data['bank'] = $this->mdl_bank->get_dataShow(null, $optional);
         $data['round'] = $this->mdl_round->get_dataShow(null, $optional);
+        $data['address'] = $this->mdl_customer_address->get_dataShow(null, $optional);
 
         $this->template->set_partial(
             'headlink',
@@ -210,7 +217,7 @@ class Ctl_bill extends MY_Controller
             $data['bill'] = (array)$bill['data'];
             $data['q_setting'] = $this->mdl_settings->get_data();
 
-            switch($page){
+            switch ($page) {
                 case 'bill':
                     $path = "bills/excel/bill";
                     break;

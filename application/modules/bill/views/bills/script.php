@@ -555,6 +555,8 @@
             .find('.total_unit').html('').end()
             .find('.status_payment').html('').end()
             .find('#list_item tbody').html('').end()
+
+            $('[name=date_order]').datepicker("setDate", new Date() );
     }
 
     //  *

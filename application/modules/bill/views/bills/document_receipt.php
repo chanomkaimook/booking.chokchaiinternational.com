@@ -20,6 +20,7 @@
         $bill_codetext = $receipt['CODETEXT'];
 
         $bill_cus_name = $bill['CUSTOMER_NAME'];
+        $bill_cus_address = $bill['CUSTOMER_ADDRESS_ADDRESS'];
         $bill_dateorder = toThaiDateTimeString($receipt['DATE_ORDER']);
 
         $bill_price_novat = $receipt['PRICE_NOVAT'] ? textMoney($receipt['PRICE_NOVAT']) : null;
@@ -120,7 +121,7 @@
                                     <div class="d-flex">
                                         <div class="pr-1">ที่อยู่</div>
                                         <div class="flex-fill justify-content-end align-self-end">
-                                            <p class="dotted"></p>
+                                            <p class="dotted"><?= $bill_cus_address; ?></p>
                                         </div>
                                     </div>
                                 </div>

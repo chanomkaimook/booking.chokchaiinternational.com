@@ -111,8 +111,6 @@
             let id = $(this).attr('data-id')
             view_data(id)
 
-            view_data_address(id)
-
             $(form_name).find(form_hidden_id).val(id)
             $(form_name).find(form_button_btn_edit).attr('data-id', id)
         })
@@ -212,12 +210,38 @@
 
             switch (action) {
                 case 'view':
+                    if (data.CUS_ADDRESS) {
+                        let cus_address = ""
+                        data.CUS_ADDRESS.forEach(function(item, index) {
+                            cus_address += `<li class="list-group-item">${item.ADDRESS}</li>`
+                        })
+                        $(modal_body_view)
+                            .find('.cus_address').html(cus_address).end()
+                    }
+
                     $(modal_body_view)
                         .find('.name').text(data.NAME).end()
                         .find('.status_text').html(data.STATUS_TEXT).end()
 
                     break
                 case 'edit':
+                    if (data.CUS_ADDRESS) {
+                        let cus_address = ""
+                        data.CUS_ADDRESS.forEach(function(item, index) {
+                            cus_address += `<li class="list-group-item card-text">
+                            <span class="display">
+                            <button type="button" class="btn btn-sm btn-warning btn-edit-address" data-id="${item.ID}">
+                            แก้ไข</button> ${item.ADDRESS}
+                            </span>
+                            <span class="input d-none">
+                            <input type="text" name="cus_address[${item.ID}]" class="form-control" data-id="${item.ID}" value="${item.ADDRESS}" disabled>
+                            </span>
+                            </li>`
+                        })
+                        $(modal_body_form)
+                            .find('.from_cus_address').html(cus_address).end()
+                    }
+
                     $(modal_body_form)
                         .find('[name=item_name]').val(data.NAME).end()
                         .find('[name=status_offview]').val(data.STATUS_OFFVIEW).end()
@@ -231,6 +255,17 @@
             modalLayout(action)
         }
     }
+
+    //
+    // for edit
+    $(document).on("click", ".btn-edit-address", function() {
+        let id = $(this).attr('data-id')
+        if (id) {
+            $(modal_body_form).find('.from_cus_address button[data-id=' + id + ']').parent('span.display').addClass('d-none').end()
+            $(modal_body_form).find('.from_cus_address button[data-id=' + id + ']').parents('li').children('span.input').removeClass('d-none').end()
+            $(modal_body_form).find('.from_cus_address [name="cus_address['+id+']"]').removeAttr('disabled')
+        }
+    })
 
     //  *
     //  * Modal
@@ -284,19 +319,6 @@
             })
             .then(() => {
                 modalLoading_clear()
-            })
-    }
-
-    function view_data_address(item_id = 0) {
-        let url = new URL(path(url_moduleControl + '/get_data_address'), domain)
-        if (id) {
-            url.searchParams.append('id', id)
-        }
-
-        fetch(url)
-        .then(res=>res.json())
-        .then((resp) => {
-                console.log(resp)
             })
     }
 
@@ -409,6 +431,7 @@
             document.getElementsByTagName('form')[key].reset();
         })
         $(modal).find('.modal_text_header').html('')
+        $(modal).find('.from_cus_address').html('')
     }
 
     //  *

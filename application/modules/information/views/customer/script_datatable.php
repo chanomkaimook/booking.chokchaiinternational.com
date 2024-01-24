@@ -68,6 +68,9 @@
                     "data": "STATUS.display",
                 },
                 {
+                    "data": "STATUS.display",
+                },
+                {
                     "data": {
                         _: 'USER_ACTIVE.display', // default show
                     }

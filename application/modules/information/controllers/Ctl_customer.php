@@ -68,6 +68,12 @@ class Ctl_customer extends MY_Controller
         if ($data) {
             foreach ($data as $row) {
 
+                $optional_bill['select'] = 'count(bill.id) as total';
+                $optional_bill['where'] = array(
+                    'customer_id'   => $row->ID
+                );
+                $r_total = $this->mdl_bill->get_dataShow(null,$optional_bill,'row');
+
                 $user_active_id = $row->USER_STARTS ? $row->USER_STARTS : $row->USER_UPDATE;
 
                 if ($row->DATE_UPDATE) {
@@ -84,6 +90,7 @@ class Ctl_customer extends MY_Controller
 
                 $sub_data['ID'] = $row->ID;
                 $sub_data['NAME'] = textNull($row->NAME);
+                $sub_data['VISIT'] = $r_total->total;
 
                 $sub_data['STATUS'] = array(
                     "display"   => $dom_status,
@@ -130,9 +137,19 @@ class Ctl_customer extends MY_Controller
         $data = $this->model->get_data($item_id);
 
         if ($data && $item_id) {
+            $this->load->model('information/mdl_customer_address');
+
             if (is_array($data)) {
+                $optional['where'] = array(
+                    'customer_id'   => $data['ID']
+                );
+                $data['CUS_ADDRESS'] = $this->mdl_customer_address->get_dataShow(null, $optional);
                 $data['STATUS_TEXT'] = status_offview($data['STATUS_OFFVIEW']);
             } else {
+                $optional['where'] = array(
+                    'customer_id'   => $data->ID
+                );
+                $data->CUS_ADDRESS = $this->mdl_customer_address->get_dataShow(null, $optional);
                 $data->STATUS_TEXT = status_offview($data->STATUS_OFFVIEW);
             }
         }
@@ -151,7 +168,7 @@ class Ctl_customer extends MY_Controller
             $optional['where'] = array(
                 'customer_id'   => $item_id
             );
-            $data = $this->mdl_customer_address->get_data(null,$optional);
+            $data = $this->mdl_customer_address->get_data(null, $optional);
 
             $result = $data;
         }

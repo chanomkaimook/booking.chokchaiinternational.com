@@ -168,7 +168,7 @@ class Mdl_customer_address extends CI_Model
     //  *
     public function insert_data($data_insert = null)
     {
-       
+
         $result = array(
             'error'     => 1,
             'txt'       => 'ไม่มีการทำรายการ',
@@ -186,7 +186,7 @@ class Mdl_customer_address extends CI_Model
         if ($return = $this->check_value_valid($array_chk_dup)) {
             return $return;
         }
-        
+
         if ($return = $this->check_dup($array_chk_dup, $item_name)) {
             return $return;
         }
@@ -220,54 +220,40 @@ class Mdl_customer_address extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null)
+    public function update_data($data_update = null, $item_id = null)
     {
-        $item_id = $this->input->post('item_id');
-
-        $request = $_POST;
-        if ($return = $this->check_value_valid($request)) {
-            return $return;
-        }
+        $item_id = $item_id ? $item_id : $this->input->post('item_id');
 
         $array_chk_dup = array(
-            'name' => $request['item_name'],
+            'address' => $data_update['address'],
             'status' => 1,
             'id !=' => $item_id,
         );
-        if ($return = $this->check_dup($array_chk_dup, $request['item_name'])) {
+
+        $return = $this->check_dup($array_chk_dup, $data_update['address']);
+        if ($return) {
             return $return;
         }
 
         if ($data_update && is_array($data_update)) {
+            $data_update['date_update'] = date('Y-m-d H:i:s');
             $data_update['user_update'] = $this->userlogin;
-            $this->db->where('id', $item_id);
-            $this->db->update($this->table, $data_update);
-        } else {
-            $item_name = textNull($this->input->post('item_name'));
-            $status_offview = textNull($this->input->post('status_offview'));
+            if ($item_id) {
+                $this->db->where('id', $item_id);
+                $this->db->update($this->table, $data_update);
 
-            $data = array(
-                'name'          => $item_name,
-                'status_offview'     => $status_offview,
+                // keep log
+                log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
+            }
 
-                'date_update'  => date('Y-m-d H:i:s'),
-                'user_update'  => $this->userlogin,
+            $result = array(
+                'error'     => 0,
+                'txt'       => 'ทำรายการสำเร็จ',
+                'data'      => array(
+                    'id'    => $item_id
+                )
             );
-
-            $this->db->where('id', $item_id);
-            $this->db->update($this->table, $data);
         }
-
-        // keep log
-        log_data(array('update ' . $this->table, 'update', $this->db->last_query()));
-
-        $result = array(
-            'error'     => 0,
-            'txt'       => 'ทำรายการสำเร็จ',
-            'data'      => array(
-                'id'    => $item_id
-            )
-        );
 
         return $result;
     }

@@ -18,6 +18,10 @@
             border: 1px solid #111;
         }
 
+        div.A4 table {
+            font-size: 12px !important;
+        }
+
         /* div.A4[layout="portrait"] {
             width: 29.7cm;
             height: 21cm;

@@ -235,7 +235,10 @@ class Mdl_customer extends CI_Model
         $item_id = $this->input->post('item_id');
 
         $request = $_POST;
-        if ($return = $this->check_value_valid($request)) {
+        $array_chk_valid = array(
+            'name' => $request['item_name'],
+        );
+        if ($return = $this->check_value_valid($array_chk_valid)) {
             return $return;
         }
 
@@ -266,6 +269,20 @@ class Mdl_customer extends CI_Model
 
             $this->db->where('id', $item_id);
             $this->db->update($this->table, $data);
+
+            // update address
+            if(is_array($request['cus_address'])){
+                $this->load->model('information/mdl_customer_address');
+                foreach($request['cus_address'] as $key => $value){
+                    $data_address = array(
+                        'address'  => $value
+                    );
+                    $r = $this->mdl_customer_address->update_data($data_address,$key);
+                    if($r['error']){
+                        return $r; 
+                    }
+                }
+            }
         }
 
         // keep log

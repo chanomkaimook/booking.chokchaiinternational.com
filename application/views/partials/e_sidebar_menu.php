@@ -61,6 +61,7 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <ul class="nav-second-level" aria-expanded="false">
+                            <li class=""><a href="<?= site_url('bill/ctl_calendar'); ?>" data-show="ปฏิทินจอง">ปฏิทินจอง</a></li>
                             <li class=""><a href="<?= site_url('bill/ctl_bill'); ?>" data-show="ข้อมูลการจอง">ข้อมูลการจอง</a></li>
                             <li class=""><a href="<?= site_url('report/ctl_page'); ?>" data-show="รายงานสรุปมัดจำ">รายงานสรุปมัดจำ</a></li>
                             <li class=""><a href="<?= site_url('bill/ctl_item'); ?>" data-show="สินค้า">สินค้า</a></li>

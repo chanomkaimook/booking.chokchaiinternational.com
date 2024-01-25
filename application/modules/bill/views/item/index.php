@@ -7,7 +7,8 @@
             <div class="mb-1 mb-md-0">
                 <div class="d-flex gap-2">
                     <div class="tool-btn">
-                        <button type="button" class="btn-add btn"><?= mb_ucfirst($this->lang->line('_form_btn_add')) ?></button>
+                        <button type="button" class="btn-add btn ticket">เพิ่มตั๋วเข้าชม</button>
+                        <button type="button" class="btn-add btn food">เพิ่มอาหาร</button>
                     </div>
                 </div>
             </div>
@@ -64,6 +65,15 @@
             item.addEventListener("keyup", function() {
                 this.value = this.value.replace(/[^0-9.]/g, '');
             })
+        })
+
+        $(document).on('click','button.ticket',function(){
+            $("select#ticket").removeAttr('disabled')
+            $("select#division").removeAttr('disabled')
+        })
+        $(document).on('click','button.food',function(){
+            $("select#ticket").attr('disabled','disabled')
+            $("select#division").attr('disabled','disabled')
         })
     })
 </script>

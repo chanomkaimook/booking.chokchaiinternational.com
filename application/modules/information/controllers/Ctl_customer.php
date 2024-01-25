@@ -56,6 +56,7 @@ class Ctl_customer extends MY_Controller
      */
     public function get_dataTable()
     {
+        $this->load->model('bill/mdl_bill');
         $this->load->helper('my_date');
 
         $request = $_REQUEST;

@@ -65,7 +65,7 @@
                     }
                 },
                 {
-                    "data": "STATUS.display",
+                    "data": "VISIT",
                 },
                 {
                     "data": "STATUS.display",

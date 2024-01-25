@@ -232,6 +232,14 @@ class Mdl_item extends CI_Model
             return $return;
         }
 
+        $array_chk_dup = array(
+            'code' => $request['code'],
+            'status' => 1
+        );
+        if ($return = $this->check_dup($array_chk_dup, $request['code'])) {
+            return $return;
+        }
+
         if ($data_insert && is_array($data_insert)) {
             $this->db->insert($this->table, $data_insert);
             $new_id = $this->db->insert_id();
@@ -308,10 +316,20 @@ class Mdl_item extends CI_Model
                 return $return;
             }
 
+            $array_chk_dup = array(
+                'code' => $request['code'],
+                'status' => 1,
+                'id !=' => $item_id,
+            );
+            if ($return = $this->check_dup($array_chk_dup, $request['code'])) {
+                return $return;
+            }
+
             if ($data_update && is_array($data_update)) {
                 $this->db->where('id', $item_id);
                 $this->db->update($this->table, $data_update);
             } else {
+                $code = textNull($this->input->post('code'));
                 $item_name = textNull($this->input->post('item_name'));
                 $ticket_id = textNull($this->input->post('ticket'));
                 $ticket_name = textNull($this->input->post('ticket_name'));
@@ -322,6 +340,7 @@ class Mdl_item extends CI_Model
                 $remark = textNull($this->input->post('remark'));
 
                 $data = array(
+                    'code'          => $code,
                     'name'          => $item_name,
                     'ticket_id'      => $ticket_id,
                     'ticket_name'    => $ticket_name,

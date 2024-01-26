@@ -18,7 +18,7 @@ $path_script_end = 'application/views/partials/e_script_end.php';
     <?php include($path_head_title); ?>
 
     <!-- Plugin css -->
-    <link href="<?= base_url('') ?>asset/plugins/jquery/ui/1.13.2/jquery-ui.css"></link>
+    <link rel="stylesheet" href="<?= base_url('') ?>asset/plugins/jquery/ui/1.13.2/jquery-ui.css"></link>
     <link href="<?= base_url('') ?>asset/libs/fullcalendar/fullcalendar.min.css" rel="stylesheet" type="text/css" />
     <!-- Link main -->
     <?php
@@ -71,7 +71,7 @@ $path_script_end = 'application/views/partials/e_script_end.php';
     <script src="<?= base_url('') ?>asset/libs/fullcalendar/fullcalendar.min.js"></script>
 
     <!-- Calendar init -->
-    <script src="<?= base_url('') ?>asset/js/pages/calendar.init.js"></script>
+    <!-- <script src="<?= base_url('') ?>asset/js/pages/calendar.init.js"></script> -->
 
     <!-- Script End -->
     <?php include($path_script_end); ?>

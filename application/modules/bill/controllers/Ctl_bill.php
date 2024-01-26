@@ -397,17 +397,41 @@ class Ctl_bill extends MY_Controller
         $data = $this->model->get_data($item_id);
 
         if ($data) {
-            $net_pure = "";
-            $deposit = $this->bill->get_deposit($item_id);
-            if ($deposit) {
-                $net_pure = floatval($data->NET) - floatval($deposit);
-            }
 
-            $data->NET_PURE = textMoney($net_pure);
+            $net_pure = "";
+
+            if ($item_id) {
+
+                $net_pure = $this->get_data_todo_1($item_id,$data);
+
+                $data->NET_PURE = textMoney($net_pure);
+            } else {
+                if (count($data)) {
+                    foreach ($data as $key => $row) {
+                        $item_id = $row->ID;
+
+                        $net_pure = $this->get_data_todo_1($item_id,$data[$key]);
+                        $data[$key]->NET_PURE = textMoney($net_pure);
+                    }
+                }
+            }
         }
 
         $result = $data;
         echo json_encode($result);
+    }
+
+    function get_data_todo_1($item_id, $data)
+    {
+        $t = "";
+        if ($item_id && $data) {
+            $deposit = $this->bill->get_deposit($item_id);
+            if ($deposit) {
+                $t = floatval($data->NET) - floatval($deposit);
+            }
+        }
+
+        return $t;
     }
 
     //  *

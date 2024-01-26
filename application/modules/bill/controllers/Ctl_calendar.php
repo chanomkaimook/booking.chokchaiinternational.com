@@ -53,7 +53,7 @@ class Ctl_calendar extends MY_Controller
             'partials/link/page',
             array(
                 'data'  => array(
-                    '<link href="' . base_url('') . 'asset/plugins/jquery/ui/1.13.2/jquery-ui.css" rel="stylesheet" type="text/css" />',
+            
                     '<link href="' . base_url('') . 'asset/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.css" rel="stylesheet" type="text/css" />',
                 )
             )
@@ -63,7 +63,7 @@ class Ctl_calendar extends MY_Controller
             'partials/script/page',
             array(
                 'data'  => array(
-                    '<script src="' . base_url('') . 'asset/plugins/jquery/ui/1.13.2/jquery-ui.js"></script>',
+            
                     '<script src="' . base_url('') . 'asset/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>',
                 )
             )

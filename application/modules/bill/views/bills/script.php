@@ -543,6 +543,8 @@
 
         $(modal).find('.modal_text_header').html('')
 
+        $(modal).find('#cus_id').attr('disabled','disabled')
+
         // clear element
         $('.text_promotion').addClass('d-none')
         $('.text_promotion div').empty()

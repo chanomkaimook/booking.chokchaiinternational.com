@@ -464,7 +464,7 @@
 
             } else {
 
-                reset_detail()
+                // reset_detail()
             }
 
         })

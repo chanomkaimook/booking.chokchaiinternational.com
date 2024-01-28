@@ -98,7 +98,7 @@
                 var CalendarApp = function() {
                     this.$body = $("body");
                     // (this.$modal = $("#event-modal")),
-                    (this.$modal = $("#add-category")),
+                    (this.$modal = $("#modal_view")),
                     (this.$event = "#external-events div.external-event"),
                     (this.$calendar = $("#calendar")),
                     (this.$saveCategoryBtn = $(".save-category")),
@@ -395,14 +395,14 @@
                     displayShow();
                     async function displayShow() {
                         let dataBill = await get_calendar_data();
-
+console.log(dataBill)
                         let dateDefault = [];
                         if (dataBill) {
                             dataBill.forEach(function(item, index) {
                                 let setArray = [];
 
-                                let start = item.BOOKING_DATE + " " + item.TIME_START;
-                                let end = item.BOOKING_DATE + " " + item.TIME_END;
+                                let start = item.BOOKING_DATE;
+                                let end = item.BOOKING_DATE;
                                 let booking_dateShow = null;
                                 if (item.BOOKING_DATE || item.BOOKING_DATE != null) {
                                     let dsplit = item.BOOKING_DATE.split("-");
@@ -439,7 +439,7 @@
                                 dateDefault.push(setArray);
                             });
                         }
-                        // console.log(dateDefault);
+                        console.log(dateDefault);
                         // code working
                         $this.$calendarObj = $this.$calendar.fullCalendar({
                             slotDuration: "00:15:00" /* If we want to split day time each 15minutes */ ,

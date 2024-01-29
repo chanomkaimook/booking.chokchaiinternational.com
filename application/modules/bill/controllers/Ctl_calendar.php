@@ -226,9 +226,9 @@ class Ctl_calendar extends MY_Controller
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
 
-            $returns = $this->model->insert_data();
+            $returns = $this->bill->create_bill();
             echo json_encode($returns);
-        } 
+        }
     }
 
     //  *
@@ -241,10 +241,11 @@ class Ctl_calendar extends MY_Controller
     {
         # code...
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
-
-            $returns = $this->model->update_data();
+            // print_r($_POST);
+            // print_r(json_decode($_POST['item_list']));die;
+            $returns = $this->bill->update_billdata();
             echo json_encode($returns);
-        } 
+        }
     }
 
 

@@ -271,7 +271,22 @@
     <!-- End Modal -->
 
     <script>
+        function effect_after_event(string = null) {
+
+            if (string == 'update') {
+                switch (string) {
+                    case 'update':
+                        window.location.reload()
+                        break;
+                    case 'insert':
+                        dataReload()
+                        break;
+                }
+            }
+        }
+
         $(document).ready(function() {
+
 
             let dataid = ""
             $('.tool-btn').html(creat_html_addreceipt())
@@ -424,52 +439,7 @@
             // Function Quotation
             // ############
             // 
-            function modalActive_quotation(action = 'view', data = []) {
-                let modal_q_name = '#modal_view',
-                    itemcode = data.CODE ? data.CODE : $('#data-bill_code').text()
-                let header = "แก้ไข " + itemcode
-                $(modal_q_name).find('.modal_text_header').html(header)
 
-                $(modal_q_name)
-                    .find('[name=customer]').val(data.CUSTOMER_NAME).end()
-                    .find('[name=agent_name]').val(data.AGENT_NAME).end()
-                    .find('[name=agent_contact]').val(data.AGENT_CONTACT).end()
-                    .find('[name=round]').val(data.ROUND_ID).end()
-                    .find('[name=remark]').text(data.REMARK).end()
-                    .find('#bank').attr('disabled', 'disabled').end()
-                    .find('[name=deposit]').attr('disabled', 'disabled').end()
-                    .find('[name=deposit_date]').attr('disabled', 'disabled').end()
-                    .find('[name=pos_date]').attr('disabled', 'disabled').end()
-
-                if (data.BOOKING_DATE) {
-                    let booking = data.BOOKING_DATE
-                    $(modal_q_name)
-                        .find('[name=bookingdate]').datepicker("setDate", new Date(booking));
-                }
-                if (data.DATE_ORDER) {
-                    let date_order = data.DATE_ORDER
-                    $(modal_q_name)
-                        .find('[name=date_order]').datepicker("setDate", new Date(date_order));
-                }
-
-                //
-                // item list
-                if (data.item_list) {
-                    data.item_list.forEach(function(item, index) {
-                        // console.log(item)
-                        if (item.ITEM_ID) {
-                            add_html_list_item()
-
-                            $("[name=item_list]:last").val(item.ITEM_ID)
-                            $("[name=item_qty]:last").val(item.QUANTITY)
-
-                            // from "form/form.php"
-                            cal_item_list()
-                        }
-                    })
-                }
-
-            }
 
             // 
             // ############

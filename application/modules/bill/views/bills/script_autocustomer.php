@@ -25,6 +25,8 @@
 
                                     // open select address
                                     $('select#cus_id').removeAttr('disabled')
+                                    $('select#cus_id option[data-cus_id!='+ui.item.id+']').addClass('d-none')
+                                    
                                     $('[name=customer_address]').val('')
                                 }
 

@@ -230,6 +230,30 @@ class Ctl_bill extends MY_Controller
         }
     }
 
+    public function get_dataCalendar()
+    {
+        $request = $_REQUEST;
+        $data_array = $this->model->get_data();
+        $data = [];
+        if ($data_array) {
+
+            $net_pure = "";
+
+            foreach ($data_array as $key => $row) {
+                $item_id = $row->ID;
+                if ($item_id) {
+                    $get_bill = $this->bill->get_bill($item_id);
+                    $data[$key] = $get_bill['data'];
+
+                    $net_pure = $this->get_data_todo_1($item_id, $data_array[$key]);
+                    $data[$key]->NET_PURE = textMoney($net_pure);
+                }
+            }
+        }
+        $result = $data;
+        echo json_encode($result);
+    }
+
     /**
      *
      * get data to datatable
@@ -402,7 +426,7 @@ class Ctl_bill extends MY_Controller
 
             if ($item_id) {
 
-                $net_pure = $this->get_data_todo_1($item_id,$data);
+                $net_pure = $this->get_data_todo_1($item_id, $data);
 
                 $data->NET_PURE = textMoney($net_pure);
             } else {
@@ -410,7 +434,7 @@ class Ctl_bill extends MY_Controller
                     foreach ($data as $key => $row) {
                         $item_id = $row->ID;
 
-                        $net_pure = $this->get_data_todo_1($item_id,$data[$key]);
+                        $net_pure = $this->get_data_todo_1($item_id, $data[$key]);
                         $data[$key]->NET_PURE = textMoney($net_pure);
                     }
                 }

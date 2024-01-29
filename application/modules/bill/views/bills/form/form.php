@@ -36,7 +36,7 @@
                     if ($address) {
                         foreach ($address as $row) {
                             $address = substr($row->ADDRESS,0,11);
-                            echo "<option value=\"$row->ADDRESS\">$address</option>";
+                            echo "<option value=\"$row->ADDRESS\" data-cus_id=\"$row->CUSTOMER_ID\">$address</option>";
                         }
                     }
                     ?>
@@ -223,6 +223,7 @@
             $('input[name=customer_id]').val('')
 
             $('select#cus_id').attr('disabled','disabled')
+            $('select#cus_id option').removeClass('d-none')
             $('select#cus_id').val(null)
         })
 

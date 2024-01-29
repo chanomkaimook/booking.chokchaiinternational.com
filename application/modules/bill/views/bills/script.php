@@ -28,7 +28,7 @@
     const form_hidden_id = '[name=frm_hidden_id]'
     const form_button_btn_view = '#modal_view .btn-view'
     const form_button_btn_edit = '#modal_view.btn-edit'
-    const form_button_btn_add =  '.btn-add'
+    const form_button_btn_add = '.btn-add'
     const form_button_btn_submit = '#modal_view button[type=submit]'
     const form_button_btn_del = '.btn-del'
 
@@ -158,7 +158,7 @@
                                         text: resp.txt,
                                         timer: swal_autoClose,
                                     }).then((result) => {
-                                        window.location.reload()
+                                        effect_after_event('update');
 
                                         modalHide()
                                     })
@@ -222,9 +222,7 @@
                                         text: resp.txt,
                                         timer: swal_autoClose,
                                     }).then((result) => {
-
-                                        dataReload()
-
+                                        effect_after_event('insert');
                                     })
                                 }
                             });
@@ -404,6 +402,59 @@
         }
     }
 
+    // 
+    // ############
+    // Function Quotation
+    // ############
+    // 
+    function modalActive_quotation(action = 'view', data = []) {
+        let modal_q_name = '#modal_view',
+            itemcode = data.CODE ? data.CODE : $('#data-bill_code').text()
+        let header = "แก้ไข " + itemcode
+        $(modal_q_name).find('.modal_text_header').html(header)
+
+        $(modal_q_name)
+            .find('[name=customer]').val(data.CUSTOMER_NAME).end()
+            .find('[name=customer_address]').val(data.CUSTOMER_ADDRESS_ADDRESS).end()
+            .find('[name=agent_name]').val(data.AGENT_NAME).end()
+            .find('[name=agent_contact]').val(data.AGENT_CONTACT).end()
+            .find('[name=round]').val(data.ROUND_ID).end()
+            .find('[name=remark]').text(data.REMARK).end()
+            .find('#bank').attr('disabled', 'disabled').end()
+            .find('[name=deposit]').attr('disabled', 'disabled').end()
+            .find('[name=deposit_date]').attr('disabled', 'disabled').end()
+            .find('[name=pos_date]').attr('disabled', 'disabled').end()
+
+        if (data.BOOKING_DATE) {
+            let booking = data.BOOKING_DATE
+            $(modal_q_name)
+                .find('[name=bookingdate]').datepicker("setDate", new Date(booking));
+        }
+        if (data.DATE_ORDER) {
+            let date_order = data.DATE_ORDER
+            $(modal_q_name)
+                .find('[name=date_order]').datepicker("setDate", new Date(date_order));
+        }
+
+        //
+        // item list
+        if (data.item_list) {
+            data.item_list.forEach(function(item, index) {
+                // console.log(item)
+                if (item.ITEM_ID) {
+                    add_html_list_item()
+
+                    $("[name=item_list]:last").val(item.ITEM_ID)
+                    $("[name=item_qty]:last").val(item.QUANTITY)
+
+                    // from "form/form.php"
+                    cal_item_list()
+                }
+            })
+        }
+
+    }
+
     //  =========================
     //  =========================
     //  End Function
@@ -543,7 +594,7 @@
 
         $(modal).find('.modal_text_header').html('')
 
-        $(modal).find('#cus_id').attr('disabled','disabled')
+        $(modal).find('#cus_id').attr('disabled', 'disabled')
 
         // clear element
         $('.text_promotion').addClass('d-none')
@@ -557,8 +608,16 @@
             .find('.total_unit').html('').end()
             .find('.status_payment').html('').end()
             .find('#list_item tbody').html('').end()
+            .find('[name=remark]').html('').end()
+            .find('[name=customer_address]').val('').end()
+    
+        $(modal)
+        .find('[name=deposit]').removeAttr('disabled','disabled').end()
+        .find('[name=bank]').removeAttr('disabled','disabled').end()
+        .find('[name=deposit_date]').removeAttr('disabled','disabled').end()
+        .find('[name=pos_date]').removeAttr('disabled','disabled').end()
 
-            $('[name=date_order]').datepicker("setDate", new Date() );
+        $('[name=date_order]').datepicker("setDate", new Date());
     }
 
     //  *

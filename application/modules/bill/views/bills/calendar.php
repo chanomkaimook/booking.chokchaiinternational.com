@@ -8,9 +8,6 @@
             </div>
         </div>
         <style>
-            .truncate {
-                max-width: 100px;
-            }
         </style>
 
 
@@ -20,8 +17,11 @@
                 <div class="mt-3">
                     <p class="text-muted">รายการที่ยังไม่ลงวันจอง
                         <br>
-                        <span class="text-warning">
+                        <span class="text-secondary">
                             <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>รอโอน
+                        </span>
+                        <span class="text-warning">
+                            <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>มัดจำแล้ว
                         </span>
                         <span class="text-success">
                             <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>โอนแล้ว
@@ -62,6 +62,27 @@
             })
         })
     }
+
+    function updateCalendar() {
+        let s = window.jQuery.CalendarApp;
+        $('#calendar').fullCalendar('destroy')
+        s.init()
+    }
+
+    function effect_after_event(string = null) {
+
+        if (string == 'update') {
+            switch (string) {
+                case 'update':
+                    updateCalendar()
+                    break;
+                case 'insert':
+                    updateCalendar()
+                    break;
+            }
+        }
+    }
+
     $(document).ready(function() {
         $("[name=bookingdate]").datepicker({
             autoclose: !0,
@@ -112,18 +133,19 @@
                 //
                 // modify
                 /* on Move */
-                /* (CalendarApp.prototype.onMove = function (eventObj, date) {
-                  console.log(eventObj);
-                  var d = new Date(date);
-                  var dateString = d.toDateString();
+                (CalendarApp.prototype.onMove = function(eventObj, date) {
+                    return false
+                    /* console.log(eventObj);
+                    var d = new Date(date);
+                    var dateString = d.toDateString();
 
-                  Swal.fire(
-                    swal_setConfirm("ยืนยันการจอง", "จองรายการในวันที่ " + dateString)
-                  ).then((result) => {
-                    if (result.value) {
-                    }
-                  });
-                }), */
+                    Swal.fire(
+                      swal_setConfirm("ยืนยันการจอง", "จองรายการในวันที่ " + dateString)
+                    ).then((result) => {
+                      if (result.value) {
+                      }
+                    }); */
+                }),
                 /* (CalendarApp.prototype.onSubmit = function (item_id, date) {
                     let url = new URL(
                       "calendar/ctl_manage/update_bill_booking",
@@ -148,90 +170,17 @@
 
                 /* on click on event */
                 (CalendarApp.prototype.onEventClick = function(calEvent, jsEvent, view) {
+                    let id = calEvent.ID
+                    $(form_name).find(form_hidden_id).val(id)
+                    modalActive_quotation('edit', calEvent)
+
                     var $this = this;
                     $this.$modal.modal({
-                        backdrop: "static",
-                    });
-                    var frm_method = $("#form_add").find("#method");
-                    var frm_item_id = $("#form_add").find("#item_id");
-                    frm_method.val("edit");
-                    frm_item_id.val(calEvent.id);
-
-                    var agent_name = "";
-                    if (calEvent.agent_name && calEvent.agent_name != null) {
-                        agent_name = calEvent.agent_name;
-                    }
-                    var agent_contact = "";
-                    if (calEvent.agent_contact && calEvent.agent_contact != null) {
-                        agent_contact = calEvent.agent_contact;
-                    }
-                    var remark = "";
-                    if (calEvent.remark && calEvent.remark != null) {
-                        remark = calEvent.remark;
-                    }
-
-                    var form = $(".block_btn");
-                    form
-                        .prepend(
-                            '<div class="form-group w-100 block_del"><button type="button" class="btn btn-warning btn-block btn-cancel waves-effect waves-light" data-id="' +
-                            calEvent.id +
-                            '">กลับไปรอจอง</button></div>'
-                        )
-                        .prepend(
-                            '<div class="form-group w-100 block_del"><button type="button" class="btn btn-danger btn-block btn-del waves-effect waves-light" data-id="' +
-                            calEvent.id +
-                            '">ลบรายการ</button></div>'
-                        );
-
-                    // console.log(calEvent);
-                    $this.$modal
-                        .find("[name=customer]")
-                        .val(calEvent.title)
-                        .end()
-                        .find("[name=agent_name]")
-                        .val(agent_name)
-                        .end()
-                        .find("[name=agent_contact]")
-                        .val(agent_contact)
-                        .end()
-                        .find("[name=totals]")
-                        .val(calEvent.totals)
-                        .end()
-                        .find("[name=remark]")
-                        .val(remark)
-                        .end()
-                        .find("#payment")
-                        .val(calEvent.payment_id)
-                        .trigger("change")
-                        .end()
-                        .find("#round")
-                        .val(calEvent.round_id)
-                        .trigger("change")
-                        .end()
-                        .find("#booking_date")
-                        .val(calEvent.booking_dateShow)
-                        .end()
-                        .find(".modal-body .block_btn")
-                        .prepend(form)
-                        .end();
-                    /* .find(".btn-del")
-                        .unbind("click")
-                        .click(function () {
-                          $this.$calendarObj.fullCalendar("removeEvents", function (ev) {
-                            return ev._id == calEvent._id;
-                          });
-                          $this.$modal.modal("hide");
-                        }); */
-
-                    $($this.$modal).on("hidden.bs.modal", function() {
-                        $(".block_del").remove();
-
-                        var frm_method = $("#form_add").find("#method");
-                        frm_method.val("");
+                        backdrop: "false",
                     });
 
                     return false;
-                    var $this = this;
+                    /* var $this = this;
                     var form = $("<form></form>");
                     form.append("<label>Change event name</label>");
                     form.append(
@@ -266,13 +215,13 @@
                         $this.$calendarObj.fullCalendar("updateEvent", calEvent);
                         $this.$modal.modal("hide");
                         return false;
-                    });
+                    }); */
                 }),
                 /* on select */
                 (CalendarApp.prototype.onSelect = function(start, end, allDay) {
                     var $this = this;
                     $this.$modal.modal({
-                        backdrop: "static",
+                        backdrop: "false",
                     });
                     var d = new Date(start);
                     var month = d.getMonth() + 1;
@@ -280,73 +229,11 @@
         .toString()
         .padStart(2, "0")}/${d.getFullYear()}`;
 
-                    $("#booking_date").val(booking_date);
+                    $("[name=bookingdate]").val(booking_date);
 
-                    return false;
-                    var $this = this;
-                    $this.$modal.modal({
-                        backdrop: "static",
-                    });
-                    var form = $("<form></form>");
-                    form.append("<div class='row'></div>");
-                    form
-                        .find(".row")
-                        .append(
-                            "<div class='col-md-6'><div class='form-group'><label class='control-label'>Event Name</label><input class='form-control' placeholder='Insert Event Name' type='text' name='title'/></div></div>"
-                        )
-                        .append(
-                            "<div class='col-md-6'><div class='form-group'><label class='control-label'>Category</label><select class='form-control' name='category'></select></div></div>"
-                        )
-                        .find("select[name='category']")
-                        .append("<option value='bg-danger'>Danger</option>")
-                        .append("<option value='bg-success'>Success</option>")
-                        .append("<option value='bg-purple'>Purple</option>")
-                        .append("<option value='bg-primary'>Primary</option>")
-                        .append("<option value='bg-pink'>Pink</option>")
-                        .append("<option value='bg-info'>Info</option>")
-                        .append("<option value='bg-inverse'>Inverse</option>")
-                        .append("<option value='bg-warning'>Warning</option></div></div>");
-                    $this.$modal
-                        .find(".delete-event")
-                        .hide()
-                        .end()
-                        .find(".save-event")
-                        .show()
-                        .end()
-                        .find(".modal-body")
-                        .empty()
-                        .prepend(form)
-                        .end()
-                        .find(".save-event")
-                        .unbind("click")
-                        .click(function() {
-                            form.submit();
-                        });
-                    $this.$modal.find("form").on("submit", function() {
-                        var title = form.find("input[name='title']").val();
-                        var beginning = form.find("input[name='beginning']").val();
-                        var ending = form.find("input[name='ending']").val();
-                        var categoryClass = form
-                            .find("select[name='category'] option:checked")
-                            .val();
-                        if (title !== null && title.length != 0) {
-                            $this.$calendarObj.fullCalendar(
-                                "renderEvent", {
-                                    title: title,
-                                    start: start,
-                                    end: end,
-                                    allDay: false,
-                                    className: categoryClass,
-                                },
-                                true
-                            );
-                            $this.$modal.modal("hide");
-                        } else {
-                            alert("You have to give a title to your event");
-                        }
-                        return false;
-                    });
+                    updateCalendar()
                     $this.$calendarObj.fullCalendar("unselect");
+                    return false;
                 }),
                 (CalendarApp.prototype.enableDrag = function() {
                     //init events
@@ -368,7 +255,7 @@
                 });
 
                 function get_calendar_data() {
-                    let url = new URL("bill/ctl_bill/get_data", window.origin);
+                    let url = new URL("bill/ctl_bill/get_dataCalendar", window.origin);
                     return new Promise((resolve, reject) => {
                         fetch(url)
                             .then((res) => res.json())
@@ -395,7 +282,7 @@
                     displayShow();
                     async function displayShow() {
                         let dataBill = await get_calendar_data();
-console.log(dataBill)
+
                         let dateDefault = [];
                         if (dataBill) {
                             dataBill.forEach(function(item, index) {
@@ -411,31 +298,33 @@ console.log(dataBill)
 
                                 let typeing;
                                 switch (item.PAYMENT_ID) {
-                                    case "4":
+                                    case "6":
+                                        typeing = "secondary";
+                                        break;
+                                    case "7":
                                         typeing = "warning";
                                         break;
-                                    case "5":
+                                    case "8":
                                         typeing = "success";
                                         break;
                                 }
 
-                                setArray = {
-                                    start: start,
-                                    id: item.ID,
-                                    end: end,
-                                    title: item.CUSTOMER_NAME,
-                                    totals: item.TOTALS,
-                                    agent_name: item.AGENT_NAME,
-                                    agent_contact: item.AGENT_CONTACT,
-                                    payment_id: item.PAYMENT_ID,
-                                    booking_date: item.BOOKING_DATE,
-                                    booking_dateShow: booking_dateShow,
-                                    remark: item.REMARK,
-                                    round_id: item.ROUND_ID,
-                                    time_start: item.TIME_START,
-                                    time_end: item.TIME_END,
-                                    className: "bg-" + typeing,
-                                };
+                                setArray = item
+                                setArray.id = item.ID
+                                setArray.start = start
+                                setArray.end = start
+                                setArray.title = item.CUSTOMER_NAME
+                                setArray.agent_name = item.AGENT_NAME
+                                setArray.agent_contact = item.AGENT_CONTACT
+                                setArray.payment_id = item.PAYMENT_ID
+                                setArray.booking_date = item.BOOKING_DATE
+                                setArray.booking_dateShow = booking_dateShow
+                                setArray.remark = item.REMARK
+                                setArray.round_id = item.ROUND_ID
+                                setArray.time_start = ""
+                                setArray.time_end = ""
+                                setArray.className = "bg-" + typeing
+
                                 dateDefault.push(setArray);
                             });
                         }
@@ -499,27 +388,6 @@ console.log(dataBill)
                       },
                     ]; */
 
-                    //on new event
-                    this.$saveCategoryBtn.on("click", function() {
-                        var categoryName = $this.$categoryForm
-                            .find("input[name='category-name']")
-                            .val();
-                        var categoryColor = $this.$categoryForm
-                            .find("select[name='category-color']")
-                            .val();
-                        if (categoryName !== null && categoryName.length != 0) {
-                            $this.$extEvents.append(
-                                '<div class="external-event bg-' +
-                                categoryColor +
-                                '" data-class="bg-' +
-                                categoryColor +
-                                '" style="position: relative;"><i class="mdi mdi-checkbox-blank-circle mr-2 vertical-middle"></i>' +
-                                categoryName +
-                                "</div>"
-                            );
-                            $this.enableDrag();
-                        }
-                    });
                 }),
                 //init CalendarApp
                 ($.CalendarApp = new CalendarApp()),
@@ -530,5 +398,14 @@ console.log(dataBill)
                 "use strict";
                 $.CalendarApp.init();
             })(window.jQuery);
+
+
+
+        calendar.onMove = function(eventObj, revertFunc) {
+            console.log('move')
+        }
+        calendar.onDrop = function(eventObj, revertFunc) {
+            console.log('Drop')
+        }
     })
 </script>

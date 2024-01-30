@@ -233,6 +233,8 @@ class Ctl_bill extends MY_Controller
     public function get_dataCalendar()
     {
         $request = $_REQUEST;
+        $this->load->model('deposit/mdl_deposit');
+
         $data_array = $this->model->get_data();
         $data = [];
         if ($data_array) {
@@ -244,6 +246,18 @@ class Ctl_bill extends MY_Controller
                 if ($item_id) {
                     $get_bill = $this->bill->get_bill($item_id);
                     $data[$key] = $get_bill['data'];
+
+                    $deposit = "";
+                   
+                    $optional_deposit['select'] = "sum(deposit) as total_deposit";
+                    $optional_deposit['where'] = array(
+                        'bill_id'   => $item_id
+                    );
+                    $q_deposit = $this->mdl_deposit->get_datashow(null, $optional_deposit, 'row_array');
+                    if ($q_deposit) {
+                        $deposit = $q_deposit['total_deposit'];
+                    }
+                    $data[$key]->DEPOSIT= $deposit;
 
                     $net_pure = $this->get_data_todo_1($item_id, $data_array[$key]);
                     $data[$key]->NET_PURE = textMoney($net_pure);

@@ -35,7 +35,7 @@
                     <?php
                     if ($address) {
                         foreach ($address as $row) {
-                            $address = substr($row->ADDRESS,0,11);
+                            $address = substr($row->ADDRESS, 0, 11);
                             echo "<option value=\"$row->ADDRESS\" data-cus_id=\"$row->CUSTOMER_ID\">$address</option>";
                         }
                     }
@@ -185,7 +185,7 @@
     let list = ""
 
     $(document).ready(function() {
-        select
+        // select
         fetch_dataItem()
             .then((resp) => {
                 if (resp) {
@@ -222,7 +222,7 @@
         $(document).on('keyup', 'input[name=customer]', function() {
             $('input[name=customer_id]').val('')
 
-            $('select#cus_id').attr('disabled','disabled')
+            $('select#cus_id').attr('disabled', 'disabled')
             $('select#cus_id option').removeClass('d-none')
             $('select#cus_id').val(null)
         })
@@ -244,9 +244,9 @@
         $(document).on('change', 'select#cus_id', function() {
             let selected = $(this).find('option:selected')
 
-            if(selected.val()){
+            if (selected.val()) {
                 $('[name=customer_address]').val(selected.val())
-            }else{
+            } else {
                 $('[name=customer_address]').val('')
             }
         })
@@ -278,6 +278,14 @@
 
 
     })
+
+    async function fetch_dataItem() {
+        let url = new URL(path('bill/ctl_item/get_dataDisplay'), domain)
+
+        const response = await fetch(url)
+        const result = await response.json()
+        return result;
+    }
 
     async function get_cartData(deposit = null, item_data = null) {
         $(function() {
@@ -341,13 +349,6 @@
 
     }
 
-    async function fetch_dataItem() {
-        let url = new URL(path('bill/ctl_item/get_dataDisplay'), domain)
-        const response = await fetch(url)
-        const result = await response.json()
-        return result;
-    }
-
     //	format number and float (.00) return string!! 
     function formatMoney(number, decPlaces, decSep, thouSep) {
         decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
@@ -381,7 +382,6 @@
         table_list_body.append(tr)
 
         input_int_only()
-
     }
 
     function create_html_list_item() {
@@ -464,7 +464,6 @@
                 }
 
             } else {
-
                 // reset_detail()
             }
 

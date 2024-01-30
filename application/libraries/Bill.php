@@ -288,6 +288,7 @@ class Bill
         $item_id = $request['item_id'] ? textNull($request['item_id']) : textNull($id);
         $customer = $request['customer'] ? textNull($request['customer']) : null;
         $customer_id = $request['customer_id'] ? textNull($request['customer_id']) : null;
+        $customer_address = $request['customer_address'] ? textNull($request['customer_address']) : null;
         $agent_name = $request['agent_name'] ? textNull($request['agent_name']) : null;
         $agent_contact = $request['agent_contact'] ? textNull($request['agent_contact']) : null;
         $round_id = $request['round'] ? textNull($request['round']) : null;
@@ -330,7 +331,7 @@ class Bill
             }
         }
 
-        //
+         //
         // array data to insert
         $data_update = array(
             'customer_id'  => $customer_id,
@@ -346,6 +347,34 @@ class Bill
 
             'remark'  => $remark,
         );
+
+        //
+        // customer address
+        $get_cus_address = "";
+
+        if ($customer_address) {
+            $optional_address['where'] = array(
+                'customer_id'   => $customer_id,
+                'address'       => $customer_address
+            );
+            $get_cus_address = $this->ci->mdl_customer_address->get_data(null,$optional_address,'row');
+        }
+
+        // check customer have data address
+        if ($get_cus_address) {
+            $data_update['customer_address_id']  = $get_cus_address->ID;
+            $data_update['customer_address_address']  = $get_cus_address->ADDRESS;
+        } else {
+            if ($customer_address) {
+                $new_id = $this->add_address($customer_id, (string)$customer_address);
+                $data_update['customer_address_id']  = $new_id['data'];
+                $data_update['customer_address_address']  = $customer_address;
+            }else{
+                $data_update['customer_address_id']  = null;
+                $data_update['customer_address_address']  = null;
+
+            }
+        }
 
         //
         // detail price bill

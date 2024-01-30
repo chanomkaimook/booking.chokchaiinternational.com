@@ -3,18 +3,9 @@
     <!-- Start Content-->
     <div class="container-fluid">
         <div class="section-tool d-flex flex-column flex-md-row justify-content-between">
+
             <div class="">
-                <?php require_once('application/views/partials/e_filter_base.php'); ?>
-            </div>
-        </div>
-        <style>
-        </style>
-
-
-        <div class="row">
-
-            <div class="col-lg-3">
-                <div class="mt-3">
+                <div class="">
                     <p class="text-muted">รายการที่ยังไม่ลงวันจอง
                         <br>
                         <span class="text-secondary">
@@ -31,9 +22,37 @@
                 <div id="external-events" class="order_list">
                 </div>
             </div>
+            <div class="">
+                <?php require_once('application/views/partials/e_filter_base.php'); ?>
+            </div>
+        </div>
+        <style>
+        </style>
+
+
+        <div class="row">
+
+            <!-- <div class="col-lg-3">
+                <div class="mt-3">
+                    <p class="text-muted">รายการที่ยังไม่ลงวันจอง
+                        <br>
+                        <span class="text-secondary">
+                            <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>รอโอน
+                        </span>
+                        <span class="text-warning">
+                            <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>มัดจำแล้ว
+                        </span>
+                        <span class="text-success">
+                            <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>โอนแล้ว
+                        </span>
+                    </p>
+                </div>
+                <div id="external-events" class="order_list">
+                </div>
+            </div> -->
 
             <!-- Begin calendar -->
-            <div class="col-lg-9">
+            <div class="col-lg-12">
                 <div id="calendar"></div>
             </div>
             <!-- End calendar -->
@@ -172,8 +191,13 @@
                 (CalendarApp.prototype.onEventClick = function(calEvent, jsEvent, view) {
                     let id = calEvent.ID
                     $(form_name).find(form_hidden_id).val(id)
-                    modalActive_quotation('edit', calEvent)
 
+                    console.log(calEvent)
+                    if(calEvent){
+                        modalActive_quotation('view', calEvent)
+                    }
+                    
+                    cal_item_list_view()
                     var $this = this;
                     $this.$modal.modal({
                         backdrop: "false",
@@ -219,6 +243,7 @@
                 }),
                 /* on select */
                 (CalendarApp.prototype.onSelect = function(start, end, allDay) {
+                    modalActive_quotation('edit', "")
                     var $this = this;
                     $this.$modal.modal({
                         backdrop: "false",
@@ -328,7 +353,6 @@
                                 dateDefault.push(setArray);
                             });
                         }
-                        console.log(dateDefault);
                         // code working
                         $this.$calendarObj = $this.$calendar.fullCalendar({
                             slotDuration: "00:15:00" /* If we want to split day time each 15minutes */ ,

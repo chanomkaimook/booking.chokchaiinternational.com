@@ -27,7 +27,7 @@
     const form_name = '#frm'
     const form_hidden_id = '[name=frm_hidden_id]'
     const form_button_btn_view = '#modal_view .btn-view'
-    const form_button_btn_edit = '#modal_view.btn-edit'
+    const form_button_btn_edit = '#modal_view .btn-edit'
     const form_button_btn_add = '.btn-add'
     const form_button_btn_submit = '#modal_view button[type=submit]'
     const form_button_btn_del = '.btn-del'
@@ -261,10 +261,11 @@
         $(d).on('click', form_button_btn_edit, function(e) {
             e.preventDefault()
 
-            let id = $(this).attr('data-id')
+            let id = $(form_name).find(form_hidden_id).val()
+            console.log(id)
             edit_data(id)
 
-            $(form_name).find(form_hidden_id).val(id)
+
         })
 
         //
@@ -384,8 +385,8 @@
     //  * layout DOM for show on modal
     //  *
     function modalLayout(action = null) {
-        let btn_edit = $(modal).find(form_button_btn_edit)
-        let btn_submit = $(modal).find(form_button_btn_submit)
+        let btn_edit = $(form_button_btn_edit)
+        let btn_submit = $(form_button_btn_submit)
 
         if (action == 'view') {
             $(modal_body_view).removeClass('d-none')
@@ -410,8 +411,57 @@
     function modalActive_quotation(action = 'view', data = []) {
         let modal_q_name = '#modal_view',
             itemcode = data.CODE ? data.CODE : $('#data-bill_code').text()
-        let header = "แก้ไข " + itemcode
+        let header
+        if (action == 'view') {
+            header = itemcode
+        } else {
+            let header = "แก้ไข " + itemcode
+        }
+
         $(modal_q_name).find('.modal_text_header').html(header)
+
+        if (action == 'view') {
+            // let booking = data.BOOKING_DATE
+            let dsplit = data.BOOKING_DATE.split("-");
+            booking = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
+
+            dsplit = data.DATE_ORDER.split("-");
+            date_order = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
+
+            $(modal_q_name)
+                .find('.customer').text(data.CUSTOMER_NAME).end()
+                .find('.customer_address').text(data.CUSTOMER_ADDRESS_ADDRESS).end()
+                .find('.agent_name').text(data.AGENT_NAME).end()
+                .find('.agent_contact').text(data.AGENT_CONTACT).end()
+                .find('.round').text(data.ROUND_NAME).end()
+                .find('.remark').text(data.REMARK).end()
+                .find('.total_pay_view').text(data.DEPOSIT).end()
+
+            $(modal_q_name)
+                .find('.bookingdate').text(booking).end()
+                .find('.date_order').text(date_order).end()
+
+            //
+            // item list
+            if (data.item_list) {
+                data.item_list.forEach(function(item, index) {
+                    // console.log(item)
+                    if (item.ITEM_ID) {
+                        let td_1 = `<td></td>`
+                        let td_2 = `<td>${item.DESCRIPTION}</td>`
+                        let td_3 = `<td class="td_item_qty">${item.QUANTITY}</td>`
+                        let td_4 = `<td class="td_item_price_unit">${item.PRICE_UNIT}</td>`
+                        let td_5 = `<td class="td_item_price">${item.PRICE}</td>`
+                        let tr = `<tr>${td_1}${td_2}${td_3}${td_4}${td_5}</tr>`
+
+                        $("#list_item_view tbody").append(tr)
+
+                        cal_item_list()
+                    }
+                })
+            }
+
+        }
 
         $(modal_q_name)
             .find('[name=customer]').val(data.CUSTOMER_NAME).end()
@@ -453,6 +503,7 @@
             })
         }
 
+        modalLayout(action)
     }
 
     //  =========================
@@ -610,12 +661,22 @@
             .find('#list_item tbody').html('').end()
             .find('[name=remark]').html('').end()
             .find('[name=customer_address]').val('').end()
-    
+
         $(modal)
-        .find('[name=deposit]').removeAttr('disabled','disabled').end()
-        .find('[name=bank]').removeAttr('disabled','disabled').end()
-        .find('[name=deposit_date]').removeAttr('disabled','disabled').end()
-        .find('[name=pos_date]').removeAttr('disabled','disabled').end()
+            .find('.total_price_view').text('').end()
+            .find('.total_discount_view').text('').end()
+            .find('.total_net_view').text('').end()
+            .find('.total_pay_view').text('').end()
+            .find('.total_unit_view').text('').end()
+            .find('.status_payment_view').text('').end()
+
+        $(modal)
+            .find('[name=deposit]').removeAttr('disabled', 'disabled').end()
+            .find('[name=bank]').removeAttr('disabled', 'disabled').end()
+            .find('[name=deposit_date]').removeAttr('disabled', 'disabled').end()
+            .find('[name=pos_date]').removeAttr('disabled', 'disabled').end()
+
+        $("#list_item_view tbody").text('')
 
         $('[name=date_order]').datepicker("setDate", new Date());
     }

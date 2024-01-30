@@ -180,7 +180,8 @@ class Ctl_item extends MY_Controller
     public function get_dataDisplay()
     {
         $request = $_REQUEST;
-        $data = $this->model->get_dataDisplay();
+        $item_id = $request['id'] ? $request['id'] : null;
+        $data = $this->model->get_dataDisplay($item_id);
 
         $result = $data;
         echo json_encode($result);

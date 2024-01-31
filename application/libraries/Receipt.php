@@ -137,10 +137,12 @@ class Receipt
             $deposit_date = textNull($request['deposit_date']) ? textNull($request['deposit_date']) : date('Y-m-d');
             $pos_date = textNull($request['pos_date']) ? textNull($request['pos_date']) : null;
             $remark = textNull($request['deposit_remark']) ? textNull($request['deposit_remark']) : null;
+            $total_unit =  $bill['total_unit'];
 
             $data_insert = array(
                 'bill_id'       => $bill_id,
                 'bill_code'     => $codebill,
+                'bill_net'      => $bill['net'],
 
                 'bank_id'       => $bank_id,
                 'bank_name'     => $bank_name,
@@ -148,18 +150,19 @@ class Receipt
                 'deposit_date'  => $deposit_date,
                 'pos_date'      => $pos_date,
                 'deposit'       => $deposit,
+                'total_unit'    => $total_unit,
                 'remark'        => $remark,
             );
 
             if ($codetext) {
                 $data_insert['codetext'] = $codetext;
             }
-
             $this->ci->db->trans_begin();
 
             // 
             // insert bill
             $bill = $this->ci->mdl_deposit->insert_data($data_insert);
+            $deposit_id = $bill['data']['id'];
 
             //
             // ตรวจสอบยอดเงินโอน
@@ -179,9 +182,15 @@ class Receipt
                 if ($total_deposit && $total_deposit >= $net) {
                     $this->create_bill($bill_id, $codebill, $deposit);
                 }
-            } else {
-                // update bill status
-                $this->ci->bill->update_bill($bill_id);
+            }
+
+            // update bill status
+            $datastatus = $this->ci->bill->update_bill($bill_id);
+            if ($datastatus && $datastatus['data']['data']['complete_id'] == 3) {
+                $data_update = array(
+                    'bill_complete'     => "1"
+                );
+                $update = $this->ci->mdl_deposit->update_data($data_update, $deposit_id,true);
             }
 
             if ($this->ci->db->trans_status() === FALSE) {
@@ -253,7 +262,18 @@ class Receipt
                     $this->clear_rc_codetext($rc_id);
 
                     // update status bill
-                    $this->ci->bill->update_bill($bill_id);
+                    $datastatus = $this->ci->bill->update_bill($bill_id);
+                    if ($datastatus && $datastatus['data']['data']['complete_id'] == 3) {
+                        $data_update = array(
+                            'bill_complete'     => "1"
+                        );
+                        $update = $this->ci->mdl_deposit->update_data($data_update, $id);
+                    }else{
+                        $data_update = array(
+                            'bill_complete'     => null
+                        );
+                        $update = $this->ci->mdl_deposit->update_data($data_update, $id);
+                    }
                 }
 
                 $result = array(

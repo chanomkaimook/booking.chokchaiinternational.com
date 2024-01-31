@@ -37,8 +37,9 @@
         </select>
     </div>
     <div class="form-group col-md-6">
+        <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">วันโอน</label>
-        <input type="text" class="form-control" name="deposit_date" placeholder="ระบุ">
+        <input type="text" class="form-control" name="deposit_date" placeholder="ระบุ" required>
     </div>
     <div class="form-group col-md-6">
         <label class="text-capitalize">วันที่ลง POS</label>
@@ -200,7 +201,7 @@
         //  * update data 
         //  *
         async function async_update_deposit(id = null, data = []) {
-            
+
             let url = new URL(path(url_moduleControl + '/update_deposit'), domain)
             let body = new FormData();
             if (data.length) {

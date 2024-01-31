@@ -89,17 +89,16 @@
     }
 
     function effect_after_event(string = null) {
-
-        if (string == 'update') {
-            switch (string) {
-                case 'update':
-                    updateCalendar()
-                    break;
-                case 'insert':
-                    updateCalendar()
-                    break;
-            }
+        switch (string) {
+            case 'update':
+                updateCalendar()
+                break;
+            case 'insert':
+                updateCalendar()
+                break;
         }
+
+        modalHide()
     }
 
     $(document).ready(function() {
@@ -192,11 +191,10 @@
                     let id = calEvent.ID
                     $(form_name).find(form_hidden_id).val(id)
 
-                    console.log(calEvent)
-                    if(calEvent){
+                    if (calEvent) {
                         modalActive_quotation('view', calEvent)
                     }
-                    
+
                     cal_item_list_view()
                     var $this = this;
                     $this.$modal.modal({

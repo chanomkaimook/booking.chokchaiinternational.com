@@ -272,16 +272,13 @@
 
     <script>
         function effect_after_event(string = null) {
-
-            if (string == 'update') {
-                switch (string) {
-                    case 'update':
-                        window.location.reload()
-                        break;
-                    case 'insert':
-                        dataReload()
-                        break;
-                }
+            switch (string) {
+                case 'update':
+                    window.location.reload()
+                    break;
+                case 'insert':
+                    dataReload()
+                    break;
             }
         }
 
@@ -640,28 +637,6 @@
                 }
             }
         })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         function document_export(type) {
             if (type == 'excel') {

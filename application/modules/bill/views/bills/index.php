@@ -54,8 +54,18 @@
 <!-- Modal -->
 <?php require_once('component/modal_item.php') ?>
 <!-- End Modal -->
-
+<?php include('script.php') ?>
 <script>
+    function effect_after_event(string = null) {
+        switch (string) {
+            case 'update':
+                window.location.reload()
+                break;
+            case 'insert':
+                dataReload()
+                break;
+        }
+    }
     $(document).ready(function() {
         getData()
 
@@ -80,7 +90,7 @@
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
         })
-        $('[name=date_order]').datepicker("setDate", new Date() );
+        $('[name=date_order]').datepicker("setDate", new Date());
 
         $("[name=deposit_date]").datepicker({
             autoclose: !0,
@@ -101,7 +111,7 @@
 
     })
 </script>
-<?php include('script.php') ?>
+
 <?php include('script_crud.php') ?>
 <?php include('script_datatable.php') ?>
 <?php include('script_autocustomer.php') ?>

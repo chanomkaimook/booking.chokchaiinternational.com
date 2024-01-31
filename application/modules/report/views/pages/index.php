@@ -88,7 +88,7 @@
 <script>
     let title_name = 'สรุปรายงานรับเงินมัดจำ (เงินโอน) ตะลอนฟาร์ม '
     $(document).ready(function() {
-        getData()
+        // getData()
 
         $(document).on('click', '.button_search ', function() {
             $('#datatable_forload').DataTable().ajax.reload();
@@ -158,30 +158,30 @@
                         "data": "CUSTOMER.display",
                     },
                     {
-                        "data": "BILL.data.total_unit",
+                        "data": "DEPOSIT.data.deposit_total_unit",
                     },
                     {
-                        "data": "BILL.data.net",
+                        "data": "DEPOSIT.data.deposit_bill_net",
                     },
                     {
                         "data": {
-                            _: 'DATE_ORDER.display', // default show
+                            _: "POS_DATE.display", // default show
                         }
                     },
                     {
                         "data": "DATA_NULL"
                     },
                     {
-                        "data": "DEPOSIT.data.codetext"
+                        "data": "DEPOSIT.data.deposit_code"
                     },
                     {
-                        "data": "BANK.data.scb"
+                        "data": "DEPOSIT.data.deposit_bank_name"
                     },
                     {
-                        "data": "BANK.data.scb_code"
+                        "data": "DEPOSIT.data.deposit_bank_number"
                     },
                     {
-                        "data": "DEPOSIT.display"
+                        "data": "DEPOSIT.data.deposit_net"
                     },
                     {
                         "data": {
@@ -189,23 +189,27 @@
                         }
                     },
 
+
+
+
+
                     {
-                        "data": "DATA"
+                        "data": "PAID.data.paid_total_unit"
                     },
                     {
-                        "data": "DATA"
+                        "data": "DATA_NULL"
                     },
                     {
-                        "data": "DATA"
+                        "data": "PAID.data.paid_code"
                     },
                     {
-                        "data": "DATA"
+                        "data": "PAID.data.paid_bank_name"
                     },
                     {
-                        "data": "DATA"
+                        "data": "PAID.data.paid_bank_number"
                     },
                     {
-                        "data": "DATA"
+                        "data": "PAID.data.paid_net"
                     },
 
                 ],

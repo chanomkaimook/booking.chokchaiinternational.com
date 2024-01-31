@@ -256,7 +256,7 @@ class Mdl_deposit extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null, $id = null)
+    public function update_data($data_update = null, $id = null, $pass = false)
     {
         $result = false;
         $item_id = $id ? $id : $this->input->post('item_id');
@@ -264,17 +264,19 @@ class Mdl_deposit extends CI_Model
         if ($item_id) {
             $request = $_POST;
 
-            $codetext = textNull($data_update['codetext']) ? $data_update['codetext'] : $request['codetext'];
-            $deposit_date = textNull($data_update['deposit_date']) ? $data_update['deposit_date'] : $request['deposit_date'];
-            $deposit = textNull($data_update['deposit']) ? $data_update['deposit'] : $request['deposit'];
-            $array_chk_dup = array(
-                'codetext' => $codetext,
-                'deposit_date' => $deposit_date,
-                'deposit' => $deposit,
-            );
+            if ($pass == false) {
+                $codetext = textNull($data_update['codetext']) ? $data_update['codetext'] : $request['codetext'];
+                $deposit_date = textNull($data_update['deposit_date']) ? $data_update['deposit_date'] : $request['deposit_date'];
+                $deposit = textNull($data_update['deposit']) ? $data_update['deposit'] : $request['deposit'];
+                $array_chk_dup = array(
+                    'codetext' => $codetext,
+                    'deposit_date' => $deposit_date,
+                    'deposit' => $deposit,
+                );
 
-            if ($return = $this->check_value_valid($array_chk_dup)) {
-                return $return;
+                if ($return = $this->check_value_valid($array_chk_dup)) {
+                    return $return;
+                }
             }
 
             /* if ($return = $this->check_dup($array_chk_dup, $item_name)) {

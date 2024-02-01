@@ -62,6 +62,7 @@ class Permit
 						//
 						// value 1 = administrator
 						if ($role_id == 1) {
+							$roles_id_list[] =  "1";
 							$roles_name_list[] =  "administrator";
 						}
 

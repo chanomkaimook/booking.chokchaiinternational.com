@@ -708,7 +708,7 @@
 
         function creat_html_addreceipt() {
 
-            let html = `<button type="button" class="btn-add-receipt btn">ออกใบกำกับย่อ</button>`
+            let html = `<button type="button" class="btn-add-receipt btn">ชำระเพิ่มวันเข้าชม</button>`
             return html
         }
 

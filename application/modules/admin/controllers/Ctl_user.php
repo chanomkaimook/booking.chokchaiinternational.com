@@ -170,7 +170,7 @@ class Ctl_user extends MY_Controller
 
         $array_permit = $this->roles->get_dataRolesJS($item_id, null, "result_array");
         $array_roles_child = $this->roles->get_dataRolesGroup($item_id, null, "result_array");
-
+print_r($array_roles_child);
 
         $permit_all = $array_permit;
 

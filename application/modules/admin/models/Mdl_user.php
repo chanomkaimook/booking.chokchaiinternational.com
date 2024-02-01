@@ -150,7 +150,8 @@ class Mdl_user extends CI_Model
                 }
             }
 
-            
+            $this->load->library('permit');
+            $this->permit->insert_batch_data($data_roles, $id);
 
             #
             # helpdesk only

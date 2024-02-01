@@ -36,7 +36,7 @@
         $item_net = "";
 
         if ($bill['COMPLETE_ID'] == 4) {
-            $item_name = "โอนจองเข้าชมฟาร์ม";
+            $item_name = "รับเงินมัดจำ";
             $item_qty = 1;
             $item_priceunit = $bill_net;
             $item_net = $bill_net;

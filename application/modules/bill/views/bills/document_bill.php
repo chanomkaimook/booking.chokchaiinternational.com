@@ -1,5 +1,7 @@
 <div class="content">
     <!-- Start Content-->
+    <input type="hidden" id="hidden_role_bill_edit" value="<?php echo check_permit('bill.edit') ? 1 : null ?>" >
+    <input type="hidden" id="hidden_role_bill_delete" value="<?php echo check_permit('bill.delete') ? 1 : null ?>" >
     <div class="container-fluid">
         <div class="section-tool d-flex flex-column flex-md-row justify-content-between">
 
@@ -787,8 +789,14 @@
         }
 
         function creat_html_btnEdit() {
-            let html = `<button type="button" class="btn-edit-quotation btn btn-warning d-none mr-2">แก้ไขใบเสนอราคา</button>`
-            html += `<button type="button" class="btn-del btn btn-danger d-none mr-2">ยกเลิก</button>`
+            let html = ''
+
+            if($('#hidden_role_bill_edit').val()){
+                html +=`<button type="button" class="btn-edit-quotation btn btn-warning d-none mr-2">แก้ไขใบเสนอราคา</button>`
+            }
+            if($('#hidden_role_bill_delete').val()){
+                html += `<button type="button" class="btn-del btn btn-danger d-none mr-2">ยกเลิก</button>`
+            }
 
             return html
         }

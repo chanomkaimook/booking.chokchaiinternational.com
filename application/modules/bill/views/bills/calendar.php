@@ -26,9 +26,7 @@
             <div class="">
                 <button class="btn btn-light" onclick="updateCalendar()" >Update Calendar</button>
             </div>
-            <div class="">
-                <?php require_once('application/views/partials/e_filter_base.php'); ?>
-            </div>
+
         </div>
         <style>
         </style>

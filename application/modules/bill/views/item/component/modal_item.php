@@ -27,8 +27,18 @@
 
                     <div>
                         <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">ปิด</button>
+                        <?php
+                        if(check_permit('product.edit')):
+                        ?>
                         <button type="button" class="btn-edit btn btn-warning waves-effect waves-light px-4">แก้ไข</button>
+                        <?php
+                        endif;
+                        if(check_permit('product.edit') || check_permit('product.insert')):
+                        ?>
                         <button type="submit" class="btn btn-success waves-effect waves-light px-4">บันทึก</button>
+                        <?php
+                        endif;
+                        ?>
                     </div>
                 </div>
 

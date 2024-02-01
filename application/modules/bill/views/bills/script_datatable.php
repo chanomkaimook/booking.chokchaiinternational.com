@@ -108,7 +108,7 @@
                         url_doc_bill.searchParams.append('code',row.CODE)
 
                         let btn_view = `<a href="${url_doc_bill}" target=_blank class="text-capitalize dropdown-item" ><i class="mdi mdi-magnify mr-2 text-info font-18 vertical-middle"></i>${table_column_view[setlang]}</a>`
-                        let btn_del = `<a data-id="${data}" class="btn-del text-capitalize dropdown-item" href="#" ><i class="mdi mdi-delete mr-2 text-danger font-18 vertical-middle"></i>${table_column_del[setlang]}</a>`
+                        let btn_del = ''
 
                         let table_action = `
                                 <div class="btn-group dropdown">

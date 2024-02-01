@@ -18,11 +18,14 @@ class Ctl_item extends MY_Controller
         $this->middleware(
             array(
                 'access'    => [
-                    // 'index'     => ['bill','quotation'],
-                    // 'view'      => ['bill.view','bill.insert']
+                    'insert_data'     => ['product.insert'],
+                    'update_data'     => ['product.edit'],
+                    'delete_data'     => ['product.delete'],
                 ],
-                // 'need'       => ['bill','quotation'],
+                'need'       => ['product.view'],
                 'except'    => [
+                    'get_data'   => [],
+                    'get_dataDisplay'   => []
                     // 'index'      => ['workorder','bill.view','bill'],
                     // 'view'      => [],
                 ]

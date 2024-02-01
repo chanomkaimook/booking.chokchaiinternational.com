@@ -18,7 +18,11 @@ class Ctl_roles extends MY_Controller
         // $this->load->model('mdl_register');
         // $this->load->model('mdl_staff');
 
-        $this->middleware();
+        $this->middleware(
+            array(
+                'need'       => ['administrator'],
+            )
+        );
 
         // set language
         $this->lang->load('roles', $this->langs);

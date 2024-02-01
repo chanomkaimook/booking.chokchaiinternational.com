@@ -21,7 +21,7 @@ class Ctl_page extends MY_Controller
                     // 'index'     => ['bill','quotation'],
                     // 'view'      => ['bill.view','bill.insert']
                 ],
-                // 'need'       => ['bill','quotation'],
+                'need'       => ['report.role'],
                 'except'    => [
                     // 'index'      => ['workorder','bill.view','bill'],
                     // 'view'      => [],

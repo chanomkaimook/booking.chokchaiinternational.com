@@ -17,17 +17,29 @@ class Ctl_customer extends MY_Controller
 
         $this->middleware(
             array(
-                'access'    => [
-                    // 'index'     => ['bill','quotation'],
-                    // 'view'      => ['bill.view','bill.insert']
-                ],
-                // 'need'       => ['bill','quotation'],
+                'need'       => ['base.role'],
                 'except'    => [
-                    // 'index'      => ['workorder','bill.view','bill'],
-                    // 'view'      => [],
+                    'get_data'      => [],
                 ]
             )
         );
+
+       /*  array(
+            'access'    => [
+                'insert_data'     => ['bill.insert'],
+                'insert_deposit'  => ['bill.insert'],
+                'update_data'     => ['bill.edit'],
+                'update_deposit'     => ['bill.edit'],
+                'update_receive'     => ['bill.edit'],
+                'delete_deposit'     => ['bill.delete'],
+                'cancel_bill'     => ['bill.delete'],
+            ],
+            'need'       => ['bill.view'],
+            'except'    => [
+                // 'index'      => ['workorder','bill.view','bill'],
+                // 'view'      => [],
+            ]
+        ) */
 
         // setting
         $this->model = $this->$modelname;

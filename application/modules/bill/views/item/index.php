@@ -1,5 +1,7 @@
 <div class="content">
     <input type="hidden" id="hidden_task_id">
+    <input type="hidden" id="hidden_role_product_edit" value="<?php echo check_permit('product.edit') ? 1 : null ?>" >
+    <input type="hidden" id="hidden_role_product_delete" value="<?php echo check_permit('product.delete') ? 1 : null ?>" >
     <!-- Start Content-->
     <div class="container-fluid">
         <div class="section-tool d-flex flex-column flex-md-row justify-content-between">
@@ -7,8 +9,14 @@
             <div class="mb-1 mb-md-0">
                 <div class="d-flex gap-2">
                     <div class="tool-btn">
-                        <button type="button" class="btn-add btn ticket">เพิ่มตั๋วเข้าชม</button>
-                        <button type="button" class="btn-add btn food">เพิ่มอาหาร</button>
+                        <?php
+                        if (check_permit('product.insert')) :
+                        ?>
+                            <button type="button" class="btn-add btn ticket">เพิ่มตั๋วเข้าชม</button>
+                            <button type="button" class="btn-add btn food">เพิ่มอาหาร</button>
+                        <?php
+                        endif;
+                        ?>
                     </div>
                 </div>
             </div>
@@ -67,13 +75,13 @@
             })
         })
 
-        $(document).on('click','button.ticket',function(){
+        $(document).on('click', 'button.ticket', function() {
             $("select#ticket").removeAttr('disabled')
             $("select#division").removeAttr('disabled')
         })
-        $(document).on('click','button.food',function(){
-            $("select#ticket").attr('disabled','disabled')
-            $("select#division").attr('disabled','disabled')
+        $(document).on('click', 'button.food', function() {
+            $("select#ticket").attr('disabled', 'disabled')
+            $("select#division").attr('disabled', 'disabled')
         })
     })
 </script>

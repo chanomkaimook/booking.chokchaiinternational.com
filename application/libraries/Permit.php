@@ -141,21 +141,19 @@ class Permit
 	 */
 	function insert_batch_data(array $data = null, int $staff_id = null)
 	{
-		if ($data) {
-			foreach ($data as $key => $value) {
-				$data[$key]['staff_id'] = $staff_id;
-			}
-
-			$q_staff = $this->control->get_dataStaff($staff_id);
-			if($q_staff){
-				$data_delete = array(
-					'staff_id'	=> $staff_id
-				);
-				$this->control->delete_pure($data_delete);
-			}
-
-			return $this->control->insert_batch_data($data);
+		foreach ($data as $key => $value) {
+			$data[$key]['staff_id'] = $staff_id;
 		}
+
+		$q_staff = $this->control->get_dataStaff($staff_id);
+		if ($q_staff) {
+			$data_delete = array(
+				'staff_id'	=> $staff_id
+			);
+			$this->control->delete_pure($data_delete);
+		}
+
+		return $this->control->insert_batch_data($data);
 	}
 
 	/**
@@ -164,27 +162,28 @@ class Permit
 	 * @param int|array $id = staff
 	 * @return void
 	 */
-	function staff_restore($id=null){
+	function staff_restore($id = null)
+	{
 		$this->ci->load->model('mdl_staff');
 
-		if($id){
+		if ($id) {
 
 			$data_array = array(
 				'status'	=> 1
 			);
-			
-			if(is_array($id)){
-				$text = implode(",",$id);
+
+			if (is_array($id)) {
+				$text = implode(",", $id);
 
 				$data_staff = array(
-					'id in('.$text.')'	=> null
+					'id in(' . $text . ')'	=> null
 				);
-				$this->ci->mdl_staff->update_data($data_array,$data_staff);
-			}else{
+				$this->ci->mdl_staff->update_data($data_array, $data_staff);
+			} else {
 				$data_staff = array(
 					'id'	=> $id
 				);
-				$this->ci->mdl_staff->update_data($data_array,$data_staff);
+				$this->ci->mdl_staff->update_data($data_array, $data_staff);
 			}
 		}
 

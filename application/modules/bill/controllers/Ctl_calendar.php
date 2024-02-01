@@ -24,15 +24,7 @@ class Ctl_calendar extends MY_Controller
 
         $this->middleware(
             array(
-                'access'    => [
-                    // 'index'     => ['bill','quotation'],
-                    // 'view'      => ['bill.view','bill.insert']
-                ],
-                // 'need'       => ['bill','quotation'],
-                'except'    => [
-                    // 'index'      => ['workorder','bill.view','bill'],
-                    // 'view'      => [],
-                ]
+                'need'       => ['calendar.view'],
             )
         );
 

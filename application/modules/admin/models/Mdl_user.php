@@ -150,10 +150,7 @@ class Mdl_user extends CI_Model
                 }
             }
 
-            if ($data_roles && count($data_roles)) {
-                $this->load->library('permit');
-                $this->permit->insert_batch_data($data_roles, $id);
-            }
+            
 
             #
             # helpdesk only
@@ -185,7 +182,7 @@ class Mdl_user extends CI_Model
                 'text' => '',
                 'id' => $id,
             );
-        } else{
+        } else {
             $result = array(
                 'error' =>   1,
                 'text' => 'ไม่พบ ID',

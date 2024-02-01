@@ -25,11 +25,17 @@ class Ctl_bill extends MY_Controller
         $this->middleware(
             array(
                 'access'    => [
-                    // 'index'     => ['bill','quotation'],
-                    // 'view'      => ['bill.view','bill.insert']
+                    'insert_data'     => ['bill.insert'],
+                    'insert_deposit'  => ['bill.insert'],
+                    'update_data'     => ['bill.edit'],
+                    'update_deposit'     => ['bill.edit'],
+                    'update_receive'     => ['bill.edit'],
+                    'delete_deposit'     => ['bill.delete'],
+                    'cancel_bill'     => ['bill.delete'],
                 ],
-                // 'need'       => ['bill','quotation'],
+                'need'       => ['bill.view'],
                 'except'    => [
+                    'get_data'   => []
                     // 'index'      => ['workorder','bill.view','bill'],
                     // 'view'      => [],
                 ]

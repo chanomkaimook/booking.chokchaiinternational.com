@@ -17,14 +17,9 @@ class Ctl_division extends MY_Controller
 
         $this->middleware(
             array(
-                'access'    => [
-                    // 'index'     => ['bill','quotation'],
-                    // 'view'      => ['bill.view','bill.insert']
-                ],
-                // 'need'       => ['bill','quotation'],
+                'need'       => ['base.role'],
                 'except'    => [
-                    // 'index'      => ['workorder','bill.view','bill'],
-                    // 'view'      => [],
+                    'get_data'      => [],
                 ]
             )
         );

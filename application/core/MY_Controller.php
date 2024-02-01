@@ -146,7 +146,6 @@ class MY_Controller extends CI_Controller
 			}
 
 			$this->load->library('permit');
-			
 			//
 			// check permit to except
 			if ($data_except && count($data_except)) {
@@ -180,14 +179,24 @@ class MY_Controller extends CI_Controller
 			} else {
 				$dataarray = $this->permit->get_dataPermitSet($this->session->userdata($this->userlogin));
 			}
+			/* echo "<br>AFTER<pre>";
+			print_r($data_need);
 
+			echo "===========================abc";
+			print_r($data_access);
+			echo "===========================def";
+			print_r($data_except);
+			echo "===========================array";
+			print_r($dataarray);
+			echo "</pre>";
+			echo "before.".$result; */
 			//
 			// check permit to need
 			$next = 1;
 			if ($data_need && count($data_need) && $result == false) {
 				//
 				// check permit to need
-				
+				$result = true;
 				foreach ($data_need as $row_need) {
 					if (can($row_need,$dataarray) === false) {
 						$result = false;
@@ -197,20 +206,20 @@ class MY_Controller extends CI_Controller
 			}
 			//
 			//
-
+			
 			//
 			// check permit allowed
+			// echo "after.".$result;
 			if ($data_access && count($data_access) && $next == 1) {
-
 				if (is_numeric(array_search($this->_method, array_keys($data_access)))) {
 					if (is_array($data_access[$this->_method]) && count($data_access[$this->_method])) {
 
 						$array = $data_access[$this->_method];
-
 						//
 						// check permit
+						$result = false;
 						foreach ($array as $row_permit) {
-							if (can($row_permit,$dataarray) === true && $result === false) {
+							if (can($row_permit,$dataarray) === true) {
 								$result = true;
 							}
 						}
@@ -221,6 +230,7 @@ class MY_Controller extends CI_Controller
 					}
 				}
 			}
+			// echo "result=".$result;
 			// die;
 		} else {
 

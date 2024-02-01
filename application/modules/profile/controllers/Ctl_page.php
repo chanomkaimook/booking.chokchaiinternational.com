@@ -15,19 +15,7 @@ class Ctl_page extends MY_Controller
         $modelname = 'mdl_page';
         $this->load->model(array('mdl_page'));
 
-        $this->middleware(
-            array(
-                'access'    => [
-                    // 'index'     => ['bill','quotation'],
-                    // 'view'      => ['bill.view','bill.insert']
-                ],
-                // 'need'       => ['bill','quotation'],
-                'except'    => [
-                    // 'index'      => ['workorder','bill.view','bill'],
-                    // 'view'      => [],
-                ]
-            )
-        );
+        $this->middleware();
 
         // set language
         $this->lang->load('user', $this->langs);

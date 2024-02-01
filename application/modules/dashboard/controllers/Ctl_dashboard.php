@@ -17,28 +17,7 @@ class Ctl_dashboard extends MY_Controller
     {
         parent::__construct();
 
-        $this->middleware(
-            array(
-                'access'    => [
-                    // 'index'     => ['bill'],
-                    // 'index'     => ['bill','bill.view'],
-                    'view'      => ['bill.view','bill.a','bill.insert']
-                    // 'view'      => ['bill.view','bill.a','bill.insert','quatation']
-                    // 'view'      => ['quotation']
-                ],
-                // 'need'       => ['workorder'],
-                // 'need'       => ['bill'],
-                // 'need'       => ['bill','quotation'],
-                // 'need'       => ['quotation'],
-
-                'except'    => [
-                    // 'index'      => ['workorder','bill.view','bill'],
-                    // 'view'      => [],
-                    // 'view'      => ['quotation','b','c','d'],
-                    // 'view'      => ['bill.a','b','c','d'],
-                ]
-            )
-        );
+        $this->middleware();
 
         include FCPATH . "mobile_detect.php";
         $this->detect = new Mobile_Detect();

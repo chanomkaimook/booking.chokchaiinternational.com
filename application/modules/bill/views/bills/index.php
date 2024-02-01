@@ -7,7 +7,13 @@
             <div class="mb-1 mb-md-0">
                 <div class="d-flex gap-2">
                     <div class="tool-btn">
-                        <button type="button" class="btn-add btn"><?= mb_ucfirst($this->lang->line('_form_btn_add')) ?></button>
+                        <?php
+                        if (check_permit('bill.insert')) :
+                        ?>
+                            <button type="button" class="btn-add btn"><?= mb_ucfirst($this->lang->line('_form_btn_add')) ?></button>
+                        <?php
+                        endif;
+                        ?>
                     </div>
                 </div>
             </div>

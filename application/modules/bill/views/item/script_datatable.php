@@ -94,8 +94,15 @@
                     "data": "ID",
                     "render": function(data, type, row, meta) {
                         let btn_view = `<a data-id="${data}" class="btn-view text-capitalize dropdown-item" href="#" data-code="${row.CODE}" ><i class="mdi mdi-magnify mr-2 text-info font-18 vertical-middle"></i>${table_column_view[setlang]}</a>`
-                        let btn_edit = `<a data-id="${data}" class="btn-edit text-capitalize dropdown-item" href="#"><i class="mdi mdi-wrench mr-2 text-warning font-18 vertical-middle"></i>${table_column_edit[setlang]}</a>`
-                        let btn_del = `<a data-id="${data}" class="btn-del text-capitalize dropdown-item" href="#" ><i class="mdi mdi-delete mr-2 text-danger font-18 vertical-middle"></i>${table_column_del[setlang]}</a>`
+                        let btn_edit = ''
+                        let btn_del = ''
+
+                        if ($('#hidden_role_product_edit').val()) {
+                            btn_edit += `<a data-id="${data}" class="btn-edit text-capitalize dropdown-item" href="#"><i class="mdi mdi-wrench mr-2 text-warning font-18 vertical-middle"></i>${table_column_edit[setlang]}</a>`
+                        }
+                        if ($('#hidden_role_product_delete').val()) {
+                            btn_del += `<a data-id="${data}" class="btn-del text-capitalize dropdown-item" href="#" ><i class="mdi mdi-delete mr-2 text-danger font-18 vertical-middle"></i>${table_column_del[setlang]}</a>`
+                        }
 
                         if (row.STATUS.data.id == 1) {
                             btn_edit = ''
@@ -131,5 +138,4 @@
         // table.buttons(0, 0).remove();
         // table.button().add(0,'print');
     }
-
 </script>

@@ -21,14 +21,7 @@ class Ctl_user extends MY_Controller
 
         $this->middleware(
             array(
-                'access'    => [
-                    // 'index'     => ['bill','quotation'],
-                    // 'view'      => ['bill.view','bill.insert']
-                ],
                 'need'       => ['administrator'],
-                'except'    => [
-                    'get_user'      => [],
-                ]
             )
         );
 

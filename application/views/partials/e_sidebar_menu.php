@@ -48,27 +48,34 @@
 
                     <!-- Base data information -->
                     <?php
-                        $menu_path_base = array(
-                            "main_menu" => array(),
-                            "sub_menu"  => array()
+                        $menu_path_sale = array(
+                            "main_menu" => array("calendar.view","bill.view","report.role","product.view"),
+                            "sub_menu"  => array("calendar.view","bill.view","report.role","product.view")
                         );
 
                     ?>
-                    <li class="">
+                    <li class="<?= check_permit_groupmenu($menu_path_sale) ?>">
                         <a href="javascript: void(0);">
                             <i class="fe-file-text"></i>
                             <span> รายการจอง </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul class="nav-second-level" aria-expanded="false">
-                            <li class=""><a href="<?= site_url('bill/ctl_calendar'); ?>" data-show="ปฏิทินจอง">ปฏิทินจอง</a></li>
-                            <li class=""><a href="<?= site_url('bill/ctl_bill'); ?>" data-show="ข้อมูลการจอง">ข้อมูลการจอง</a></li>
-                            <li class=""><a href="<?= site_url('report/ctl_page'); ?>" data-show="รายงานสรุปมัดจำ">รายงานสรุปมัดจำ</a></li>
-                            <li class=""><a href="<?= site_url('bill/ctl_item'); ?>" data-show="สินค้า">สินค้า</a></li>
+                            <li class="<?= check_permit_menu($menu_path_sale['sub_menu'][0]) ?>"><a href="<?= site_url('bill/ctl_calendar'); ?>" data-show="ปฏิทินจอง">ปฏิทินจอง</a></li>
+                            <li class="<?= check_permit_menu($menu_path_sale['sub_menu'][1]) ?>"><a href="<?= site_url('bill/ctl_bill'); ?>" data-show="ข้อมูลการจอง">ข้อมูลการจอง</a></li>
+                            <li class="<?= check_permit_menu($menu_path_sale['sub_menu'][2]) ?>"><a href="<?= site_url('report/ctl_page'); ?>" data-show="รายงานสรุปมัดจำ">รายงานสรุปมัดจำ</a></li>
+                            <li class="<?= check_permit_menu($menu_path_sale['sub_menu'][3]) ?>"><a href="<?= site_url('bill/ctl_item'); ?>" data-show="สินค้า">สินค้า</a></li>
                         </ul>
                     </li>
 
-                    <li class="">
+                    <?php
+                        $menu_path_base = array(
+                            "main_menu" => array("base.role"),
+                            "sub_menu"  => array()
+                        );
+
+                    ?>
+                    <li class="<?= check_permit_groupmenu($menu_path_base) ?>">
                         <a href="javascript: void(0);">
                             <i class="fe-database"></i>
                             <span> ข้อมูลพื้นฐาน </span>

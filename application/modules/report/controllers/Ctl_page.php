@@ -244,7 +244,9 @@ class Ctl_page extends MY_Controller
                     "data"      =>  array(
                         'deposit_code'    => $row['deposit_code'],
                         'deposit_bill_net'  => $row['deposit_bill_net'],
+                        'deposit_bill_net_display'  => textMoney($row['deposit_bill_net']),
                         'deposit_net'    => $row['deposit_net'],
+                        'deposit_net_display'    => textMoney($row['deposit_net']),
                         'deposit_total_unit'    => $row['deposit_total_unit'],
                         'deposit_bank_name'    => $row['deposit_bank_name'],
                         'deposit_bank_number'    => $row['deposit_bank_number'],
@@ -252,6 +254,7 @@ class Ctl_page extends MY_Controller
                 );
 
                 $sub_data['PAID'] = array(
+                    "display"   => textMoney($row['paid_net']),
                     "data"      =>  array(
                         'paid_code'    => $row['paid_code'],
                         'paid_net'    => $row['paid_net'],

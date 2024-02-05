@@ -76,7 +76,7 @@
 
 <div class="row">
     <div class="form-group col-md-3">
-        <label class="text-capitalize">ยอดเงินมัดจำ</label>
+        <label class="text-capitalize">ยอดมัดจำ/ชำระ</label>
         <input type="text" class="form-control int_only" name="deposit" placeholder="ระบุตัวเลข">
     </div>
     <div class="form-group col-md-3">
@@ -445,7 +445,7 @@
                     if (price && total) {
                         totalprice = price * total
 
-                        $(item).find('td.price').text(price)
+                        $(item).find('td.price').text(formatMoney(price))
                         $(item).find('td.net').text(formatMoney(totalprice))
                         total_unit = total_unit + parseInt(total)
 

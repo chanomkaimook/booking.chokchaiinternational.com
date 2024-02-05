@@ -261,7 +261,7 @@ class Receipt
                     $rc_id = $r_rc->ID;
                     $this->clear_rc_codetext($rc_id);
 
-                    // update status bill
+                    /* // update status bill
                     $datastatus = $this->ci->bill->update_bill($bill_id);
                     if ($datastatus && $datastatus['data']['data']['complete_id'] == 3) {
                         $data_update = array(
@@ -273,7 +273,7 @@ class Receipt
                             'bill_complete'     => null
                         );
                         $update = $this->ci->mdl_deposit->update_data($data_update, $id);
-                    }
+                    } */
                 }
 
                 $result = array(

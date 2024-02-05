@@ -5,7 +5,7 @@
     </div>
     
     <div class="form-group col-md-6">
-        <label class="text-capitalize">ยอดเงินมัดจำ</label>
+        <label class="text-capitalize">ยอดมัดจำ/ชำระ</label>
         <h5 class="card-text deposit"></h5>
     </div>
     <div class="form-group col-md-6">

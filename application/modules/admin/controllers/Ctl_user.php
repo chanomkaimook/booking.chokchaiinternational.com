@@ -22,6 +22,9 @@ class Ctl_user extends MY_Controller
         $this->middleware(
             array(
                 'need'       => ['administrator'],
+                'except'    => [
+                    'get_user'      => [],
+                ]
             )
         );
 
@@ -170,10 +173,25 @@ class Ctl_user extends MY_Controller
 
         $array_permit = $this->roles->get_dataRolesJS($item_id, null, "result_array");
         $array_roles_child = $this->roles->get_dataRolesGroup($item_id, null, "result_array");
-print_r($array_roles_child);
+        if (is_numeric(array_search(1, $item_id))) {
+            $array_roles_child[] = array(
+                'ID'            => 0,
+                'ROLES_ID'      => 1,
+                'ROLES_ID_CHILD'    => "",
+                'PERMIT_ID'     => "",
+                'ARIA'          => "",
+                'PERIOD_BEGIN'   => "",
+                'PERIOD_END'     => "",
+                'DATE_STARTS'    => "",
+                'DATE_UPDATE'    => "",
+                'USER_STARTS'    => "",
+                'USER_UPDATE'    => "",
+                'STATUS_OFFVIEW' => "",
+                'ROLES_CODE'     => "admin",
+            );
+        }
 
         $permit_all = $array_permit;
-
 
         // permit id
         $array_permit_only = $this->roles->get_dataPermitOnly($user_login, null, "result_array");
@@ -185,7 +203,7 @@ print_r($array_roles_child);
             }
         }
 
-        if($data){
+        if ($data) {
             $data->PERMIT = $permit_all;
             $data->PERMIT_HTML = html_roles_jstree($permit_all);
             $data->ROLES = $array_roles_child;

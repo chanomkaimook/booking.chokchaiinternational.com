@@ -21,6 +21,9 @@ class Ctl_roles extends MY_Controller
         $this->middleware(
             array(
                 'need'       => ['administrator'],
+                'except'    => [
+                    'get_dataRole'      => [],
+                ]
             )
         );
 

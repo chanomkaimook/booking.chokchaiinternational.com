@@ -1,7 +1,7 @@
 <div class="content">
     <!-- Start Content-->
-    <input type="hidden" id="hidden_role_bill_edit" value="<?php echo check_permit('bill.edit') ? 1 : null ?>" >
-    <input type="hidden" id="hidden_role_bill_delete" value="<?php echo check_permit('bill.delete') ? 1 : null ?>" >
+    <input type="hidden" id="hidden_role_bill_edit" value="<?php echo check_permit('bill.edit') ? 1 : null ?>">
+    <input type="hidden" id="hidden_role_bill_delete" value="<?php echo check_permit('bill.delete') ? 1 : null ?>">
     <div class="container-fluid">
         <div class="section-tool d-flex flex-column flex-md-row justify-content-between">
 
@@ -178,7 +178,7 @@
                                             $item_number .= "<p>" . $number_item . "</p>";
                                             $item_name .= "<p>" . $bill_detail[$key_db]['DESCRIPTION'] . "</p>";
                                             $item_qty .= "<p>" . $bill_detail[$key_db]['QUANTITY'] . "</p>";
-                                            $item_price .= "<p>" . textMoney($bill_detail[$key_db]['PRICE']) . "</p>";
+                                            $item_price .= "<p>" . textMoney($bill_detail[$key_db]['PRICE_UNIT']) . "</p>";
                                             $item_net .= "<p>" . textMoney($bill_detail[$key_db]['NET']) . "</p>";
 
                                             $number_item++;
@@ -470,9 +470,9 @@
 
                         $('.modal-body-form')
                             .find('.code').text(data.CODE).end()
-                            .find('.price_novat').text(data.PRICE_NOVAT).end()
-                            .find('.vat').text(data.VAT).end()
-                            .find('.net').text(data.NET).end()
+                            .find('.price_novat').text(formatMoney(data.PRICE_NOVAT)).end()
+                            .find('.vat').text(formatMoney(data.VAT)).end()
+                            .find('.net').text(formatMoney(data.NET)).end()
                             .find('.codetext').text(data.CODETEXT).end()
                             .find('.booking_date').text(new_date_order).end()
                             .find('.remark_receipt').text(data.REMARK).end()
@@ -500,11 +500,11 @@
             // ############
             // 
             function modalActive_deposit(action = 'view', data = []) {
-                let header = 'สร้างใบรับเงินมัดจำ'
+                let header = 'สร้างใบรับชำระเงิน'
                 if (action == 'add') {
                     $(modal_dp_name).find('.modal_text_header').html(header)
                 } else {
-                    header = 'ใบรับเงินมัดจำ'
+                    header = 'ใบรับชำระเงิน'
                     $(modal_dp_name).find('.modal_text_header').html(header)
                 }
 
@@ -530,7 +530,7 @@
                             .find('.deposit_date').text(new_date_order).end()
                             .find('.pos_date').text(new_date_pos).end()
                             .find('.bank').text(data.BANK_NAME).end()
-                            .find('.deposit').text(data.DEPOSIT).end()
+                            .find('.deposit').text(formatMoney(data.DEPOSIT)).end()
                             .find('.remark_deposit').text(data.REMARK).end()
                             .find('.user_active').text(data.USER_ACTIVE).end()
                             .find('.date_active').text(data.DATE_ACTIVE).end()
@@ -729,7 +729,7 @@
                                     if (num) {
                                         t = "ชำระหน้าฟาร์ม "
                                     }
-                                    t = t + item.DEPOSIT
+                                    t = t + formatMoney(item.DEPOSIT)
                                     v += creat_html_billvat(item.ID, t, item.USER_UPDATE)
                                     num++
                                 })
@@ -791,10 +791,10 @@
         function creat_html_btnEdit() {
             let html = ''
 
-            if($('#hidden_role_bill_edit').val()){
-                html +=`<button type="button" class="btn-edit-quotation btn btn-warning d-none mr-2">แก้ไขใบเสนอราคา</button>`
+            if ($('#hidden_role_bill_edit').val()) {
+                html += `<button type="button" class="btn-edit-quotation btn btn-warning d-none mr-2">แก้ไขใบเสนอราคา</button>`
             }
-            if($('#hidden_role_bill_delete').val()){
+            if ($('#hidden_role_bill_delete').val()) {
                 html += `<button type="button" class="btn-del btn btn-danger d-none mr-2">ยกเลิก</button>`
             }
 
@@ -1080,6 +1080,20 @@
             // $('.section-tool .sector_billvat').remove('')
 
             $('.section-tool .sector_button-edit').empty()
+        }
+
+        function formatMoney(number, decPlaces, decSep, thouSep) {
+            decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
+                decSep = typeof decSep === "undefined" ? "." : decSep;
+            thouSep = typeof thouSep === "undefined" ? "," : thouSep;
+            var sign = number < 0 ? "-" : "";
+            var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
+            var j = (j = i.length) > 3 ? j % 3 : 0;
+
+            return sign +
+                (j ? i.substr(0, j) + thouSep : "") +
+                i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+                (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
         }
     </script>
 

@@ -161,7 +161,7 @@
                         "data": "DEPOSIT.data.deposit_total_unit",
                     },
                     {
-                        "data": "DEPOSIT.data.deposit_bill_net",
+                        "data": "DEPOSIT.data.deposit_bill_net_display",
                     },
                     {
                         "data": {
@@ -181,7 +181,7 @@
                         "data": "DEPOSIT.data.deposit_bank_number"
                     },
                     {
-                        "data": "DEPOSIT.data.deposit_net"
+                        "data": "DEPOSIT.data.deposit_net_display"
                     },
                     {
                         "data": {
@@ -209,7 +209,7 @@
                         "data": "PAID.data.paid_bank_number"
                     },
                     {
-                        "data": "PAID.data.paid_net"
+                        "data": "PAID.display"
                     },
 
                 ],

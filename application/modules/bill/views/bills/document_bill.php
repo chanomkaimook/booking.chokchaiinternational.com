@@ -642,13 +642,12 @@
 
         function document_export(type) {
             if (type == 'excel') {
-                console.log('test')
-                /* let datacode = $('#data-bill_code').val()
+                let datacode = $('#data-bill_code').val()
                 let url = new URL(path(url_moduleControl + "/export"), domain)
                 url.searchParams.append('page', 'bill')
                 url.searchParams.append('code', datacode)
 
-                window.open(url) */
+                window.open(url)
             }
 
         }

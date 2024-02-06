@@ -214,7 +214,7 @@ class Ctl_bill extends MY_Controller
             }
 
             if ($item_id) {
-                $optional_receipt['where'] = array(
+               $optional_receipt['where']  = array(
                     'bill_id'   => $item_id
                 );
                 $data['receipt'] = $this->mdl_receipt->get_datashow(null, $optional_receipt, 'row_array');
@@ -222,6 +222,19 @@ class Ctl_bill extends MY_Controller
 
             $data['bill'] = (array)$bill['data'];
             $data['q_setting'] = $this->mdl_settings->get_data();
+
+            $deposit = "";
+            $this->load->model('deposit/mdl_deposit');
+            $optional_deposit['select'] = "sum(deposit) as total_deposit";
+            $optional_deposit['where'] = array(
+                'bill_id'   => $item_id
+            );
+
+            $q_deposit = $this->mdl_deposit->get_datashow(null, $optional_deposit, 'row_array');
+            if ($q_deposit) {
+                $deposit = $q_deposit['total_deposit'];
+            }
+            $data['total_deposit'] = $deposit;
 
             switch ($page) {
                 case 'bill':
@@ -254,7 +267,7 @@ class Ctl_bill extends MY_Controller
                     $data[$key] = $get_bill['data'];
 
                     $deposit = "";
-                   
+
                     $optional_deposit['select'] = "sum(deposit) as total_deposit";
                     $optional_deposit['where'] = array(
                         'bill_id'   => $item_id
@@ -263,7 +276,7 @@ class Ctl_bill extends MY_Controller
                     if ($q_deposit) {
                         $deposit = $q_deposit['total_deposit'];
                     }
-                    $data[$key]->DEPOSIT= $deposit;
+                    $data[$key]->DEPOSIT = $deposit;
 
                     $net_pure = $this->get_data_todo_1($item_id, $data_array[$key]);
                     $data[$key]->NET_PURE = textMoney($net_pure);

@@ -331,7 +331,7 @@ class Bill
             }
         }
 
-         //
+        //
         // array data to insert
         $data_update = array(
             'customer_id'  => $customer_id,
@@ -357,7 +357,7 @@ class Bill
                 'customer_id'   => $customer_id,
                 'address'       => $customer_address
             );
-            $get_cus_address = $this->ci->mdl_customer_address->get_data(null,$optional_address,'row');
+            $get_cus_address = $this->ci->mdl_customer_address->get_data(null, $optional_address, 'row');
         }
 
         // check customer have data address
@@ -369,10 +369,9 @@ class Bill
                 $new_id = $this->add_address($customer_id, (string)$customer_address);
                 $data_update['customer_address_id']  = $new_id['data'];
                 $data_update['customer_address_address']  = $customer_address;
-            }else{
+            } else {
                 $data_update['customer_address_id']  = null;
                 $data_update['customer_address_address']  = null;
-
             }
         }
 
@@ -613,7 +612,7 @@ class Bill
                 'customer_id'   => $customer_id,
                 'address'       => $customer_address
             );
-            $get_cus_address = $this->ci->mdl_customer_address->get_data(null,$optional_address,'row');
+            $get_cus_address = $this->ci->mdl_customer_address->get_data(null, $optional_address, 'row');
         }
 
         // check custoemr have data address
@@ -822,6 +821,11 @@ class Bill
                 // update receipt price
                 $receipt_id = $data_receipt->ID;
                 $this->keep_price_to_receipt($receipt_id, $id);
+            } else {
+
+                // create receipt for bill cancel
+                $this->ci->load->library('receipt');
+                $this->ci->receipt->create_bill($id);
             }
 
             if ($this->ci->db->trans_status() === FALSE) {

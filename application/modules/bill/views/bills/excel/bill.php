@@ -41,8 +41,8 @@ $text_bill_discount = "ส่วนลด";
 $text_bill_deposit = "Deposit";
 $text_bill_total = "คงเหลือ";
 
-$text_bill_by = "ผู้เสนอราคา : ....................................\nadmin";
-$text_bill_customer = "ลูกค้า : ....................................";
+$text_bill_by = "ผู้เสนอราคา : ..................................................\nadmin";
+$text_bill_customer = "ลูกค้า : ..................................................";
 
 $list_remark = "หมายเหตุ: 1. ตะลอนฟาร์มโชคชัย \n2. ราคานี้รวมภาษีมูลค่าเพิ่ม 7% แล้ว";
 
@@ -144,7 +144,7 @@ $company = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
 $company->createTextRun($text_company)
     ->getFont()->setBold(true);
 $company->createTextRun("\n" . $text_company_address . "\n" . $text_company_textphone)
-    ->getFont()->setSize(8);
+    ->getFont()->setSize($font_size_general);
 $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($company);
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel)->applyFromArray($styleCenter);
 
@@ -296,7 +296,7 @@ $start = $rowexcel + 1;
 for ($i = 0; $i < 8; $i++) {
     $rowexcel = $rowexcel + 1;
     $spreadsheet->getActiveSheet()->mergeCells('B' . $rowexcel . ':C' . $rowexcel);
-    $spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(8, "mm");
+    $spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(10, "mm");
 
     if ($bill['item_list'] && $bill['item_list'][$i]) {
         $detail_item = $bill['item_list'][$i];
@@ -354,11 +354,11 @@ for ($i = 0; $i < 8; $i++) {
 }
 
 $end = $rowexcel;
-$spreadsheet->getActiveSheet()->getStyle($cl_s . $start . ':' . $cl_e . $end)->applyFromArray($styleBorderOut);
-$spreadsheet->getActiveSheet()->getStyle('B' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
-$spreadsheet->getActiveSheet()->getStyle('D' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
-$spreadsheet->getActiveSheet()->getStyle('E' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
-$spreadsheet->getActiveSheet()->getStyle('F' . $start . ':' . $cl_s . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('A' . $start . ':A' . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('B' . $start . ':C' . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('D' . $start . ':D' . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('E' . $start . ':E' . $end)->applyFromArray($styleBorderOut);
+$spreadsheet->getActiveSheet()->getStyle('F' . $start . ':F' . $end)->applyFromArray($styleBorderOut);
 
 #
 # condition
@@ -439,7 +439,7 @@ $excel_text_bill_by->createTextRun($text_bill_by)
 $spreadsheet->getActiveSheet()->getCell($cl_s . $rowexcel)->setValue($excel_text_bill_by);
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ':' . $cl_s . $rowexcel)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ':' . $cl_s . $rowexcel)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-$spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(18, "mm");
+$spreadsheet->getActiveSheet()->getRowDimension($rowexcel)->setRowHeight(35, "mm");
 $spreadsheet->getActiveSheet()->getStyle($cl_s . $rowexcel . ':C' . $rowexcel)->applyFromArray($styleBorderOut);
 
 $spreadsheet->getActiveSheet()->mergeCells('D' . $rowexcel . ':' . $cl_e . $rowexcel);
@@ -471,6 +471,23 @@ $spreadsheet->getActiveSheet()->setTitle(date('Y-m-d'));
 #	set font default excel
 $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
 $spreadsheet->getDefaultStyle()->getFont()->setSize(8);
+
+#	set alignment
+$spreadsheet->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
+
+#	set margin
+$spreadsheet->getActiveSheet()->getPageMargins()->setTop(0.75);
+$spreadsheet->getActiveSheet()->getPageMargins()->setRight(0.25);
+$spreadsheet->getActiveSheet()->getPageMargins()->setLeft(0.25);
+$spreadsheet->getActiveSheet()->getPageMargins()->setBottom(0.75);
+
+#   set page rotate
+/* $spreadsheet->getActiveSheet()->getPageSetup()
+    ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE); */
+
+#   set page size
+$spreadsheet->getActiveSheet()->getPageSetup()
+    ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
 
 #	protection
 // $spreadsheet->getActiveSheet()->getProtection()->setSheet(false);

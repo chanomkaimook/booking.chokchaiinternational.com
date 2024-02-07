@@ -450,8 +450,8 @@
                         let td_1 = `<td></td>`
                         let td_2 = `<td>${item.DESCRIPTION}</td>`
                         let td_3 = `<td class="td_item_qty">${item.QUANTITY}</td>`
-                        let td_4 = `<td class="td_item_price_unit">${item.PRICE_UNIT}</td>`
-                        let td_5 = `<td class="td_item_price">${item.PRICE}</td>`
+                        let td_4 = `<td class="td_item_price_unit">${formatMoney(item.PRICE_UNIT)}</td>`
+                        let td_5 = `<td class="td_item_price">${formatMoney(item.PRICE)}</td>`
                         let tr = `<tr>${td_1}${td_2}${td_3}${td_4}${td_5}</tr>`
 
                         $("#list_item_view tbody").append(tr)

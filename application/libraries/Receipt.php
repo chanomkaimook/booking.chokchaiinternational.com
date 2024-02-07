@@ -392,7 +392,7 @@ class Receipt
             $bill = $this->ci->mdl_bill->get_data(null, $optional, 'row_array');
             $bill = array_change_key_case($bill, CASE_LOWER);
             if (!$codebill) {
-                $codebill = $bill['CODE'];
+                $codebill = $bill['code'];
             }
 
             $code = $this->gen_code();

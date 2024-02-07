@@ -138,6 +138,29 @@ class Mdl_bill extends CI_Model
         }
     }
 
+    public function get_dataDisplayCalendar(int $id = null, array $optionnal = null, string $type = "result")
+    {
+        # code...
+        $sql = (object) $this->get_sql($id, $optionnal, $type);
+        $sql->where('bill.complete_id in(1,2,3)',null,false);
+
+        if ($this->offview) {
+            $sql->where($this->table . '.' . $this->offview . ' is null', null, false);
+        }
+
+        if ($this->fildstatus) {
+            $sql->where($this->table . '.' . $this->fildstatus, 1);
+        }
+
+        $query = $sql->get();
+
+        if ($id) {
+            return $query->row();
+        } else {
+            return $query->$type();
+        }
+    }
+
     //  *
     //  * Check validate
     //  * validation

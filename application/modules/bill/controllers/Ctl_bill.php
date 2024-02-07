@@ -254,7 +254,7 @@ class Ctl_bill extends MY_Controller
         $request = $_REQUEST;
         $this->load->model('deposit/mdl_deposit');
 
-        $data_array = $this->model->get_data();
+        $data_array = $this->model->get_dataDisplayCalendar();
         $data = [];
         if ($data_array) {
 

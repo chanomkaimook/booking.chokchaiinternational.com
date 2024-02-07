@@ -46,7 +46,7 @@
 
                         $customer_id = textNull($bill['CUSTOMER_ID']);
                         $customer_name = textNull($bill['CUSTOMER_NAME']);
-                        $customer_address = "";
+                        $customer_address = textShow($bill['CUSTOMER_ADDRESS_ADDRESS'],"-");
                         $agent_name = textNull($bill['AGENT_NAME']);
                         $agent_contact = textNull($bill['AGENT_CONTACT']);
 
@@ -114,7 +114,7 @@
                                 <tr class="pb_head">
                                     <td rowspan="4" class="pb_head_cus">
                                         <p><b>เรียน/Attention : <?= $customer_name; ?></b></p>
-                                        <!-- <p> <?= $customer_address; ?></b></p> -->
+                                        <p><b><?= $customer_address; ?></b></p>
                                         <p>ผู้ประสานงาน : <?= $agent_name . $agent_contact; ?></b></p>
                                         <p>Email : <?= $agent_email; ?></b></p>
                                     </td>
@@ -1061,6 +1061,7 @@
                             swalalert()
 
                             $('#modal_view').modal('hide')
+                            get_receipt()
 
                             clear_tool()
                         } else {

@@ -142,7 +142,7 @@
 
     async function get_cartData_view(deposit = null, item_data = null) {
         $(function() {
-            if (item_data) {
+            if (item_data && url_moduleControl != 'bill/event_calendar') {
                 let url = new URL(path('bill/ctl_bill/get_cartData'), domain)
 
                 let body = new FormData();

@@ -85,6 +85,7 @@ class Ctl_page extends MY_Controller
             $group = array_values(array_unique(array_column($data, 'CODE')));
             $deposit_array = array_keys(array_column($data, "dp_complete"), null);
             $receipt_array = array_keys(array_column($data, "dp_complete"), 1);
+            // print_r($group);
             // print_r($receipt_array);
             if ($group) {
                 foreach ($group as $group_k => $group_v) {
@@ -187,7 +188,7 @@ class Ctl_page extends MY_Controller
                     );
                 }
             }
-            // print_r($group);
+
             $no = 1;
             foreach ($group as $key => $row) {
                 $user_active_id = $row['bill_user_starts'] ? $row['bill_user_starts'] : $row['bill_user_update'];
@@ -212,6 +213,7 @@ class Ctl_page extends MY_Controller
                     "data"      =>  array(
                         'id'    => $row['ID'],
                         'code'    => textShow($row['bill_code']),
+                        'complete'    => textShow($row['bill_complete']),
                         'net'       => textShow($row['bill_net']),
                         'paid'      => textShow($row['bill_paid']),
                         'date_order'    => textShow($row['bill_date_order']),

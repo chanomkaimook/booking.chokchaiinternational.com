@@ -2,6 +2,7 @@
     <input type="hidden" id="hidden_task_id">
     <!-- Start Content-->
     <div class="container-fluid">
+
         <div class="section-tool d-flex flex-column flex-md-row justify-content-between">
 
             <div class="">
@@ -23,32 +24,10 @@
                 </div>
 
             </div>
-            <div class="">
-                <button class="btn btn-light" onclick="updateCalendar()" >Update Calendar</button>
-            </div>
 
         </div>
+
         <div class="row">
-
-            <!-- <div class="col-lg-3">
-                <div class="mt-3">
-                    <p class="text-muted">รายการที่ยังไม่ลงวันจอง
-                        <br>
-                        <span class="text-secondary">
-                            <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>รอโอน
-                        </span>
-                        <span class="text-warning">
-                            <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>มัดจำแล้ว
-                        </span>
-                        <span class="text-success">
-                            <i class="mdi mdi-checkbox-blank-circle mr-1 vertical-middle"></i>โอนแล้ว
-                        </span>
-                    </p>
-                </div>
-                <div id="external-events" class="order_list">
-                </div>
-            </div> -->
-
             <!-- Begin calendar -->
             <div class="col-lg-12">
                 <div id="calendar"></div>
@@ -61,12 +40,10 @@
 </div> <!-- end content -->
 
 <!-- Modal -->
-<?php require_once('component/modal_item.php') ?>
+<?php require_once('component/modal_public.php') ?>
 <!-- End Modal -->
 
 <?php require_once('script.php') ?>
-<?php require_once('script_crud.php') ?>
-<?php require_once('script_autocustomer.php') ?>
 <script>
     input_int_only()
 
@@ -150,38 +127,7 @@
                 /* on Move */
                 (CalendarApp.prototype.onMove = function(eventObj, date) {
                     return false
-                    /* console.log(eventObj);
-                    var d = new Date(date);
-                    var dateString = d.toDateString();
-
-                    Swal.fire(
-                      swal_setConfirm("ยืนยันการจอง", "จองรายการในวันที่ " + dateString)
-                    ).then((result) => {
-                      if (result.value) {
-                      }
-                    }); */
                 }),
-                /* (CalendarApp.prototype.onSubmit = function (item_id, date) {
-                    let url = new URL(
-                      "calendar/ctl_manage/update_bill_booking",
-                      window.origin
-                    );
-
-                    let data = new FormData();
-                    data.append("item_id", item_id);
-                    data.append("booking_date", date);
-
-                    fetch(url, {
-                      method: "post",
-                      body: data,
-                    })
-                      .then((res) => res.json())
-                      .then((resp) => {
-                        return resp;
-                      });
-                  }), */
-                //
-                //
 
                 /* on click on event */
                 (CalendarApp.prototype.onEventClick = function(calEvent, jsEvent, view) {
@@ -199,42 +145,7 @@
                     });
 
                     return false;
-                    /* var $this = this;
-                    var form = $("<form></form>");
-                    form.append("<label>Change event name</label>");
-                    form.append(
-                        "<div class='input-group m-b-15'><input class='form-control' type=text value='" +
-                        calEvent.title +
-                        "' /><span class='input-group-append'><button type='submit' class='btn btn-success btn-md waves-effect waves-light'><i class='fa fa-check'></i> Save</button></span></div>"
-                    );
-                    $this.$modal.modal({
-                        backdrop: "static",
-                    });
-                    $this.$modal
-                        .find(".delete-event")
-                        .show()
-                        .end()
-                        .find(".save-event")
-                        .hide()
-                        .end()
-                        .find(".modal-body")
-                        .empty()
-                        .prepend(form)
-                        .end()
-                        .find(".delete-event")
-                        .unbind("click")
-                        .click(function() {
-                            $this.$calendarObj.fullCalendar("removeEvents", function(ev) {
-                                return ev._id == calEvent._id;
-                            });
-                            $this.$modal.modal("hide");
-                        });
-                    $this.$modal.find("form").on("submit", function() {
-                        calEvent.title = form.find("input[type=text]").val();
-                        $this.$calendarObj.fullCalendar("updateEvent", calEvent);
-                        $this.$modal.modal("hide");
-                        return false;
-                    }); */
+
                 }),
                 /* on select */
                 (CalendarApp.prototype.onSelect = function(start, end, allDay) {
@@ -245,9 +156,7 @@
                     });
                     var d = new Date(start);
                     var month = d.getMonth() + 1;
-                    var booking_date = `${d.getDate().toString().padStart(2, "0")}/${month
-        .toString()
-        .padStart(2, "0")}/${d.getFullYear()}`;
+                    var booking_date = `${d.getDate().toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${d.getFullYear()}`;
 
                     $("[name=bookingdate]").val(booking_date);
 
@@ -275,7 +184,7 @@
                 });
 
                 function get_calendar_data() {
-                    let url = new URL("bill/ctl_bill/get_dataCalendar", window.origin);
+                    let url = new URL("bill/event_calendar/get_dataCalendar", window.origin);
                     return new Promise((resolve, reject) => {
                         fetch(url)
                             .then((res) => res.json())
@@ -416,12 +325,12 @@
             //initializing CalendarApp
             (function($) {
                 "use strict";
-                
+
                 $.CalendarApp.init();
             })(window.jQuery);
-           
 
-       
+
+
         calendar.onMove = function(eventObj, revertFunc) {
             console.log('move')
         }

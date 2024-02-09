@@ -186,18 +186,21 @@
 
     $(document).ready(function() {
         // select
-        fetch_dataItem()
-            .then((resp) => {
-                if (resp) {
-                    resp.forEach(function(item, index) {
-                        select += `<option value="${item.ID}" 
+        if (url_moduleControl != 'bill/event_calendar') {
+            fetch_dataItem()
+                .then((resp) => {
+                    if (resp) {
+                        resp.forEach(function(item, index) {
+                            select += `<option value="${item.ID}" 
                         data-name="${item.NAME}"
                         data-price="${item.PRICE}">
                         ${item.NAME}
                         </option>`
-                    })
-                }
-            })
+                        })
+                    }
+                })
+        }
+
 
 
         table_list_body = $('table#list_item tbody')

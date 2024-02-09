@@ -413,7 +413,7 @@ class Mdl_page extends CI_Model
         ->join('deposit',$this->table.'.id=deposit.bill_id','left')
         ->join('bank','deposit.bank_id=bank.id','left')
         // ->join('receipt',$this->table.'.id=receipt.bill_id','left');
-        ->where($this->table.'.complete_id',3)
+        // ->where($this->table.'.complete_id',3)
         ->where('deposit.status',1);
 
         if (textNull($request['hidden_datestart'])) {

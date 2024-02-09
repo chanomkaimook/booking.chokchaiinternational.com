@@ -25,7 +25,7 @@
     $(document).ready(function() {
         let menu = $('.nav-second-level li.mm-active a')
         let main = $('.metismenu > li.mm-active span:first')
-        let menuShow = menu.attr('data-show')
+        let menuShow = menu.attr('data-show').trim()
 
         if (menuShow) {
             document.getElementsByClassName('breadcrumb-item')[0].innerHTML = 'Backend'

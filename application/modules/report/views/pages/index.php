@@ -48,6 +48,7 @@
                 <thead>
                         <tr>
                             <th>ลำดับ</th>
+                            <th>สถานะ</th>
                             <th>ชื่อลูกค้า</th>
                             <th>นทท. (จอง) ท่าน</th>
                             <th>ราคาจอง(บาท)</th>
@@ -155,6 +156,9 @@
                         "data": "NO",
                     },
                     {
+                        "data": "BILL.data.complete",
+                    },
+                    {
                         "data": "CUSTOMER.display",
                     },
                     {
@@ -241,6 +245,6 @@
 </script>
 <?php include('script.php') ?>
 <?php include('script_crud.php') ?>
-<?php include('script_datatable.php') ?>
+
 <?php //require_once('application/views/partials/e_script_print.php'); 
 ?>

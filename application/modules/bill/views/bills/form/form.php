@@ -74,7 +74,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row section_form_deposit">
     <div class="form-group col-md-3">
         <label class="text-capitalize">ยอดมัดจำ/ชำระ</label>
         <input type="text" class="form-control int_only" name="deposit" placeholder="ระบุตัวเลข">
@@ -102,12 +102,8 @@
     </div>
 </div>
 
-<div class="row">
-
-</div>
-
 <div class="row section_item">
-    <div class="form-group col-md-12">
+    <div class="form-group col-md-12 section_item__detail">
         <div class="row">
             <div class="col-md-4 col-6">
                 <h5><small>ราคาเต็ม </small><br><span class="total_price"></span></h5>

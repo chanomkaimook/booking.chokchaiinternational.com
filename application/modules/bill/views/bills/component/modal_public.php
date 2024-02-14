@@ -52,3 +52,7 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<script>
+    $('.section_form_deposit').addClass('d-none')
+    $('.section_item__detail').addClass('d-none')
+</script>

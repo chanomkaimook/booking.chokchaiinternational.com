@@ -6,9 +6,11 @@
 
     @media print {
 
-
+        .remark_section {
+            display:none;
+        }
         div.A4 {
-            margin-top: 4cm !important;
+            margin-top: 3.7cm !important;
             width: 21cm;
             height: 29.7cm;
 

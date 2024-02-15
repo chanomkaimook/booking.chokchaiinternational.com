@@ -7,8 +7,9 @@
             <option value="" selected><?= mb_ucfirst($this->lang->line('_fillter_text_all')) ?></option>
 
             <option value="1">รอ</option>
-            <option value="2">กำลังทำ</option>
-            <option value="3">ปิดงานสำเร็จ</option>
+            <option value="2">กำลัง</option>
+            <option value="3">สำเร็จ</option>
+            <option value="4">ยกเลิก</option>
         </select>
     </div>
 </div>

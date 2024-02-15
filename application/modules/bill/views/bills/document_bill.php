@@ -46,7 +46,7 @@
 
                         $customer_id = textNull($bill['CUSTOMER_ID']);
                         $customer_name = textNull($bill['CUSTOMER_NAME']);
-                        $customer_address = textShow($bill['CUSTOMER_ADDRESS_ADDRESS'],"-");
+                        $customer_address = textShow($bill['CUSTOMER_ADDRESS_ADDRESS'], "-");
                         $agent_name = textNull($bill['AGENT_NAME']);
                         $agent_contact = textNull($bill['AGENT_CONTACT']);
 
@@ -70,7 +70,7 @@
                         $discount = textMoney($bill['DISCOUNT']);
                         $deposit = textMoney($total_deposit);
                         $net = textMoney(floatval($bill['NET']) - floatval($total_deposit));
-                        $net_text_convert_th = $bill['NET'] ? convertNumberToText('100.00') : null;
+                        $net_text_convert_th = $bill['NET'] ? convertNumberToText($price) : null;
 
                         $staff = whois($bill['USER_STARTS']);
                         ?>
@@ -81,6 +81,28 @@
                         <input type="hidden" id="data-bill_booking" value="<?= $bill['BOOKING_DATE']; ?>">
 
                         <div class="A4">
+                            <style>
+                                .A4 {
+                                    position: relative;
+                                }
+
+                                .remark_section {
+                                    position: absolute;
+                                    top: 15px;
+                                    right: 15px;
+                                }
+                            </style>
+                            <?php
+                                if($bill['REMARK']):
+                            ?>
+                            <div class="remark_section">
+                                <button type="button" class="btn btn-secondary rounded-pill" data-target="#modal_remark" data-toggle="modal">
+                                    <i class="fas fa-info"> หมายเหตุ</i>
+                                </button>
+                            </div>
+                            <?php
+                                endif;
+                            ?>
                             <div class="page_header">
 
                                 <div class="logo">
@@ -264,6 +286,37 @@
 
     </div> <!-- end content -->
     <!-- Modal -->
+    <div id="modal_remark" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Form -->
+                <form class="form-horizontal" autocomplete="off" id="frm">
+                    <input type="hidden" name="frm_hidden_id">
+                    <div class="modal-body">
+                        <div class="modal-body-content" style="height:70vh">
+                            <div class="color-scroll" style="max-height:70vh">
+                                <!-- HTML -->
+                                <div class="modal-body-view">
+                                    <div class="row">
+                                        <div class="form-group col-md-12">
+                                            <label class="text-capitalize">หมายเหตุ</label>
+                                            <h5 class="card-text remark">
+                                                <?= textNull($bill['REMARK']); ?>
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- End Form -->
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     <?php require_once('component/modal_formbillvat.php') ?>
     <?php require_once('component/modal_receipt.php') ?>
     <?php require_once('component/modal_item.php') ?>
@@ -676,7 +729,7 @@
         function update_deposit(id = null) {
             async_get_price_deposit(id)
                 .then((resp) => {
-                    $('.text_deposit').text(resp)
+                    $('.text_deposit').text(formatMoney(resp))
                 })
         }
 

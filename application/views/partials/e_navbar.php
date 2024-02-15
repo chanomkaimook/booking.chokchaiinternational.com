@@ -230,6 +230,7 @@
                     <input type="hidden" name="theme-page-title" value="<?= $pagetitle ? $pagetitle : 'null'; ?>">
                     <input type="hidden" name="theme-breadcrumb" value="<?= $breadcrumb[0] ? $breadcrumb[0] : 'null'; ?>">
                     <input type="hidden" name="theme-breadcrumb" value="<?= $breadcrumb[1] ? $breadcrumb[1] : 'null'; ?>">
+                    <input type="hidden" name="theme-menu-url" value="<?= $menuactive ? $menuactive : 'null'; ?>">
 
          </div>
          <!-- end Topbar -->

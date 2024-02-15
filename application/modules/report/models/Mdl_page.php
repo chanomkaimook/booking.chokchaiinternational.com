@@ -276,14 +276,14 @@ class Mdl_page extends CI_Model
     //  * 
     //  * update data
     //  *
-    public function update_data($data_update = null,int $id=null)
+    public function update_data($data_update = null, int $id = null)
     {
         $result = false;
         $item_id = $id ? $id : textNull($this->input->post('item_id'));
 
         if ($item_id) {
             $request = $_POST;
-            
+
             $item_name = textNull($data_update['name']) ? $data_update['name'] : $request['item_name'];
             $array_chk_dup = array(
                 'name' => $item_name,
@@ -294,7 +294,7 @@ class Mdl_page extends CI_Model
             if ($return = $this->check_value_valid($array_chk_dup)) {
                 return $return;
             }
-            
+
             if ($return = $this->check_dup($array_chk_dup, $item_name)) {
                 return $return;
             }
@@ -410,11 +410,11 @@ class Mdl_page extends CI_Model
         $hidden_end = "";
 
         $sql = $this->db->from($this->table)
-        ->join('deposit',$this->table.'.id=deposit.bill_id','left')
-        ->join('bank','deposit.bank_id=bank.id','left')
-        // ->join('receipt',$this->table.'.id=receipt.bill_id','left');
-        // ->where($this->table.'.complete_id',3)
-        ->where('deposit.status',1);
+            ->join('deposit', $this->table . '.id=deposit.bill_id', 'left')
+            ->join('bank', 'deposit.bank_id=bank.id', 'left')
+            // ->join('receipt',$this->table.'.id=receipt.bill_id','left');
+            // ->where($this->table.'.complete_id',3)
+            ->where('deposit.status', 1);
 
         if (textNull($request['hidden_datestart'])) {
             $hidden_start = textNull($request['hidden_datestart']);
@@ -424,16 +424,26 @@ class Mdl_page extends CI_Model
         }
 
         if ($hidden_start && $hidden_end) {
-            // $sql->where('date(' . $this->table . '.date_starts) >=', $hidden_start);
-            // $sql->where('date(' . $this->table . '.date_starts) <=', $hidden_end);
+            if ($hidden_datetype = textNull($request['hidden_datetype'])) {
+                if ($hidden_datetype == 'date_update') {
+                    // $sql->where('if(date(' . $this->table . '.'.$hidden_datetype.'),date(' . $this->table . '.'.$hidden_datetype.') >='.$hidden_start.',date(' . $this->table . '.date_starts'.') >='.$hidden_start.')',null,false);
+                    $sql->where('(CASE WHEN date(' . $this->table . '.' . $hidden_datetype . ') is not null THEN date(' . $this->table . '.' . $hidden_datetype . ') >="' . $hidden_start . '" ELSE date(' . $this->table . '.date_starts' . ') >="' . $hidden_start . '" END)', null, false);
+                    $sql->where('(CASE WHEN date(' . $this->table . '.' . $hidden_datetype . ') is not null THEN date(' . $this->table . '.' . $hidden_datetype . ') <="' . $hidden_end . '" ELSE date(' . $this->table . '.date_starts' . ') <="' . $hidden_end . '" END)', null, false);
+                } else {
+                    $sql->where('date(' . $this->table . '.' . $hidden_datetype . ') >=', $hidden_start);
+                    $sql->where('date(' . $this->table . '.' . $hidden_datetype . ') <=', $hidden_end);
+                }
+            } else {
+                $sql->where('date(' . $this->table . '.date_starts) >=', $hidden_start);
+                $sql->where('date(' . $this->table . '.date_starts) <=', $hidden_end);
+            }
+        }
 
-            $sql->where(
-                '(date(' . $this->table . '.date_starts) >= "'.$hidden_start.'" and
-                date(' . $this->table . '.date_starts) <= "'.$hidden_end.'")
-                or 
-                (date(' . $this->table . '.date_update) >= "'.$hidden_start.'" and
-                date(' . $this->table . '.date_update) <= "'.$hidden_end.'")
-        ',null,false);
+        if ($payment_id = textNull($request['hidden_statuspayment'])) {
+            $sql->where($this->table . '.payment_id', $payment_id);
+        }
+        if ($complete_id = textNull($request['hidden_statusbill'])) {
+            $sql->where($this->table . '.complete_id', $complete_id);
         }
 
         if ($id) {
@@ -446,13 +456,13 @@ class Mdl_page extends CI_Model
 
         if ($optionnal['where'] && count($optionnal['where'])) {
             foreach ($optionnal['where'] as $column => $value) {
-                $sql->where($column, $value);
+                $sql->where($this->table . '.' . $column, $value);
             }
         }
 
         if ($optionnal['order_by'] && count($optionnal['order_by'])) {
             foreach ($optionnal['order_by'] as $column => $value) {
-                $sql->order_by($column, $value);
+                $sql->order_by($this->table . '.' . $column, $value);
             }
         } else {
             $sql->order_by($this->table . '.id', 'desc');
@@ -460,7 +470,7 @@ class Mdl_page extends CI_Model
 
         if ($optionnal['group_by'] && count($optionnal['group_by'])) {
             foreach ($optionnal['group_by'] as $column) {
-                $sql->group_by($column);
+                $sql->group_by($this->table . '.' . $column);
             }
         }
 

@@ -6,12 +6,19 @@
         <div id="collapseOne" class="collapse show d-md-block" aria-labelledby="headingOne" data-parent="#accordion">
 
             <div class="d-sm-flex">
-                <div class="filter">
-                    <?php include('application/views/partials/dom_filter_calendar.php'); ?>
+                <div class="filter-add">
+                    <?php include('application/views/partials/dom_filter_payment.php'); ?>
                 </div>
                 <div class="filter-add">
                     <?php include('application/views/partials/dom_filter_doc.php'); ?>
                 </div>
+                <div class="filter-add">
+                    <?php include('application/views/partials/dom_filter_datetype.php'); ?>
+                </div>
+                <div class="filter">
+                    <?php include('application/views/partials/dom_filter_calendar.php'); ?>
+                </div>
+
 
                 <?php include('application/views/partials/dom_filter_button.php'); ?>
             </div>

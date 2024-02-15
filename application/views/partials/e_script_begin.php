@@ -27,10 +27,10 @@
         /* var dateTypeVar = $('#datestart-autoclose').datepicker('getDate');
         $.datepicker.formatDate('Y-m-d', dateTypeVar); */
 
-        $(document).on('click', '.button_search', function(reload=true) {
-            if(reload == false){
+        $(document).on('click', '.button_search', function(reload = true) {
+            if (reload == false) {
                 $('#datatable').DataTable().ajax.reload(false);
-            }else{
+            } else {
                 $('#datatable').DataTable().ajax.reload();
             }
         })
@@ -44,14 +44,15 @@
             d.hidden_datestart = document.getElementById('hidden_datestart').value;
             d.hidden_dateend = document.getElementById('hidden_dateend').value;
 
-            if ($('#item_operator_id').length) {
-                d.hidden_operator_id = document.getElementById('item_operator_id').value
-
-            }
-
-            if ($('#item_statusbill').length) {
-                d.hidden_statusbill = document.getElementById('item_statusbill').value
-
+            if (dataarray) {
+                dataarray.forEach(function(item, index) {
+                    let item_name = item.name
+                    if(item_name == 'column'){
+                        d.item_name = item.value
+                    }else{
+                        d[item_name] = document.getElementById(item_name).value
+                    }
+                })
             }
         }
     }

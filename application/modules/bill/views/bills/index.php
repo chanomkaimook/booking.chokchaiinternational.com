@@ -19,7 +19,7 @@
             </div>
 
             <div class="">
-                <?php require_once('application/views/partials/e_filter_base.php'); ?>
+                <?php require_once('application/views/partials/e_filter_base_status.php'); ?>
             </div>
 
         </div>

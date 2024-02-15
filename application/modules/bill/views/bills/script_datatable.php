@@ -1,10 +1,10 @@
 <script>
     function getData() {
+        // console.log( $("#hidden_statuspayment").val())
         let datatable = $('#datatable')
 
         let last_columntable = datatable.find('th').length - 1
         let last_defaultSort = last_columntable - 1
-
         //
         // get data to data table
         //
@@ -15,8 +15,19 @@
         // # datatable_dom     = form e_navbar.php
         // # datatable_button  = form e_navbar.php
         //
+        /* data: dataFillterFunc([{
+            name: 'column',
+            value: {
+                0: 'code',
+                1: 'name',
+                2: 'workstatus',
+                3: 'status_offview',
+                4: 'user_active', // find staff to do
+                5: 'date_active' // find date time to do
+            }
+        }, ]) */
         let urlname = new URL(path(url_moduleControl + '/get_dataTable'), domain);
-
+        let r = document.querySelector('#hidden_statuspayment').value
         let table = datatable.DataTable({
             scrollY: dataTableHeight(),
             scrollCollapse: false,
@@ -30,7 +41,16 @@
                 url: urlname,
                 type: 'get',
                 dataType: 'json',
-                data: dataFillterFunc()
+                data: dataFillterFunc([{
+                        name: 'hidden_statuspayment',
+                    },
+                    {
+                        name: 'hidden_statusbill', 
+                    },
+                    {
+                        name: 'hidden_datetype', 
+                    },
+                ])
             },
             order: [],
             columnDefs: [{
@@ -43,7 +63,7 @@
                     targets: last_columntable
                 },
                 {
-                    "targets": [0,1],
+                    "targets": [0, 1],
                     "className": "truncate"
                 },
             ],
@@ -51,8 +71,8 @@
                     "data": "CODE",
                     "render": function(data, type, row, meta) {
                         let code = data
-                        let url_doc_bill = new URL(path(url_moduleControl+'/document'),domain)
-                        url_doc_bill.searchParams.append('code',code)
+                        let url_doc_bill = new URL(path(url_moduleControl + '/document'), domain)
+                        url_doc_bill.searchParams.append('code', code)
 
                         code = `<a href=${url_doc_bill} target=_blank class="text-info">
                         #${data}
@@ -78,7 +98,7 @@
                     "data": {
                         _: "BOOKING.display",
                         sort: 'BOOKING.timestamp'
-                    }   
+                    }
                 },
                 {
                     "data": {
@@ -104,8 +124,8 @@
                 {
                     "data": "ID",
                     "render": function(data, type, row, meta) {
-                        let url_doc_bill = new URL(path(url_moduleControl+'/document'),domain)
-                        url_doc_bill.searchParams.append('code',row.CODE)
+                        let url_doc_bill = new URL(path(url_moduleControl + '/document'), domain)
+                        url_doc_bill.searchParams.append('code', row.CODE)
 
                         let btn_view = `<a href="${url_doc_bill}" target=_blank class="text-capitalize dropdown-item" ><i class="mdi mdi-magnify mr-2 text-info font-18 vertical-middle"></i>${table_column_view[setlang]}</a>`
                         let btn_del = ''

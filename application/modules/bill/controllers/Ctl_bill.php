@@ -87,6 +87,7 @@ class Ctl_bill extends MY_Controller
         // set page title
         $data['pagetitle'] = "ใบเสนอราคา";
         $data['breadcrumb'] = array('รายการจอง', 'ข้อมูลการจอง');
+        $data['menuactive'] = site_url('bill/ctl_bill');
 
         $optional['order_by'] = array('id' => 'asc');
         $data['bank'] = $this->mdl_bank->get_dataShow(null, $optional);

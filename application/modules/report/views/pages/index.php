@@ -13,7 +13,7 @@
             </div>
 
             <div class="">
-                <?php require_once('application/views/partials/e_filter_base.php'); ?>
+                <?php require_once('application/views/partials/e_filter_base_status.php'); ?>
             </div>
 
         </div>
@@ -23,29 +23,9 @@
             }
         </style>
         <div class="">
-            <div class="card-box d-none">
+            <div class="card-box">
                 <table id="datatable" class="table table-hover m-0 table-actions-bar dt-responsive dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                     <thead>
-                        <tr>
-                            <th>#</th>
-                            <th><?= mb_ucfirst($this->lang->line('_name')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_status')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_display')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_usernow')) ?></th>
-                            <th><?= mb_ucfirst($this->lang->line('_datenow')) ?></th>
-                            <th class="hidden-sm"><?= mb_ucfirst($this->lang->line('_action')) ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="">
-            <div class="card-box">
-                <table id="datatable_forload" class="table table-hover m-0 table-actions-bar dt-responsive dataTable no-footer dtr-inline" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                <thead>
                         <tr>
                             <th>ลำดับ</th>
                             <th>สถานะ</th>
@@ -91,13 +71,10 @@
     $(document).ready(function() {
         // getData()
 
-        $(document).on('click', '.button_search ', function() {
-            $('#datatable_forload').DataTable().ajax.reload();
-        })
         $(document).on('click', '#load_report', function() {
             //
             // load report
-            $('#datatable_forload').DataTable().button('0').trigger();
+            $('#datatable').DataTable().button('0').trigger();
 
             $.toast({
                 text: "ดำเนินการดาวน์โหลดรายงานจากระบบเรียบร้อย โปรดตรวจสอบที่โฟลเดอร์ Download",
@@ -114,11 +91,11 @@
         // 
         // Datatable for load
         function getDataForload() {
-            if($('#datestart-autoclose').val()){
-                
+            if ($('#datestart-autoclose').val()) {
+
             }
 
-            let datatable = $('#datatable_forload')
+            let datatable = $('#datatable')
 
             let last_columntable = datatable.find('th').length - 1
             let last_defaultSort = last_columntable - 1
@@ -138,7 +115,16 @@
                     url: urlname,
                     type: 'get',
                     dataType: 'json',
-                    data: dataFillterFunc()
+                    data: dataFillterFunc([{
+                            name: 'hidden_statuspayment',
+                        },
+                        {
+                            name: 'hidden_statusbill',
+                        },
+                        {
+                            name: 'hidden_datetype',
+                        },
+                    ])
                 },
                 order: [],
                 columnDefs: [{
@@ -151,8 +137,7 @@
                         targets: last_columntable
                     },
                 ],
-                columns: [
-                    {
+                columns: [{
                         "data": "NO",
                     },
                     {
@@ -223,7 +208,11 @@
             })
 
             // table.buttons(0, 1).remove();
-            table.button().add(0, { extend: 'excel', text: 'Excel' , title: title_name},);
+            table.button().add(0, {
+                extend: 'excel',
+                text: 'Excel',
+                title: title_name
+            }, );
         }
 
 

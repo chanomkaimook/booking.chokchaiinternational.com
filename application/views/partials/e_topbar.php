@@ -25,7 +25,10 @@
     $(document).ready(function() {
         let menu = $('.nav-second-level li.mm-active a')
         let main = $('.metismenu > li.mm-active span:first')
-        let menuShow = menu.attr('data-show').trim()
+        let menuShow
+        if(menu.length){
+            menuShow = menu.attr('data-show').trim() 
+        }
 
         if (menuShow) {
             document.getElementsByClassName('breadcrumb-item')[0].innerHTML = 'Backend'
@@ -41,6 +44,19 @@
                 document.getElementsByClassName('breadcrumb-item')[0].innerHTML = 'Backend'
                 document.getElementsByClassName('breadcrumb-item')[1].innerHTML = $("[name=theme-breadcrumb]").eq(0).val()
                 document.getElementsByClassName('breadcrumb-item')[2].innerHTML = $("[name=theme-breadcrumb]").eq(1).val()
+            }
+
+            // menu active
+            let hidden_menuactive = $("[name=theme-menu-url]").val()
+            if(hidden_menuactive){
+                let sidebar = $('#sidebar-menu').find("li a[href='"+hidden_menuactive+"']")
+                if(sidebar.length){
+                    sidebar
+                    .parent("li").addClass("mm-active").end()
+                    .parents("li").addClass("mm-active").end()
+                    .parents("li").find("a:first").addClass("active").end()
+                    .parents("li").find("ul").addClass("mm-show").end()
+                }
             }
         }
     })

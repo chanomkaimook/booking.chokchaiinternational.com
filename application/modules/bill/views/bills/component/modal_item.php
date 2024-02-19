@@ -16,7 +16,7 @@
             }
         }
     </style>
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <!-- Form -->
             <form class="form-horizontal" autocomplete="off" id="frm">

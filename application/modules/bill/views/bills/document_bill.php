@@ -768,22 +768,22 @@
             async_get_deposit(id)
                 .then((resp) => {
                     if (resp.length) {
-
                         step_billvat()
 
                         async function step_billvat() {
-                            let t = "มัดจำ "
-                            let v = " "
+                            let t
+                            let v = ""
                             let result = new Promise((resolve, reject) => {
 
-                                num = 0
+
                                 resp.forEach(function(item, index) {
-                                    if (num) {
+                                    if (item.BILL_COMPLETE) {
                                         t = "ชำระหน้าฟาร์ม "
+                                    }else{
+                                        t = "มัดจำ "
                                     }
                                     t = t + formatMoney(item.DEPOSIT)
                                     v += creat_html_billvat(item.ID, t, item.USER_UPDATE)
-                                    num++
                                 })
                                 resolve($('.sector_billvat').html(v))
                             })

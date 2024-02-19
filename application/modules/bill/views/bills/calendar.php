@@ -24,7 +24,7 @@
 
             </div>
             <div class="">
-                <button class="btn btn-light" onclick="updateCalendar()" >Update Calendar</button>
+                <button class="btn btn-light" onclick="updateCalendar()">Update Calendar</button>
             </div>
 
         </div>
@@ -238,7 +238,7 @@
                 }),
                 /* on select */
                 (CalendarApp.prototype.onSelect = function(start, end, allDay) {
-                    modalActive_quotation('edit', "")
+                    /* modalActive_quotation('edit', "")
                     var $this = this;
                     $this.$modal.modal({
                         backdrop: "false",
@@ -253,7 +253,7 @@
 
                     updateCalendar()
                     $this.$calendarObj.fullCalendar("unselect");
-                    return false;
+                    return false; */
                 }),
                 (CalendarApp.prototype.enableDrag = function() {
                     //init events
@@ -416,12 +416,12 @@
             //initializing CalendarApp
             (function($) {
                 "use strict";
-                
+
                 $.CalendarApp.init();
             })(window.jQuery);
-           
 
-       
+
+
         calendar.onMove = function(eventObj, revertFunc) {
             console.log('move')
         }

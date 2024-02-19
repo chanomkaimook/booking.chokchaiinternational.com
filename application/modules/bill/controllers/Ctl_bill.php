@@ -100,7 +100,7 @@ class Ctl_bill extends MY_Controller
 
         if ($item_code) {
             $optional['where'] = array(
-                'bill.code'  => $item_code
+                'code'  => $item_code
             );
             $data['bill'] = $this->mdl_bill->get_dataShow(null, $optional, 'row_array');
 
@@ -157,7 +157,7 @@ class Ctl_bill extends MY_Controller
 
         if ($item_code) {
             $optional['where'] = array(
-                'bill.code'  => $item_code
+                'code'  => $item_code
             );
             $b = $this->mdl_bill->get_data(null, $optional, 'row_array');
             if ($b) {
@@ -539,7 +539,7 @@ class Ctl_bill extends MY_Controller
                 $optional['where'] = array(
                     'bill_id'   => $bill_id
                 );
-                $optional['order_by'] = array('id' => 'asc');
+                $optional['order_by'] = array('bill_complete' => 'asc');
                 $data = $this->mdl_deposit->get_dataShow(null, $optional);
                 //
                 // add data user active

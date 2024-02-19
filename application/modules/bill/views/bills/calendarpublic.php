@@ -149,7 +149,7 @@
                 }),
                 /* on select */
                 (CalendarApp.prototype.onSelect = function(start, end, allDay) {
-                    modalActive_quotation('edit', "")
+                    /* modalActive_quotation('edit', "")
                     var $this = this;
                     $this.$modal.modal({
                         backdrop: "false",
@@ -162,7 +162,7 @@
 
                     updateCalendar()
                     $this.$calendarObj.fullCalendar("unselect");
-                    return false;
+                    return false; */
                 }),
                 (CalendarApp.prototype.enableDrag = function() {
                     //init events

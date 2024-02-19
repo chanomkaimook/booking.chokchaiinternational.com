@@ -187,10 +187,26 @@ class Receipt
             // update bill status
             $datastatus = $this->ci->bill->update_bill($bill_id);
             if ($datastatus && $datastatus['data']['data']['complete_id'] == 3) {
-                $data_update = array(
-                    'bill_complete'     => "1"
+
+                $bill_complete = 1; // default 1= ชำระหน้าฟาร์ม
+
+                //
+                // หากเกิดเคสลบยอดเงินมัดจำ (ยอดแรก) และเพิ่มยอดเข้ามาใหม่ เพราะใส่ผิด
+                // (ไม่แก้ไข เผลอไปลบ) และมียอดชำระหน้าฟาร์มอยู่แล้ว ค่า bill_complte
+                // ต้องเป็น null
+                $optionalp['where'] = array(
+                    'bill_id'  => $bill_id,
+                    'bill_complete'  => 1
                 );
-                $update = $this->ci->mdl_deposit->update_data($data_update, $deposit_id,true);
+                $num_dp = $this->ci->mdl_deposit->get_data_all(null, $optionalp);
+                if ($num_dp) {
+                    $bill_complete = null;
+                }
+
+                $data_update = array(
+                    'bill_complete'     => $bill_complete
+                );
+                $update = $this->ci->mdl_deposit->update_data($data_update, $deposit_id, true);
             }
 
             if ($this->ci->db->trans_status() === FALSE) {

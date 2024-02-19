@@ -534,8 +534,8 @@ class Bill
 
         $item_bill_id = "";
         $item_bill_code = "";
-        // print_r($request);
-        // die;
+        print_r($request);
+        die;
         $customer = $request['customer'] ? textNull($request['customer']) : null;
         $customer_id = $request['customer_id'] ? textNull($request['customer_id']) : null;
         $customer_address = $request['customer_address'] ? textNull($request['customer_address']) : null;

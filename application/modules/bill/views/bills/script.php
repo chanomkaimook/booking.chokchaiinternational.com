@@ -85,12 +85,14 @@
                                 let bill_item_name = item_select.attr('data-name')
                                 let bill_item_price = item_select.attr('data-price')
                                 let bill_item_qty = $(item).find('input[name=item_qty]').val()
+                                let bill_item_discount = $(item).find('input[name=item_discount]').val()
 
                                 resolve(
                                     item_list.push({
                                         id: bill_item_id,
                                         name: bill_item_name,
                                         price: bill_item_price,
+                                        discount: formatMoney(bill_item_discount),
                                         total: bill_item_qty
                                     })
                                 )
@@ -103,6 +105,11 @@
                 data.push({
                     'name': 'bank_name',
                     'value': $(modal).find('#bank option:selected').text()
+                })
+
+                data.push({
+                    'name': 'customer',
+                    'value': $(modal).find('[name=customer]').val()
                 })
 
                 // 
@@ -448,7 +455,7 @@
                     // console.log(item)
                     if (item.ITEM_ID) {
                         let td_1 = `<td></td>`
-                        let td_2 = `<td>${item.DESCRIPTION}</td>`
+                        let td_2 = `<td class="text-left">${item.DESCRIPTION}</td>`
                         let td_3 = `<td class="td_item_qty">${item.QUANTITY}</td>`
                         let td_4 = `<td class="td_item_price_unit">${formatMoney(item.PRICE_UNIT)}</td>`
                         let td_5 = `<td class="td_item_price">${formatMoney(item.PRICE)}</td>`

@@ -150,9 +150,11 @@
                                 <tr>
                                     <th></th>
                                     <th width="50%">รายการ</th>
-                                    <th width="15%">จำนวน</th>
-                                    <th width="15%">หน่วยละ</th>
-                                    <th width="15%">ราคา</th>
+                                    <th width="12%">จำนวน</th>
+                                    <th width="12%">ส่วนลด</th>
+
+                                    <th width="12%">หน่วยละ</th>
+                                    <th width="14%">ราคา</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -177,6 +179,7 @@
     let table_list_body = ""
     let select = ""
     let input_total = `<input type="text" name="item_qty" class="form-control form-control-sm int_only" value="1" required>`
+    let input_discount = `<input type="text" name="item_discount" class="form-control form-control-sm int_only" value="" >`
 
     let list = ""
 
@@ -405,6 +408,7 @@
                     </select>
                 </td>
                 <td>${input_total}</td>
+                <td>${input_discount}</td>
                 <td class="price" ></td>
                 <td class="net" ></td>
             `

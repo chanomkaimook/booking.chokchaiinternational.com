@@ -488,7 +488,7 @@ class Mdl_bill extends CI_Model
 
         if ($optionnal['where'] && count($optionnal['where'])) {
             foreach ($optionnal['where'] as $column => $value) {
-                $sql->order_by($this->table . '.' . $column, $value);
+                $sql->where($this->table . '.' . $column, $value);
             }
         }
 

@@ -23,6 +23,7 @@ class Bill
                 'mdl_settings',
                 'bill/mdl_bill',
                 'bill/mdl_bill_detail',
+                'bill/mdl_booking',
                 'deposit/mdl_deposit'
             )
         );
@@ -130,10 +131,9 @@ class Bill
                     $name = $value->name;
                     $unit = $unit + $value->total;
 
-                    $price_item = 0.00;
-                    $discount_item = 0.00;
+                    $discount_item = floatval($value->discount);
 
-                    $price_item = $value->price * $value->total;
+                    $price_item = ($value->price * $value->total);
                     $price = $price + $price_item;
 
                     $promotion_id = "";
@@ -179,11 +179,13 @@ class Bill
                         $discount_detail['promotion']->TOTAL_UNIT = $total_item_unit;
                         $discount_detail['promotion']->TOTAL_DISCOUNT = $discount_item + $total_item_discount;
                         $promotion[] = $discount_detail['promotion'];
+                    } else {
+                        $discount = $discount + $discount_item;
                     }
 
                     //
                     // set item list
-                    $net_item = $price_item;
+                    $net_item = $price_item - $discount_item;
                     $item_data_list[] = array(
                         'item_id'       => $value->id,
                         'promotion_id'  => null,
@@ -191,7 +193,7 @@ class Bill
                         'price_unit'    => $value->price,
                         'quantity'      => $value->total,
                         'price'         => $price_item,
-                        'discount'      => null,
+                        'discount'      => $value->discount,
                         'net'           => $net_item,
                         'p_id_use'      => textNull($promotion_id),
                     );
@@ -220,7 +222,8 @@ class Bill
 
                 $net = $price - $discount;
             }
-
+            // echo "price".$price;
+            // echo "discount_item".$discount_item;
             if ($request['pay']) {
                 $pay = $request['pay'];
             } else {
@@ -534,7 +537,9 @@ class Bill
 
         $item_bill_id = "";
         $item_bill_code = "";
+        echo "<pre>";
         print_r($request);
+        echo "</pre>";
         die;
         $customer = $request['customer'] ? textNull($request['customer']) : null;
         $customer_id = $request['customer_id'] ? textNull($request['customer_id']) : null;
@@ -542,9 +547,10 @@ class Bill
         $customer_address_id = $request['customer_address_id'] ? textNull($request['customer_address_id']) : null;
         $agent_name = $request['agent_name'] ? textNull($request['agent_name']) : null;
         $agent_contact = $request['agent_contact'] ? textNull($request['agent_contact']) : null;
-        $round_id = $request['round'] ? textNull($request['round']) : null;
+        $round_array = $request['round'] ? $request['round'] : null;
         $date_order = $request['date_order'] ? textNull($request['date_order']) : null;
-        $bookingdate = $request['bookingdate'] ? textNull($request['bookingdate']) : null;
+        $bookingdate_array = $request['bookingdate'] ? $request['bookingdate'] : null;
+        $bookingtotal_array = $request['bookingtotal'] ? $request['bookingtotal'] : null;
         $remark = $request['remark'] ? textNull($request['remark']) : null;
 
         $deposit_date = $request['deposit_date'] ? textNull($request['deposit_date']) : null;
@@ -596,7 +602,6 @@ class Bill
             'agent_name'  => $agent_name,
             'agent_contact'  => $agent_contact,
             'date_order'    => $date_order,
-            'booking_date'  => $bookingdate,
 
             'price'     => null,
             'discount'  => null,
@@ -636,7 +641,6 @@ class Bill
         // detail price bill
         //
         $detail_bill = $this->get_cartData();
-
         if ($detail_bill) {
             if ($detail_bill['payment_status']) {
                 $data_insert['payment_id'] = $detail_bill['payment_id'];
@@ -682,41 +686,61 @@ class Bill
                 $data_insert['total_unit'] = $detail_bill['unit'];
             }
         }
-        //
-        // bill Round
-        //
-        if ($round_id) {
-            if ($row_round = $this->ci->mdl_round->get_data($round_id)) {
-
-                $data_insert['round_id'] = $round_id;
-
-                $round_name = $row_round->NAME;
-                $time_start = $row_round->TIME_START;
-                $time_end = $row_round->TIME_END;
-
-                if ($row_round->NAME) {
-                    $round_name = $row_round->NAME;
-                    $data_insert['round_name'] = $round_name;
-                }
-                if ($row_round->TIME_START) {
-                    $time_start = $row_round->TIME_START;
-                    $data_insert['time_start'] = $time_start;
-                }
-                if ($row_round->TIME_END) {
-                    $time_end = $row_round->TIME_END;
-                    $data_insert['time_end'] = $time_end;
-                }
-            }
-        }
 
         $this->ci->db->trans_begin();
 
         // 
         // insert bill
         $data_bill = $this->ci->mdl_bill->insert_data($data_insert);
+
         $item_new_data = [];
 
         if ($data_bill) {
+
+            //
+            // new bill id
+            $new_bill_id = $data_bill['data']['id'];
+
+            //
+            // bill Round
+            //
+            $data_booking = [];
+            if (is_array($round_array) && count($round_array)) {
+                foreach ($round_array as $key => $value) {
+                    $round_id = $value;
+
+                    if ($row_round = $this->ci->mdl_round->get_data($round_id)) {
+
+                        $data_booking['bill_id'] = $new_bill_id;
+                        $data_booking['booking_date'] = $bookingdate_array[$key];
+                        $data_booking['booking_total'] = $bookingtotal_array[$key];
+                        $data_booking['round_id'] = $round_id;
+
+                        $round_name = $row_round->NAME;
+                        $time_start = $row_round->TIME_START;
+                        $time_end = $row_round->TIME_END;
+
+                        if ($row_round->NAME) {
+                            $round_name = $row_round->NAME;
+                            $data_booking['round_name'] = $round_name;
+                        }
+                        if ($row_round->TIME_START) {
+                            $time_start = $row_round->TIME_START;
+                            $data_booking['time_start'] = $time_start;
+                        }
+                        if ($row_round->TIME_END) {
+                            $time_end = $row_round->TIME_END;
+                            $data_booking['time_end'] = $time_end;
+                        }
+                    }
+                }
+            }
+
+            if ($data_booking && count($data_booking)) {
+                // 
+                // insert booking
+                $data_bill = $this->ci->mdl_booking->insert_data($data_booking);
+            }
 
             $item_bill_id = $data_bill['data']['id'];
             $item_bill_code = $data_bill['data']['code'];

@@ -178,11 +178,17 @@
 
                     } else {
 
-                        if ($('[name=bookingdate]').val()) {
-                            var dateTypeVar = $('[name=bookingdate]').datepicker('getDate');
+                        if ($('.calendar').val()) {
+                            let booking_date_array = []
+                            $.each($('.calendar'), function(index, item) {
+                                console.log(index)
+                                var dateTypeVar = $('.calendar').datepicker('getDate');
+                                booking_date_array[index] = new Array($.datepicker.formatDate('yy-mm-dd', dateTypeVar))
+                            })
+
                             data.push({
                                 'name': 'bookingdate',
-                                'value': $.datepicker.formatDate('yy-mm-dd', dateTypeVar)
+                                'value': booking_date_array
                             })
                         }
                         if ($('[name=date_order]').val()) {

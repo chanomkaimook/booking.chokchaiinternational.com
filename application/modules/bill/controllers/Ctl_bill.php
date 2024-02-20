@@ -51,7 +51,6 @@ class Ctl_bill extends MY_Controller
     {
         $optional['order_by'] = array('id' => 'asc');
         $data['bank'] = $this->mdl_bank->get_dataShow(null, $optional);
-        $data['round'] = $this->mdl_round->get_dataShow(null, $optional);
         $data['address'] = $this->mdl_customer_address->get_dataShow(null, $optional);
 
         $this->template->set_partial(

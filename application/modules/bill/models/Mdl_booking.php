@@ -1,12 +1,12 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mdl_page extends CI_Model
+class Mdl_booking extends CI_Model
 
 {
-    private $table = "blank";
-    private $offview = "status_offview";
-    private $fildstatus = "status";
+    private $table = "booking";
+    // private $offview = "status_offview";
+    // private $fildstatus = "status";
 
     public function __construct()
     {
@@ -138,74 +138,6 @@ class Mdl_page extends CI_Model
     }
 
     //  *
-    //  * Check validate
-    //  * validation
-    //  *
-    /**
-     * Check validate
-     *
-     * @param array|null $arrayset = array from method POST or GET
-     * @param array|null $array_to_find
-     * @return void
-     */
-    function check_value_valid($arrayset, array $array_to_find = null)
-    {
-
-        $result = false;
-
-        if ($array_to_find) {
-            $array_text_error = $array_to_find;
-        } else {
-            $array_text_error = array(
-                'name'       => 'ชื่อ',
-            );
-        }
-
-        if (is_array($array_text_error) && count($array_text_error)) {
-            if ($text = check_value_valid($array_text_error, $arrayset)) {
-                $result = array(
-                    'error' => 1,
-                    'txt'   => 'โปรดระบุ ' . $text,
-                );
-
-                return $result;
-            }
-        }
-
-
-        return $result;
-    }
-
-    /**
-     * Check duplicate
-     *
-     * @param array|null $arraywhere = array where query
-     * @param string|null $valueshow = value for show when error
-     * @param string|null $table = table name for check
-     * @return void
-     */
-    function check_dup($arraywhere, string $valueshow = null, string $table = null)
-    {
-        $result = false;
-
-        if ($arraywhere && $valueshow) {
-
-            if (!$table) {
-                $table = $this->table;
-            }
-
-            if (check_dup($arraywhere, $table)) {
-                $result = array(
-                    'error' => 1,
-                    'txt'   => $valueshow . ' ซ้ำในระบบ ',
-                );
-            }
-        }
-
-        return $result;
-    }
-
-    //  *
     //  * CRUD
     //  * insert
     //  * 
@@ -213,41 +145,10 @@ class Mdl_page extends CI_Model
     //  *
     public function insert_data($data_insert = null)
     {
-
         $result = array(
             'error'     => 1,
             'txt'       => 'ไม่มีการทำรายการ',
         );
-
-        $request = $_POST;
-
-        $item_code = textNull($data_insert['code']) ? $data_insert['code'] : $request['code'];
-        $item_name = textNull($data_insert['name']) ? $data_insert['name'] : $request['name'];
-        $array_chk_dup = array(
-            'code' => $item_code,
-            'name' => $item_name,
-            'status' => 1
-        );
-
-        if ($return = $this->check_value_valid($array_chk_dup)) {
-            return $return;
-        }
-
-        $array_chk_dup1 = array(
-            'code' => $item_code,
-            'status' => 1
-        );
-        if ($return = $this->check_dup($array_chk_dup1, $item_code)) {
-            return $return;
-        }
-
-        $array_chk_dup2 = array(
-            'name' => $item_name,
-            'status' => 1
-        );
-        if ($return = $this->check_dup($array_chk_dup2, $item_name)) {
-            return $return;
-        }
 
         $new_id = "";
 
@@ -287,31 +188,6 @@ class Mdl_page extends CI_Model
 
         if ($item_id) {
             $request = $_POST;
-
-            $item_code = textNull($data_update['code']) ? $data_update['code'] : $request['code'];
-            $item_name = textNull($data_update['name']) ? $data_update['name'] : $request['name'];
-            $array_chk_dup = array(
-                'name' => $item_name,
-                'status' => 1,
-                'id !=' => $item_id,
-            );
-
-            if ($return = $this->check_value_valid($array_chk_dup)) {
-                return $return;
-            }
-
-            if ($return = $this->check_dup($array_chk_dup, $item_name)) {
-                return $return;
-            }
-
-            $array_chk_dupcode = array(
-                'code' => $item_code,
-                'status' => 1,
-                'id !=' => $item_id,
-            );
-            if ($return = $this->check_dup($array_chk_dupcode, $item_name)) {
-                return $return;
-            }
 
             if ($data_update && is_array($data_update)) {
                 $data_update['date_update'] = date('Y-m-d H:i:s');

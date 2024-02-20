@@ -151,6 +151,16 @@ class Ctl_round extends MY_Controller
         echo json_encode($result);
     }
 
+    public function get_dataDisplay()
+    {
+        $request = $_REQUEST;
+        $item_id = $request['id'] ? $request['id'] : null;
+        $data = $this->model->get_dataShow($item_id);
+
+        $result = $data;
+        echo json_encode($result);
+    }
+
     //  *
     //  * CRUD
     //  * insert

@@ -47,30 +47,39 @@
     </div>
 </div>
 
-
-
 <div class="row">
-    <div class="form-group col-md-6">
-        <label class="text-capitalize">รอบจอง</label>
-        <select id="round" name="round" class="form-control">
-            <option value="" disabled selected>ระบุ</option>
-            <?php
-            if ($round) {
-                foreach ($round as $row) {
-                    echo "<option value=\"$row->ID\">$row->NAME</option>";
-                }
-            }
-            ?>
-        </select>
-    </div>
-    <!-- <div class="form-group col-md-4">
-        <label class="text-capitalize">จำนวนคน</label>
-        <input type="text" id="demo3" name="demo3" class="touchspin int_only">
-    </div> -->
+    <div class="form-group col-md-12">
+        <div class="border">
+            <div class="p-2">
+                <div class="bg-light d-flex justify-content-between px-1">
+                    <div class="">
+                        <h5 class="">รอบจอง</h5>
+                    </div>
+                    <div class="pt-1">
+                        <button type="button" class="btn btn-outline-success btn-sm btn-add-book">เพิ่มรอบจอง</button>
+                    </div>
+                </div>
 
-    <div class="form-group col-md-6">
-        <label class="text-capitalize">วันจองเข้าชม</label>
-        <input type="text" class="form-control" name="bookingdate" placeholder="ระบุ">
+                <div class="card-body p-1">
+                    <div class="table-responsive">
+                        <table id="list_booking" class="w-100 text-center">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th width="30%">รอบจอง</th>
+                                    <th width="30%">วันเข้าชม</th>
+                                    <th width="30%">จำนวนคน</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -178,6 +187,7 @@
 <script>
     let table_list_body = ""
     let select = ""
+    let select_booking = ""
     let input_total = `<input type="text" name="item_qty" class="form-control form-control-sm int_only" value="1" required>`
     let input_discount = `<input type="text" name="item_discount" class="form-control form-control-sm int_only" value="" >`
 
@@ -198,11 +208,38 @@
                         })
                     }
                 })
+
+            fetch_dataBooking()
+                .then((resp) => {
+                    if (resp) {
+                        resp.forEach(function(item, index) {
+                            select_booking += `<option value="${item.ID}">
+                        ${item.NAME}
+                        </option>`
+                        })
+                    }
+                })
         }
 
 
 
+        table_booking_body = $('table#list_booking tbody')
         table_list_body = $('table#list_item tbody')
+
+        // 
+        // Round Booking
+        // 
+        // add
+        $(document).on('click', '.btn-add-book', function() {
+            add_html_list_booking()
+        })
+
+        // delete
+        $(document).on('click', '.btn-del-booking', function() {
+            let dataid = $(this).attr('data-row')
+
+            table_booking_body.find('tr[data-row=' + dataid + ']').remove()
+        })
 
         // 
         // Event
@@ -283,6 +320,13 @@
 
     async function fetch_dataItem() {
         let url = new URL(path('bill/ctl_item/get_dataDisplay'), domain)
+
+        const response = await fetch(url)
+        const result = await response.json()
+        return result;
+    }
+    async function fetch_dataBooking() {
+        let url = new URL(path('information/ctl_round/get_dataDisplay'), domain)
 
         const response = await fetch(url)
         const result = await response.json()
@@ -417,6 +461,46 @@
         return item_html
     }
 
+    function add_html_list_booking() {
+        let tr = create_html_list_booking()
+        table_booking_body.append(tr)
+
+        $(".calendar").datepicker({
+            autoclose: !0,
+            todayHighlight: !0,
+            dateFormat: 'dd/mm/yy',
+        })
+    }
+
+    function create_html_list_booking() {
+        // identify row
+        let number = table_booking_body.find('tr:last').attr('data-row')
+        if (!number) {
+            number = 1
+        } else {
+            number = parseInt(number) + 1
+        }
+
+        let btn = `<button data-row="${number}" type="button" class="btn btn-danger btn-sm btn-del-booking"><i class="far fa-trash-alt"></i></button>`
+
+        let item_html
+
+        item = `
+                <td>${btn}</td>
+                <td class="text-left">
+                    <select name="round[]" class="form-control form-control-sm" required>
+                        <option value="" disabled selected >เลือกรอบ</option>
+                        ${select_booking}
+                    </select>
+                </td>
+                <td><input type="text" class="calendar form-control form-control-sm" name="bookingdate[]" placeholder="ระบุ"></td>
+                <td><input type="text" class="form-control form-control-sm int_only" name="bookingtotal[]" placeholder="ระบุ"></td>
+            `
+        item_html = `<tr data-row="${number}">${item}</tr>`
+
+        return item_html
+    }
+
     // 
     // calculate price list
     // 
@@ -444,9 +528,10 @@
                     id = $(item).find('select[name=item_list]').val()
                     price = $(item).find('select[name=item_list] option:selected').attr('data-price')
                     total = $(item).find('input[name=item_qty]').val()
+                    discount = $(item).find('input[name=item_discount]').val()
 
                     if (price && total) {
-                        totalprice = price * total
+                        totalprice = (price * total) - discount
 
                         $(item).find('td.price').text(formatMoney(price))
                         $(item).find('td.net').text(formatMoney(totalprice))
@@ -456,6 +541,7 @@
                             'id': id,
                             'price': price,
                             'total': total,
+                            'discount': discount,
                         })
                     }
                 })

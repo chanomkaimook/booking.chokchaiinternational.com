@@ -93,15 +93,15 @@
                                 }
                             </style>
                             <?php
-                                if($bill['REMARK']):
+                            if ($bill['REMARK']) :
                             ?>
-                            <div class="remark_section">
-                                <button type="button" class="btn btn-secondary rounded-pill" data-target="#modal_remark" data-toggle="modal">
-                                    <i class="fas fa-info"> หมายเหตุ</i>
-                                </button>
-                            </div>
+                                <div class="remark_section">
+                                    <button type="button" class="btn btn-secondary rounded-pill" data-target="#modal_remark" data-toggle="modal">
+                                        <i class="fas fa-info"> หมายเหตุ</i>
+                                    </button>
+                                </div>
                             <?php
-                                endif;
+                            endif;
                             ?>
                             <div class="page_header">
 
@@ -290,7 +290,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <!-- Form -->
-                <form class="form-horizontal" autocomplete="off" id="frm">
+                <form class="form-horizontal" autocomplete="off" id="frm_delete">
                     <input type="hidden" name="frm_hidden_id">
                     <div class="modal-body">
                         <div class="modal-body-content" style="height:70vh">
@@ -365,12 +365,6 @@
                 todayHighlight: !0,
                 format: 'dd/mm/yyyy',
             })
-            $("input[name=bookingdate]").datepicker({
-                autoclose: !0,
-                todayHighlight: !0,
-                format: 'dd/mm/yyyy',
-            })
-
             $("input[name=date_receipt_show]").datepicker({
                 autoclose: !0,
                 todayHighlight: !0,
@@ -760,7 +754,7 @@
 
         function creat_html_addreceipt() {
 
-            let html = `<button type="button" class="btn-add-receipt btn">ชำระเพิ่มวันเข้าชม</button>`
+            let html = `<button type="button" class="btn-add-receipt btn">ชำระเงิน</button>`
             return html
         }
 
@@ -779,7 +773,7 @@
                                 resp.forEach(function(item, index) {
                                     if (item.BILL_COMPLETE) {
                                         t = "ชำระหน้าฟาร์ม "
-                                    }else{
+                                    } else {
                                         t = "มัดจำ "
                                     }
                                     t = t + formatMoney(item.DEPOSIT)
@@ -1135,18 +1129,13 @@
             $('.section-tool .sector_button-edit').empty()
         }
 
-        function formatMoney(number, decPlaces, decSep, thouSep) {
-            decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-                decSep = typeof decSep === "undefined" ? "." : decSep;
-            thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-            var sign = number < 0 ? "-" : "";
-            var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-            var j = (j = i.length) > 3 ? j % 3 : 0;
-
-            return sign +
-                (j ? i.substr(0, j) + thouSep : "") +
-                i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-                (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+        function formatMoney(number,decPlaces = 2) {
+            // const r = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
+            const convertNumber = Number(number)
+            const convertFloat = Math.abs(Number(convertNumber)).toFixed(decPlaces)
+            const convertComma = convertFloat.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
+            
+            return convertComma
         }
     </script>
 

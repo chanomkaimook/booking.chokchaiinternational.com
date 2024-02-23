@@ -387,7 +387,7 @@
                         $('.total_price').text(formatMoney(resp.price))
                         $('.total_discount').text(formatMoney(resp.discount))
                         $('.total_net').text(formatMoney(resp.net))
-                        $('.total_unit').text(resp.unit)
+                        $('.total_unit').text(formatMoney(resp.unit, 0))
                         $('.status_payment').text(resp.payment_status)
                     })
             }
@@ -396,18 +396,13 @@
     }
 
     //	format number and float (.00) return string!! 
-    function formatMoney(number, decPlaces, decSep, thouSep) {
-        decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-            decSep = typeof decSep === "undefined" ? "." : decSep;
-        thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-        var sign = number < 0 ? "-" : "";
-        var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-        var j = (j = i.length) > 3 ? j % 3 : 0;
+    function formatMoney(number, decPlaces = 2) {
+        // const r = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
+        const convertNumber = Number(number)
+        const convertFloat = Math.abs(Number(convertNumber)).toFixed(decPlaces)
+        const convertComma = convertFloat.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
-        return sign +
-            (j ? i.substr(0, j) + thouSep : "") +
-            i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-            (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+        return convertComma
     }
 
     function input_int_only() {
@@ -468,8 +463,11 @@
         $(".calendar").datepicker({
             autoclose: !0,
             todayHighlight: !0,
-            dateFormat: 'dd/mm/yy',
+            dateFormat: 'dd/mm/yy', // datepicker for calendar theme
+            format: 'dd/mm/yyyy',   // new datepicker version
         })
+
+        input_int_only()
     }
 
     function create_html_list_booking() {
@@ -488,13 +486,13 @@
         item = `
                 <td>${btn}</td>
                 <td class="text-left">
-                    <select name="round[]" class="form-control form-control-sm" required>
+                    <select name="round[]" class="form-control form-control-sm class-round" required>
                         <option value="" disabled selected >เลือกรอบ</option>
                         ${select_booking}
                     </select>
                 </td>
-                <td><input type="text" class="calendar form-control form-control-sm" name="bookingdate[]" placeholder="ระบุ"></td>
-                <td><input type="text" class="form-control form-control-sm int_only" name="bookingtotal[]" placeholder="ระบุ"></td>
+                <td><input type="text" class="calendar form-control form-control-sm class-bookingdate" name="bookingdate_temp[]" placeholder="ระบุ"></td>
+                <td><input type="text" class="form-control form-control-sm int_only class-bookingtotal" name="bookingtotal[]" placeholder="ระบุ"></td>
             `
         item_html = `<tr data-row="${number}">${item}</tr>`
 

@@ -86,9 +86,11 @@ class Bill
             );
             $b = $this->ci->mdl_bill->get_data($id);
             $bd = $this->ci->mdl_bill_detail->get_data(null, $optional);
+            $bkd = $this->ci->mdl_booking->get_dataShow(null, $optional);
 
             if ($b) {
                 $b->item_list = $bd;
+                $b->booking_list = $bkd;
 
                 $result = array(
                     'error' => 0,
@@ -294,9 +296,10 @@ class Bill
         $customer_address = $request['customer_address'] ? textNull($request['customer_address']) : null;
         $agent_name = $request['agent_name'] ? textNull($request['agent_name']) : null;
         $agent_contact = $request['agent_contact'] ? textNull($request['agent_contact']) : null;
-        $round_id = $request['round'] ? textNull($request['round']) : null;
+        $round_array = $request['round'] ? $request['round'] : null;
         $date_order = $request['date_order'] ? textNull($request['date_order']) : null;
-        $bookingdate = $request['bookingdate'] ? textNull($request['bookingdate']) : null;
+        $bookingdate_array = $request['bookingdate'] ? $request['bookingdate'] : null;
+        $bookingtotal_array = $request['bookingtotal'] ? $request['bookingtotal'] : null;
         $remark = $request['remark'] ? textNull($request['remark']) : null;
 
         $item_list = $request['item_list'] ? $request['item_list'] : null;
@@ -342,7 +345,6 @@ class Bill
             'agent_name'  => $agent_name,
             'agent_contact'  => $agent_contact,
             'date_order'    => $date_order,
-            'booking_date'  => $bookingdate,
 
             'price'     => null,
             'discount'  => null,
@@ -428,32 +430,6 @@ class Bill
                 $data_update['total_unit'] = $detail_bill['unit'];
             }
         }
-        //
-        // bill Round
-        //
-        if ($round_id) {
-            if ($row_round = $this->ci->mdl_round->get_data($round_id)) {
-
-                $data_update['round_id'] = $round_id;
-
-                $round_name = $row_round->NAME;
-                $time_start = $row_round->TIME_START;
-                $time_end = $row_round->TIME_END;
-
-                if ($row_round->NAME) {
-                    $round_name = $row_round->NAME;
-                    $data_update['round_name'] = $round_name;
-                }
-                if ($row_round->TIME_START) {
-                    $time_start = $row_round->TIME_START;
-                    $data_update['time_start'] = $time_start;
-                }
-                if ($row_round->TIME_END) {
-                    $time_end = $row_round->TIME_END;
-                    $data_update['time_end'] = $time_end;
-                }
-            }
-        }
 
         // 
         // update bill
@@ -461,6 +437,59 @@ class Bill
 
         $data_bill = $this->ci->mdl_bill->update_data($data_update, $item_id);
         $item_new_data = [];
+
+        if ($data_bill) {
+            //
+            // bill Round
+            //
+            $data_booking = [];
+            if (is_array($round_array) && count($round_array)) {
+                foreach ($round_array as $key => $value) {
+                    $round_id = $value;
+
+                    if ($row_round = $this->ci->mdl_round->get_data($round_id)) {
+
+                        $data_booking[$key] = array(
+                            'bill_id'   => $item_id,
+                            'booking_date'   => $bookingdate_array[$key],
+                            'booking_total'   => $bookingtotal_array[$key],
+                            'round_id'   => $round_id,
+                        );
+
+                        $round_name = $row_round->NAME;
+                        $time_start = $row_round->TIME_START;
+                        $time_end = $row_round->TIME_END;
+
+                        if ($row_round->NAME) {
+                            $round_name = $row_round->NAME;
+                            $data_booking[$key]['round_name'] = $round_name;
+                        }
+                        if ($row_round->TIME_START) {
+                            $time_start = $row_round->TIME_START;
+                            $data_booking[$key]['time_start'] = $time_start;
+                        }
+                        if ($row_round->TIME_END) {
+                            $time_end = $row_round->TIME_END;
+                            $data_booking[$key]['time_end'] = $time_end;
+                        }
+                    }
+                }
+            }
+
+            if ($data_booking && count($data_booking)) {
+                // 
+                // clear data booking old
+                $optional_destroy['where'] = array(
+                    'bill_id'      => $item_id
+                );
+                $result_delete = $this->ci->mdl_booking->destroy_data(null,$optional_destroy);
+                if ($result_delete['error'] == 0) {
+                    // 
+                    // insert booking
+                    $data_booking = $this->ci->mdl_booking->insert_data_batch($data_booking);
+                }
+            }
+        }
 
         $item_bill_id = $data_bill['data']['id'];
         $item_bill_code = $data_bill['data']['code'];
@@ -537,10 +566,10 @@ class Bill
 
         $item_bill_id = "";
         $item_bill_code = "";
-        echo "<pre>";
+        /* echo "<pre>";
         print_r($request);
         echo "</pre>";
-        die;
+        die; */
         $customer = $request['customer'] ? textNull($request['customer']) : null;
         $customer_id = $request['customer_id'] ? textNull($request['customer_id']) : null;
         $customer_address = $request['customer_address'] ? textNull($request['customer_address']) : null;
@@ -687,10 +716,10 @@ class Bill
             }
         }
 
-        $this->ci->db->trans_begin();
-
         // 
         // insert bill
+        $this->ci->db->trans_begin();
+
         $data_bill = $this->ci->mdl_bill->insert_data($data_insert);
 
         $item_new_data = [];
@@ -711,10 +740,12 @@ class Bill
 
                     if ($row_round = $this->ci->mdl_round->get_data($round_id)) {
 
-                        $data_booking['bill_id'] = $new_bill_id;
-                        $data_booking['booking_date'] = $bookingdate_array[$key];
-                        $data_booking['booking_total'] = $bookingtotal_array[$key];
-                        $data_booking['round_id'] = $round_id;
+                        $data_booking[$key] = array(
+                            'bill_id'   => $new_bill_id,
+                            'booking_date'   => $bookingdate_array[$key],
+                            'booking_total'   => $bookingtotal_array[$key],
+                            'round_id'   => $round_id,
+                        );
 
                         $round_name = $row_round->NAME;
                         $time_start = $row_round->TIME_START;
@@ -722,15 +753,15 @@ class Bill
 
                         if ($row_round->NAME) {
                             $round_name = $row_round->NAME;
-                            $data_booking['round_name'] = $round_name;
+                            $data_booking[$key]['round_name'] = $round_name;
                         }
                         if ($row_round->TIME_START) {
                             $time_start = $row_round->TIME_START;
-                            $data_booking['time_start'] = $time_start;
+                            $data_booking[$key]['time_start'] = $time_start;
                         }
                         if ($row_round->TIME_END) {
                             $time_end = $row_round->TIME_END;
-                            $data_booking['time_end'] = $time_end;
+                            $data_booking[$key]['time_end'] = $time_end;
                         }
                     }
                 }
@@ -739,7 +770,7 @@ class Bill
             if ($data_booking && count($data_booking)) {
                 // 
                 // insert booking
-                $data_bill = $this->ci->mdl_booking->insert_data($data_booking);
+                $data_booking = $this->ci->mdl_booking->insert_data_batch($data_booking);
             }
 
             $item_bill_id = $data_bill['data']['id'];

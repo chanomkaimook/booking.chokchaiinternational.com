@@ -30,18 +30,35 @@
 </div>
 
 <div class="row">
-    <div class="form-group col-md-6">
-        <label class="text-capitalize">รอบจอง</label>
-        <h5 class="card-text round"></h5>
-    </div>
-    <!-- <div class="form-group col-md-4">
-        <label class="text-capitalize">จำนวนคน</label>
-        <input type="text" id="demo3" name="demo3" class="touchspin int_only">
-    </div> -->
+    <div class="form-group col-md-12">
+        <div class="border">
+            <div class="p-2">
+                <div class="bg-light d-flex justify-content-between px-1">
+                    <div class="">
+                        <h5 class="">รอบจอง</h5>
+                    </div>
+                </div>
 
-    <div class="form-group col-md-6">
-        <label class="text-capitalize">วันจองเข้าชม</label>
-        <h5 class="card-text bookingdate"></h5>
+                <div class="card-body p-1">
+                    <div class="table-responsive">
+                        <table id="list_booking_view" class="w-100 text-center">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th width="30%">รอบจอง</th>
+                                    <th width="30%">วันเข้าชม</th>
+                                    <th width="30%">จำนวนคน</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -203,18 +220,13 @@
     }
 
     //	format number and float (.00) return string!! 
-    function formatMoney(number, decPlaces, decSep, thouSep) {
-        decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-            decSep = typeof decSep === "undefined" ? "." : decSep;
-        thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-        var sign = number < 0 ? "-" : "";
-        var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-        var j = (j = i.length) > 3 ? j % 3 : 0;
+    function formatMoney(number, decPlaces = 2) {
+        // const r = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
+        const convertNumber = Number(number)
+        const convertFloat = Math.abs(Number(convertNumber)).toFixed(decPlaces)
+        const convertComma = convertFloat.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
-        return sign +
-            (j ? i.substr(0, j) + thouSep : "") +
-            i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-            (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+        return convertComma
     }
 
     // 

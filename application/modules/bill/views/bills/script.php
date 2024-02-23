@@ -63,7 +63,7 @@
             e.preventDefault()
 
             let f = $(modal_body_form)
-            let item_id = $(modal).find(form_hidden_id).val()
+            let item_id = $('#modal_view').find(form_hidden_id).val()
 
             let data = $(form_name).serializeArray()
 
@@ -131,14 +131,17 @@
 
                     if (item_id) {
 
-                        if ($('[name=bookingdate]').val()) {
-                            let booking = $('[name=bookingdate]').val();
-                            set_booking = booking.split("/")
-                            let new_booking = set_booking[2] + "-" + set_booking[1] + "-" + set_booking[0]
+                        if ($('.calendar').val()) {
+                            let booking_date_array = []
+                            $.each($('.calendar'), function(index, item) {
+                                let booking_date = $(item).val();
+                                split_date_order = booking_date.split("/")
+                                let data_booking_date = split_date_order[2] + "-" + split_date_order[1] + "-" + split_date_order[0]
 
-                            data.push({
-                                'name': 'bookingdate',
-                                'value': new_booking,
+                                data.push({
+                                'name': 'bookingdate[]',
+                                'value': data_booking_date,
+                            })
                             })
                         }
                         if ($('[name=date_order]').val()) {
@@ -151,7 +154,6 @@
                                 'value': new_date_order,
                             })
                         }
-
                         async_update_data(item_id, data)
                             .then((resp) => {
                                 if (resp.error == 1) {
@@ -181,15 +183,15 @@
                         if ($('.calendar').val()) {
                             let booking_date_array = []
                             $.each($('.calendar'), function(index, item) {
-                                console.log(index)
-                                var dateTypeVar = $('.calendar').datepicker('getDate');
-                                booking_date_array[index] = new Array($.datepicker.formatDate('yy-mm-dd', dateTypeVar))
+                                var dateTypeVar = $(item).datepicker('getDate');
+
+                                data.push({
+                                    'name': 'bookingdate[]',
+                                    'value': $.datepicker.formatDate('yy-mm-dd', dateTypeVar)
+                                })
                             })
 
-                            data.push({
-                                'name': 'bookingdate',
-                                'value': booking_date_array
-                            })
+
                         }
                         if ($('[name=date_order]').val()) {
                             var dateTypeVar = $('[name=date_order]').datepicker('getDate');
@@ -434,11 +436,7 @@
         $(modal_q_name).find('.modal_text_header').html(header)
 
         if (action == 'view') {
-            // let booking = data.BOOKING_DATE
-            let dsplit = data.BOOKING_DATE.split("-");
-            booking = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
-
-            dsplit = data.DATE_ORDER.split("-");
+            let dsplit = data.DATE_ORDER.split("-");
             date_order = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
 
             $(modal_q_name)
@@ -451,8 +449,31 @@
                 .find('.total_pay_view').text(data.DEPOSIT).end()
 
             $(modal_q_name)
-                .find('.bookingdate').text(booking).end()
-                .find('.date_order').text(date_order).end()
+                // .find('.bookingdate').text(booking).end()
+                // .find('.date_order').text(date_order).end()
+
+            //
+            // item list
+            if (data.booking_list) {
+                data.booking_list.forEach(function(item, index) {
+                    let bsplit
+                    // console.log(item)
+                    if (item.BOOKING_DATE) {
+                        bsplit = item.BOOKING_DATE.split("-");
+                        booking_date = bsplit[2] + "/" + bsplit[1] + "/" + bsplit[0];
+
+                        let td_1 = `<td></td>`
+                        let td_2 = `<td>${item.ROUND_NAME}</td>`
+                        let td_3 = `<td>${booking_date}</td>`
+                        let td_4 = `<td>${formatMoney(item.BOOKING_TOTAL,0)}</td>`
+                        let tr = `<tr>${td_1}${td_2}${td_3}${td_4}</tr>`
+
+                        $("#list_booking_view tbody").append(tr)
+
+                        cal_item_list()
+                    }
+                })
+            }
 
             //
             // item list
@@ -488,15 +509,45 @@
             .find('[name=deposit_date]').attr('disabled', 'disabled').end()
             .find('[name=pos_date]').attr('disabled', 'disabled').end()
 
-        if (data.BOOKING_DATE) {
+        /* if (data.BOOKING_DATE) {
             let booking = data.BOOKING_DATE
             $(modal_q_name)
                 .find('[name=bookingdate]').datepicker("setDate", new Date(booking));
-        }
+        } */
         if (data.DATE_ORDER) {
             let date_order = data.DATE_ORDER
             $(modal_q_name)
                 .find('[name=date_order]').datepicker("setDate", new Date(date_order));
+        }
+
+        //
+        // item list
+        if (data.booking_list) {
+            data.booking_list.forEach(function(item, index) {
+                let bsplit
+                if (item.BOOKING_DATE) {
+                    /* bsplit = item.BOOKING_DATE.split("-");
+                    booking_date = bsplit[2] + "/" + bsplit[1] + "/" + bsplit[0];
+
+                    let td_1 = `<td></td>`
+                    let td_2 = `<td>${item.ROUND_NAME}</td>`
+                    let td_3 = `<td>${booking_date}</td>`
+                    let td_4 = `<td>${formatMoney(item.BOOKING_TOTAL)}</td>`
+                    let tr = `<tr>${td_1}${td_2}${td_3}${td_4}</tr>`
+
+                    $("#list_booking tbody").append(tr) */
+
+                    add_html_list_booking()
+                    bsplit = item.BOOKING_DATE.split("-");
+                    booking_date = bsplit[2] + "/" + bsplit[1] + "/" + bsplit[0];
+
+                    // $("[name=round]:last").val(item.ROUND_ID)
+                    // $("[name=bookingdate_temp]:last").val(item.BOOKING_DATE)
+                    $("#list_booking tbody .class-round:last").val(item.ROUND_ID)
+                    $("#list_booking tbody .class-bookingdate:last").val(booking_date)
+                    $("#list_booking tbody .class-bookingtotal:last").val(item.BOOKING_TOTAL)
+                }
+            })
         }
 
         //
@@ -520,18 +571,13 @@
     }
 
     //	format number and float (.00) return string!! 
-    function formatMoney(number, decPlaces, decSep, thouSep) {
-        decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-            decSep = typeof decSep === "undefined" ? "." : decSep;
-        thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-        var sign = number < 0 ? "-" : "";
-        var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-        var j = (j = i.length) > 3 ? j % 3 : 0;
+    function formatMoney(number, decPlaces = 2) {
+        // const r = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
+        const convertNumber = Number(number)
+        const convertFloat = Math.abs(Number(convertNumber)).toFixed(decPlaces)
+        const convertComma = convertFloat.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
-        return sign +
-            (j ? i.substr(0, j) + thouSep : "") +
-            i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-            (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+        return convertComma
     }
     //  =========================
     //  =========================
@@ -685,6 +731,7 @@
             .find('.total_pay').html('').end()
             .find('.total_unit').html('').end()
             .find('.status_payment').html('').end()
+            .find('#list_booking tbody').html('').end()
             .find('#list_item tbody').html('').end()
             .find('[name=remark]').html('').end()
             .find('[name=customer_address]').val('').end()
@@ -703,6 +750,7 @@
             .find('[name=deposit_date]').removeAttr('disabled', 'disabled').end()
             .find('[name=pos_date]').removeAttr('disabled', 'disabled').end()
 
+        $("#list_booking_view tbody").text('')
         $("#list_item_view tbody").text('')
 
         $('[name=date_order]').datepicker("setDate", new Date());

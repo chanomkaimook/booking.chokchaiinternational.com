@@ -174,6 +174,39 @@ class Mdl_booking extends CI_Model
 
         return $result;
     }
+    public function insert_data_batch($data_insert = null)
+    {
+        $result = array(
+            'error'     => 1,
+            'txt'       => 'ไม่มีการทำรายการ',
+        );
+
+        $new_id = "";
+
+        if ($data_insert && is_array($data_insert)) {
+            foreach ($data_insert as $key => $row) {
+                $data_insert[$key]['user_starts'] = $this->userlogin;;
+            }
+            $this->db->insert_batch($this->table, $data_insert);
+            $new_id = $this->db->insert_id();
+        }
+
+        if ($new_id) {
+
+            // keep log
+            log_data(array('insert ' . $this->table, 'insert', $this->db->last_query()));
+
+            $result = array(
+                'error'     => 0,
+                'txt'       => 'ทำรายการสำเร็จ',
+                'data'      => array(
+                    'id'    => $new_id
+                )
+            );
+        }
+
+        return $result;
+    }
 
     //  *
     //  * CRUD
@@ -216,9 +249,9 @@ class Mdl_booking extends CI_Model
     //  * 
     //  * delete data
     //  *
-    public function delete_data()
+    public function delete_data($id = null)
     {
-        $item_id = textNull($this->input->post('item_id'));
+        $item_id = textNull($this->input->post('item_id')) ? textNull($this->input->post('item_id')) : $id;
         $item_remark = textNull($this->input->post('item_remark'));
 
         $result = array(
@@ -250,7 +283,42 @@ class Mdl_booking extends CI_Model
 
         $result = array(
             'error'     => 0,
-            'txt'       => 'ลบการสำเร็จ'
+            'txt'       => 'การลบสำเร็จ'
+        );
+
+        return $result;
+    }
+    public function destroy_data($id = null,$optional = [])
+    {
+        $item_id = textNull($this->input->post('item_id')) ? textNull($this->input->post('item_id')) : $id;
+        $item_remark = textNull($this->input->post('item_remark'));
+
+        $pass = 0;
+        $result = array(
+            'error' => 1,
+            'txt'        => 'ไม่มีการทำรายการ'
+        );
+
+        if ($item_id) {
+            $pass = 1;
+        }
+
+        if($optional['where']){
+            $pass = 1;
+        }
+
+        if($pass != 1){
+            return $result;
+        }
+
+        $this->db->delete($this->table, $optional['where']);
+
+        // keep log
+        log_data(array('delete ' . $this->table, 'delete', $this->db->last_query()));
+
+        $result = array(
+            'error'     => 0,
+            'txt'       => 'การลบสำเร็จถาวร'
         );
 
         return $result;
@@ -380,8 +448,8 @@ class Mdl_booking extends CI_Model
                     );
                     $next = 0;
                 }
-                if($next == 1){
-                    $sql->order_by($this->table . '.'.$item_column, $request['order'][0]['dir']);
+                if ($next == 1) {
+                    $sql->order_by($this->table . '.' . $item_column, $request['order'][0]['dir']);
                 }
             } else {
                 $sql->order_by($this->table . '.id', 'desc');

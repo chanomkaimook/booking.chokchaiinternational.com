@@ -363,7 +363,7 @@ class Mdl_roles extends CI_Model
 
         $result = array(
             'error'     => 0,
-            'txt'       => 'ลบการสำเร็จ'
+            'txt'       => 'การลบสำเร็จ'
         );
 
         return $result;

@@ -99,7 +99,7 @@
     }
 
     $(document).ready(function() {
-        $("[name=bookingdate]").datepicker({
+        $(".calendar").datepicker({
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
@@ -305,53 +305,94 @@
 
                         let dateDefault = [];
                         if (dataBill) {
+                            
                             dataBill.forEach(function(item, index) {
-                                let setArray = [];
+                                console.log(item)
+                                console.log(item.ID+"==="+item.booking_list.length)
+                                if (item.booking_list && item.booking_list.length) {
+                                    item.booking_list.forEach(function(b_item, b_index) {
+                                        // console.log(b_item, b_index)
+                                        let setArray = [];
+                                        
+                                        let booking_dateShow = null;
+                                        if (b_item.BOOKING_DATE || b_item.BOOKING_DATE != null) {
+                                            let dsplit = b_item.BOOKING_DATE.split("-");
+                                            booking_dateShow = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
+                                        }
+                                        console.log("in"+b_item.BOOKING_DATE)
+                                        let typeing;
+                                        switch (item.PAYMENT_ID) {
+                                            case "6":
+                                                typeing = "secondary";
+                                                break;
+                                            case "7":
+                                                typeing = "warning";
+                                                break;
+                                            case "8":
+                                                typeing = "success";
+                                                break;
+                                            default:
+                                                typeing = "secondary"
+                                                break;
+                                        }
+                                        
+                                        setArray = item
+                                        // setArray.ID = ""
+                                        // setArray.CODE = ""
+                                        // setArray.AGENT_NAME = ""
+                                        // setArray.COMPLETE_ALIAS = ""
+                                        // setArray.COMPLETE_ID = ""
+                                        // setArray.CUSTOMER_ADDRESS_ADDRESS = ""
+                                        // setArray.CUSTOMER_ADDRESS_ID = ""
+                                        // setArray.CUSTOMER_ID = ""
+                                        // setArray.CUSTOMER_NAME = ""
+                                        // setArray.DATE_ORDER = ""
+                                        // setArray.DATE_STARTS = ""
+                                        // setArray.DATE_UPDATE = ""
+                                        // setArray.DEPOSIT = ""
+                                        // setArray.NET = ""
+                                        // setArray.STATUS = ""
+                                        // setArray.PAYMENT_ALIAS = ""
+                                        // setArray.PAYMENT_ID = ""
+                                        // setArray.PRICE = ""
+                                        // setArray.PRICE_NOVAT = ""
+                                        // setArray.TOTAL_UNIT = ""
+                                        // setArray.USER_STARTS = ""
+                                        // setArray.USER_UPDATE = ""
+                                        // setArray.VAT = ""
+                                        // setArray.VATNUM = ""
+                                        // setArray.booking_list = ""
+                                        // setArray.item_list = ""
+                                        // setArray.ids = b_item.ID
+                                        
+                                        setArray['start'] = b_item.BOOKING_DATE
+                                        setArray['end'] = b_item.BOOKING_DATE
+                                       /*  setArray.title = item.CUSTOMER_NAME
+                                        setArray.agent_name = item.AGENT_NAME
+                                        setArray.agent_contact = item.AGENT_CONTACT
+                                        setArray.payment_id = item.PAYMENT_ID
+                                        setArray.booking_date = b_item.BOOKING_DATE
+                                        setArray.booking_dateShow = booking_dateShow
+                                        setArray.remark = item.REMARK
+                                        setArray.round_id = b_item.ROUND_ID
+                                        setArray.time_start = ""
+                                        setArray.time_end = ""
+                                        setArray.className = "bg-" + typeing */
+                                        console.log("=========="+b_item.BOOKING_DATE+"="+b_item.ID)
+                                        // console.log(setArray)
+                                        
+                                        dateDefault.push(setArray);
+                                        console.log("dateDefault"+JSON.stringify(setArray))
 
-                                let start = item.BOOKING_DATE;
-                                let end = item.BOOKING_DATE;
-                                let booking_dateShow = null;
-                                if (item.BOOKING_DATE || item.BOOKING_DATE != null) {
-                                    let dsplit = item.BOOKING_DATE.split("-");
-                                    booking_dateShow = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
+                                    })
                                 }
-
-                                let typeing;
-                                switch (item.PAYMENT_ID) {
-                                    case "6":
-                                        typeing = "secondary";
-                                        break;
-                                    case "7":
-                                        typeing = "warning";
-                                        break;
-                                    case "8":
-                                        typeing = "success";
-                                        break;
-                                }
-
-                                setArray = item
-                                setArray.id = item.ID
-                                setArray.start = start
-                                setArray.end = start
-                                setArray.title = item.CUSTOMER_NAME
-                                setArray.agent_name = item.AGENT_NAME
-                                setArray.agent_contact = item.AGENT_CONTACT
-                                setArray.payment_id = item.PAYMENT_ID
-                                setArray.booking_date = item.BOOKING_DATE
-                                setArray.booking_dateShow = booking_dateShow
-                                setArray.remark = item.REMARK
-                                setArray.round_id = item.ROUND_ID
-                                setArray.time_start = ""
-                                setArray.time_end = ""
-                                setArray.className = "bg-" + typeing
-
-                                dateDefault.push(setArray);
                             });
                         }
+                        console.log(dateDefault)
                         // code working
                         $this.$calendarObj = $this.$calendar.fullCalendar({
                             slotDuration: "00:15:00" /* If we want to split day time each 15minutes */ ,
-                            minTime: "08:00:00",
+                            minTime: "08 :00:00",
                             maxTime: "19:00:00",
                             defaultView: "month",
                             handleWindowResize: true,

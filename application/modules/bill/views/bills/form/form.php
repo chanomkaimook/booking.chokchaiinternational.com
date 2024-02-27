@@ -464,7 +464,10 @@
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy', // datepicker for calendar theme
-            format: 'dd/mm/yyyy',   // new datepicker version
+            format: 'dd/mm/yyyy', // new datepicker version
+            beforeShow: function(input, inst) {
+                setDatepickerPos(input, inst)
+            }
         })
 
         input_int_only()

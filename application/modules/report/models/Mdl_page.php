@@ -411,6 +411,7 @@ class Mdl_page extends CI_Model
 
         $sql = $this->db->from($this->table)
             ->join('deposit', $this->table . '.id=deposit.bill_id', 'left')
+            ->join('booking', $this->table . '.id=booking.bill_id', 'left')
             ->join('bank', 'deposit.bank_id=bank.id', 'left')
             // ->join('receipt',$this->table.'.id=receipt.bill_id','left');
             // ->where($this->table.'.complete_id',3)

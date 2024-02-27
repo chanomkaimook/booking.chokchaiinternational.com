@@ -73,6 +73,9 @@ class Ctl_page extends MY_Controller
         deposit.pos_date as dp_pos_date,
         bank.id as bank_id,
         bank.numbercard as bank_numbercard,
+        booking.booking_date as BOOKING_DATE,
+        booking.round_id as round_id,
+        booking.round_name as round_name,
         ";
         $data = $this->model->get_dataShow(null, $optional);
         $count = $this->model->get_data_all();
@@ -110,23 +113,29 @@ class Ctl_page extends MY_Controller
                     $paid_bank_number = null;
 
                     $bill_array = (array)array_keys(array_column($data, "CODE"), $group_v);
-                    // print_r($bill_array);
+                    /* print_r($bill_array);
+                    echo "==================";
+                    print_r($deposit_array);
+                    echo "======================================"; */
                     //
                     // deposit
                     if ($bill_array && $deposit_array) {
                         $array = [];
                         $array = array_values(array_intersect($bill_array, $deposit_array));
+
+                        $deposit_total_unit = textShow($data[$group_k]->dp_total_unit);
+                        $deposit_bill_net = textShow($data[$group_k]->dp_bill_net);
+                        $deposit_pos_date = textShow($data[$group_k]->dp_pos_date);
+
                         if ($array) {
                             $deposit_id = textShow($data[$array[0]]->dp_id);
                             $deposit_code = textShow($data[$array[0]]->dp_codetext);
-                            $deposit_bill_net = textShow($data[$array[0]]->dp_bill_net);
                             $deposit_net = textShow($data[$array[0]]->dp_deposit);
-                            $deposit_total_unit = textShow($data[$array[0]]->dp_total_unit);
                             $deposit_bank_id = textShow($data[$array[0]]->bank_id);
                             $deposit_bank_name = textShow($data[$array[0]]->dp_bank);
                             $deposit_bank_number = textShow($data[$array[0]]->bank_numbercard);
-                            $deposit_pos_date = textShow($data[$array[0]]->dp_pos_date);
-                        
+                           
+
                             $price_paid = $price_paid + floatval($deposit_net);
                         }
                     }
@@ -177,7 +186,7 @@ class Ctl_page extends MY_Controller
                         'deposit_bank_name' => $deposit_bank_name,
                         'deposit_bank_number' => $deposit_bank_number,
                         'deposit_pos_date' => $deposit_pos_date,
-                        
+
                         'paid_id' => $paid_id,
                         'paid_code' => $paid_code,
                         'paid_net' => $paid_net,

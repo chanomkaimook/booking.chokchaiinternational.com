@@ -80,11 +80,17 @@
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
         })
         $("[name=date_order]").datepicker({
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
         })
         $('[name=date_order]').datepicker("setDate", new Date());
 
@@ -92,12 +98,18 @@
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
         })
 
         $("[name=pos_date]").datepicker({
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
         })
 
         $(".touchspin").TouchSpin({
@@ -215,46 +227,82 @@
                         let dateDefault = [];
                         if (dataBill) {
                             dataBill.forEach(function(item, index) {
-                                let setArray = [];
+                                if (item.booking_list && item.booking_list.length) {
+                                    item.booking_list.forEach(function(b_item, b_index) {
 
-                                let start = item.BOOKING_DATE;
-                                let end = item.BOOKING_DATE;
-                                let booking_dateShow = null;
-                                if (item.BOOKING_DATE || item.BOOKING_DATE != null) {
-                                    let dsplit = item.BOOKING_DATE.split("-");
-                                    booking_dateShow = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
+                                        let setArray = [];
+
+                                        let start = item.BOOKING_DATE;
+                                        let end = item.BOOKING_DATE;
+                                        let booking_dateShow = null;
+                                        if (item.BOOKING_DATE || item.BOOKING_DATE != null) {
+                                            let dsplit = item.BOOKING_DATE.split("-");
+                                            booking_dateShow = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
+                                        }
+
+                                        let typeing;
+                                        switch (item.PAYMENT_ID) {
+                                            case "6":
+                                                typeing = "secondary";
+                                                break;
+                                            case "7":
+                                                typeing = "warning";
+                                                break;
+                                            case "8":
+                                                typeing = "success";
+                                                break;
+                                        }
+
+                                        // setArray = item
+                                        setArray['ID'] = item.ID
+                                        setArray['AGENT_CONTACT'] = item.AGENT_CONTACT
+                                        setArray['AGENT_NAME'] = item.AGENT_NAME
+                                        setArray['CODE'] = item.CODE
+                                        setArray['COMPLETE_ALIAS'] = item.COMPLETE_ALIAS
+                                        setArray['COMPLETE_ID'] = item.COMPLETE_ID
+                                        setArray['CUSTOMER_ADDRESS_ADDRESS'] = item.CUSTOMER_ADDRESS_ADDRESS
+                                        setArray['CUSTOMER_ADDRESS_ID'] = item.CUSTOMER_ADDRESS_ID
+                                        setArray['CUSTOMER_ID'] = item.CUSTOMER_ID
+                                        setArray['CUSTOMER_NAME'] = item.CUSTOMER_NAME
+                                        setArray['DATE_ORDER'] = item.DATE_ORDER
+                                        setArray['DATE_STARTS'] = item.DATE_STARTS
+                                        setArray['DATE_UPDATE'] = item.DATE_UPDATE
+                                        setArray['DEPOSIT'] = item.DEPOSIT
+                                        setArray['DISCOUNT'] = item.DISCOUNT
+                                        setArray['ID'] = item.ID
+                                        setArray['NET'] = item.NET
+                                        setArray['NET_PURE'] = item.NET_PURE
+                                        setArray['PAYMENT_ALIAS'] = item.PAYMENT_ALIAS
+                                        setArray['PAYMENT_ID'] = item.PAYMENT_ID
+                                        setArray['PRICE'] = item.PRICE
+                                        setArray['PRICE_NOVAT'] = item.PRICE_NOVAT
+                                        setArray['REMARK'] = item.REMARK
+                                        setArray['REMARK_DELETE'] = item.REMARK_DELETE
+                                        setArray['STATUS'] = item.STATUS
+                                        setArray['TOTAL_UNIT'] = item.TOTAL_UNIT
+                                        setArray['USER_STARTS'] = item.USER_STARTS
+                                        setArray['USER_UPDATE'] = item.USER_UPDATE
+                                        setArray['VAT'] = item.VAT
+                                        setArray['VATNUM'] = item.VATNUM
+                                        setArray['booking_list'] = item.booking_list
+                                        setArray['item_list'] = item.item_list
+
+                                        setArray['start'] = b_item.BOOKING_DATE
+                                        setArray['end'] = b_item.BOOKING_DATE
+                                        setArray['title'] = item.CUSTOMER_NAME
+                                        setArray['agent_name'] = item.AGENT_NAME
+                                        setArray['agent_contact'] = item.AGENT_CONTACT
+                                        setArray['payment_id'] = item.PAYMENT_ID
+                                        setArray['booking_date'] = b_item.BOOKING_DATE
+                                        setArray['booking_dateShow'] = booking_dateShow
+                                        setArray['remark'] = item.REMARK
+                                        setArray['round_id'] = b_item.ROUND_ID
+                                        setArray['time_start'] = ""
+                                        setArray['time_end'] = ""
+                                        setArray['className'] = "bg-" + typeing
+                                        dateDefault.push(setArray);
+                                    })
                                 }
-
-                                let typeing;
-                                switch (item.PAYMENT_ID) {
-                                    case "6":
-                                        typeing = "secondary";
-                                        break;
-                                    case "7":
-                                        typeing = "warning";
-                                        break;
-                                    case "8":
-                                        typeing = "success";
-                                        break;
-                                }
-
-                                setArray = item
-                                setArray.id = item.ID
-                                setArray.start = start
-                                setArray.end = start
-                                setArray.title = item.CUSTOMER_NAME
-                                setArray.agent_name = item.AGENT_NAME
-                                setArray.agent_contact = item.AGENT_CONTACT
-                                setArray.payment_id = item.PAYMENT_ID
-                                setArray.booking_date = item.BOOKING_DATE
-                                setArray.booking_dateShow = booking_dateShow
-                                setArray.remark = item.REMARK
-                                setArray.round_id = item.ROUND_ID
-                                setArray.time_start = ""
-                                setArray.time_end = ""
-                                setArray.className = "bg-" + typeing
-
-                                dateDefault.push(setArray);
                             });
                         }
                         // code working

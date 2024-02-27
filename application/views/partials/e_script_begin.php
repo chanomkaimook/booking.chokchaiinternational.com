@@ -68,4 +68,17 @@
 
         return result
     }
+
+    //
+    // fixed datepicker position when work on scolling
+    function setDatepickerPos(input, inst) {
+        var rect = input.getBoundingClientRect();
+        // use 'setTimeout' to prevent effect overridden by other scripts
+        setTimeout(function() {
+            var scrollTop = $("body").scrollTop();
+            inst.dpDiv.css({
+                top: rect.top + input.offsetHeight + scrollTop
+            });
+        }, 0);
+    }
 </script>

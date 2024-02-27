@@ -348,27 +348,42 @@
                 autoclose: !0,
                 todayHighlight: !0,
                 format: 'dd/mm/yyyy',
+                beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
             })
 
             $("input[name=date_order]").datepicker({
                 autoclose: !0,
                 todayHighlight: !0,
                 format: 'dd/mm/yyyy',
+                beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
             })
             $("input[name=deposit_date]").datepicker({
                 autoclose: !0,
                 todayHighlight: !0,
                 format: 'dd/mm/yyyy',
+                beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
             })
             $("input[name=pos_date]").datepicker({
                 autoclose: !0,
                 todayHighlight: !0,
                 format: 'dd/mm/yyyy',
+                beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
             })
             $("input[name=date_receipt_show]").datepicker({
                 autoclose: !0,
                 todayHighlight: !0,
                 format: 'dd/mm/yyyy',
+                beforeShow: function(input, inst) {
+                    setDatepickerPos(input, inst)
+                }
             })
 
             let modal_dp_name = '#modal_billvat'
@@ -1129,12 +1144,12 @@
             $('.section-tool .sector_button-edit').empty()
         }
 
-        function formatMoney(number,decPlaces = 2) {
+        function formatMoney(number, decPlaces = 2) {
             // const r = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
             const convertNumber = Number(number)
             const convertFloat = Math.abs(Number(convertNumber)).toFixed(decPlaces)
-            const convertComma = convertFloat.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
-            
+            const convertComma = convertFloat.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
             return convertComma
         }
     </script>

@@ -90,11 +90,17 @@
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                setDatepickerPos(input, inst)
+            }
         })
         $("[name=date_order]").datepicker({
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                setDatepickerPos(input, inst)
+            }
         })
         $('[name=date_order]').datepicker("setDate", new Date());
 
@@ -102,12 +108,18 @@
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                setDatepickerPos(input, inst)
+            }
         })
 
         $("[name=pos_date]").datepicker({
             autoclose: !0,
             todayHighlight: !0,
             dateFormat: 'dd/mm/yy',
+            beforeShow: function(input, inst) {
+                setDatepickerPos(input, inst)
+            }
         })
 
         $(".touchspin").TouchSpin({

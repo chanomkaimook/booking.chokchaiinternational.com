@@ -277,7 +277,7 @@
             e.preventDefault()
 
             let id = $(form_name).find(form_hidden_id).val()
-            console.log(id)
+
             edit_data(id)
 
 
@@ -432,10 +432,24 @@
         } else {
             let header = "แก้ไข " + itemcode
         }
-
         $(modal_q_name).find('.modal_text_header').html(header)
 
+        // status for bill complete
+        let status_complete
+        if(data.COMPLETE_ID == 3){
+            status_complete = 1
+        }
+
         if (action == 'view') {
+
+            // when bill success
+            // hide button edit
+            if(status_complete){
+                $('.modal .btn-edit').addClass('d-none')
+            }else{
+                $('.modal .btn-edit').removeClass('d-none')
+            }
+
             let dsplit = data.DATE_ORDER.split("-");
             date_order = dsplit[2] + "/" + dsplit[1] + "/" + dsplit[0];
 
@@ -450,7 +464,7 @@
 
             $(modal_q_name)
                 // .find('.bookingdate').text(booking).end()
-                // .find('.date_order').text(date_order).end()
+                .find('.date_order').text(date_order).end()
 
             //
             // item list

@@ -38,7 +38,7 @@
                             <th>ธนาคาร</th>
                             <th>เลขที่บัญชี</th>
                             <th>รับเงินมัดจำ</th>
-                            <th>วันที่เข้าชมฟาร์ม</th>
+                            <th>วันชำระเงิน</th>
 
                             <th>นทท. เข้าชมฟาร์ม ท่าน</th>
                             <th>ใบเสร็จ/<br>ใบกำกับภาษี</th>
@@ -174,7 +174,7 @@
                     },
                     {
                         "data": {
-                            _: 'BOOKING_DATE.display', // default show
+                            _: 'DEPOSIT.data.deposit_date.display', // default show
                         }
                     },
 

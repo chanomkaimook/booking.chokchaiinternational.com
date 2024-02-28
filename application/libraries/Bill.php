@@ -86,7 +86,10 @@ class Bill
             );
             $b = $this->ci->mdl_bill->get_data($id);
             $bd = $this->ci->mdl_bill_detail->get_data(null, $optional);
-            $bkd = $this->ci->mdl_booking->get_dataShow(null, $optional);
+
+            $optional_bkd = $optional;
+            $optional_bkd['order_by'] = array('id' => 'asc');
+            $bkd = $this->ci->mdl_booking->get_dataShow(null, $optional_bkd);
 
             if ($b) {
                 $b->item_list = $bd;
@@ -482,7 +485,7 @@ class Bill
                 $optional_destroy['where'] = array(
                     'bill_id'      => $item_id
                 );
-                $result_delete = $this->ci->mdl_booking->destroy_data(null,$optional_destroy);
+                $result_delete = $this->ci->mdl_booking->destroy_data(null, $optional_destroy);
                 if ($result_delete['error'] == 0) {
                     // 
                     // insert booking

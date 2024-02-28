@@ -72,12 +72,28 @@ class Ctl_page extends MY_Controller
         deposit.deposit_date as deposit_date,
         deposit.pos_date as dp_pos_date,
         bank.id as bank_id,
+        bank.numbercard as bank_numbercard
+        ";
+        /* $optional['select'] = "
+        bill.*,
+        deposit.id as dp_id,
+        deposit.codetext as dp_codetext,
+        deposit.deposit as dp_deposit,
+        deposit.bill_net as dp_bill_net,
+        deposit.bank_name as dp_bank,
+        deposit.bill_complete as dp_complete,
+        deposit.total_unit as dp_total_unit,
+        deposit.deposit_date as deposit_date,
+        deposit.pos_date as dp_pos_date,
+        bank.id as bank_id,
         bank.numbercard as bank_numbercard,
         booking.booking_date as BOOKING_DATE,
         booking.round_id as round_id,
         booking.round_name as round_name,
-        ";
+        "; */
+        $optional['group_by'] = array('deposit.id');
         $data = $this->model->get_dataShow(null, $optional);
+        // echo $this->db->last_query();
         $count = $this->model->get_data_all();
         // print_r($data);
 
@@ -85,118 +101,126 @@ class Ctl_page extends MY_Controller
 
         if ($data) {
             // split group
-            $group = array_values(array_unique(array_column($data, 'CODE')));
+            // $group = array_values(array_unique(array_column($data, 'CODE')));
             $deposit_array = array_keys(array_column($data, "dp_complete"), null);
             $receipt_array = array_keys(array_column($data, "dp_complete"), 1);
             // print_r($group);
             // print_r($receipt_array);
-            if ($group) {
-                foreach ($group as $group_k => $group_v) {
-                    $price_paid = 0;
+            // if ($data) {
+            foreach ($data as $group_k => $group_v) {
+                $price_paid = 0;
 
-                    $deposit_id = null;
-                    $deposit_code = null;
-                    $deposit_bill_net = null;
-                    $deposit_net = null;
-                    $deposit_total_unit = null;
-                    $deposit_bank_id = null;
-                    $deposit_bank_name = null;
-                    $deposit_bank_number = null;
-                    $deposit_pos_date = null;
+                $deposit_id = null;
+                $deposit_code = null;
+                $deposit_bill_net = null;
+                $deposit_net = null;
+                $deposit_total_unit = null;
+                $deposit_bank_id = null;
+                $deposit_bank_name = null;
+                $deposit_bank_number = null;
+                $deposit_pos_date = null;
 
-                    $paid_id = null;
-                    $paid_code = null;
-                    $paid_net = null;
-                    $paid_total_unit = null;
-                    $paid_bank_id = null;
-                    $paid_bank_name = null;
-                    $paid_bank_number = null;
+                $paid_id = null;
+                $paid_code = null;
+                $paid_net = null;
+                $paid_total_unit = null;
+                $paid_bank_id = null;
+                $paid_bank_name = null;
+                $paid_bank_number = null;
 
-                    $bill_array = (array)array_keys(array_column($data, "CODE"), $group_v);
-                    /* print_r($bill_array);
+                // $bill_array = (array)array_keys(array_column($data, "CODE"), $group_v);
+                // echo "group_v:" . $group_v->ID . " keys" . $group_k;
+                /* print_r(array_keys(array_column($data, "CODE")));
                     echo "==================";
                     print_r($deposit_array);
                     echo "======================================"; */
-                    //
-                    // deposit
-                    if ($bill_array && $deposit_array) {
-                        $array = [];
-                        $array = array_values(array_intersect($bill_array, $deposit_array));
-
-                        $deposit_total_unit = textShow($data[$group_k]->dp_total_unit);
-                        $deposit_bill_net = textShow($data[$group_k]->dp_bill_net);
-                        $deposit_pos_date = textShow($data[$group_k]->dp_pos_date);
-
-                        if ($array) {
-                            $deposit_id = textShow($data[$array[0]]->dp_id);
-                            $deposit_code = textShow($data[$array[0]]->dp_codetext);
-                            $deposit_net = textShow($data[$array[0]]->dp_deposit);
-                            $deposit_bank_id = textShow($data[$array[0]]->bank_id);
-                            $deposit_bank_name = textShow($data[$array[0]]->dp_bank);
-                            $deposit_bank_number = textShow($data[$array[0]]->bank_numbercard);
-                           
-
-                            $price_paid = $price_paid + floatval($deposit_net);
+                // print_r($deposit_array);
+                /* if(is_numeric(array_search($group_k,$deposit_array))){
+                            echo "yes::".$group_k;
+                        }else{
+                            echo "no::".$group_k;
                         }
-                    }
+                        echo "==<br>";
+                    // */
+                // deposit
+                $deposit_total_unit = textShow($data[$group_k]->dp_total_unit);
+                    $deposit_bill_net = textShow($data[$group_k]->dp_bill_net);
+                    $deposit_date = textShow($data[$group_k]->deposit_date);
+                    $deposit_pos_date = textShow($data[$group_k]->dp_pos_date);
+                if ($deposit_array && is_numeric(array_search($group_k, $deposit_array))) {
 
-                    // 
-                    // deposit (last time)
-                    if ($bill_array && $receipt_array) {
-                        $array = [];
-                        $array = array_values(array_intersect($bill_array, $receipt_array));
-                        if ($array) {
-                            $paid_id = textShow($data[$array[0]]->dp_id);
-                            $paid_code = textShow($data[$array[0]]->dp_codetext);
-                            $paid_net = textShow($data[$array[0]]->dp_deposit);
-                            $paid_total_unit = textShow($data[$array[0]]->dp_total_unit);
-                            $paid_bank_id = textShow($data[$array[0]]->bank_id);
-                            $paid_bank_name = textShow($data[$array[0]]->dp_bank);
-                            $paid_bank_number = textShow($data[$array[0]]->bank_numbercard);
+                    
 
-                            $price_paid = $price_paid + floatval($paid_net);
-                        }
-                    }
+                    $deposit_id = textShow($data[$group_k]->dp_id);
+                    $deposit_code = textShow($data[$group_k]->dp_codetext);
+                    $deposit_net = textShow($data[$group_k]->dp_deposit);
+                    $deposit_bank_id = textShow($data[$group_k]->bank_id);
+                    $deposit_bank_name = textShow($data[$group_k]->dp_bank);
+                    $deposit_bank_number = textShow($data[$group_k]->bank_numbercard);
 
-                    $group[$group_k] = array(
-                        'bill_complete_id' => $data[$bill_array[0]]->COMPLETE_ID,
-                        'bill_complete' => $data[$bill_array[0]]->COMPLETE_ALIAS,
-                        'bill_payment_id' => $data[$bill_array[0]]->PAYMENT_ID,
-                        'bill_payment' => $data[$bill_array[0]]->PAYMENT_ALIAS,
-                        'bill_customer' => $data[$bill_array[0]]->CUSTOMER_NAME,
-                        'bill_customer_id' => $data[$bill_array[0]]->CUSTOMER_ID,
-                        'bill_user_starts' => $data[$bill_array[0]]->USER_STARTS,
-                        'bill_user_update' => $data[$bill_array[0]]->USER_UPDATE,
-                        'bill_date_starts' => $data[$bill_array[0]]->DATE_STARTS,
-                        'bill_date_update' => $data[$bill_array[0]]->DATE_UPDATE,
-                        'bill_id' => $data[$bill_array[0]]->ID,
-                        'bill_code' => $data[$bill_array[0]]->CODE,
-                        'bill_net' => $data[$bill_array[0]]->NET,
-                        'bill_date_order' => $data[$bill_array[0]]->DATE_ORDER,
-                        'bill_booking' => $data[$bill_array[0]]->BOOKING_DATE,
-                        'bill_status' => $data[$bill_array[0]]->STATUS_OFFVIEW,
-                        'bill_paid' => $price_paid,
 
-                        'deposit_id' => $deposit_id,
-                        'deposit_code' => $deposit_code,
-                        'deposit_bill_net' => $deposit_bill_net,
-                        'deposit_net' => $deposit_net,
-                        'deposit_total_unit' => $deposit_total_unit,
-                        'deposit_bank_id' => $deposit_bank_id,
-                        'deposit_bank_name' => $deposit_bank_name,
-                        'deposit_bank_number' => $deposit_bank_number,
-                        'deposit_pos_date' => $deposit_pos_date,
-
-                        'paid_id' => $paid_id,
-                        'paid_code' => $paid_code,
-                        'paid_net' => $paid_net,
-                        'paid_total_unit' => $paid_total_unit,
-                        'paid_bank_id' => $paid_bank_id,
-                        'paid_bank_name' => $paid_bank_name,
-                        'paid_bank_number' => $paid_bank_number,
-                    );
+                    $price_paid = $price_paid + floatval($deposit_net);
                 }
+
+                // 
+                // deposit (last time)
+                if ($receipt_array && is_numeric(array_search($group_k, $receipt_array))) {
+
+                    //
+                    // if price follow last receipt (deposit:bill_complete=1)
+                    $deposit_bill_net = textShow($data[$group_k]->dp_bill_net);
+
+                    $paid_id = textShow($data[$group_k]->dp_id);
+                    $paid_code = textShow($data[$group_k]->dp_codetext);
+                    $paid_net = textShow($data[$group_k]->dp_deposit);
+                    $paid_total_unit = textShow($data[$group_k]->dp_total_unit);
+                    $paid_bank_id = textShow($data[$group_k]->bank_id);
+                    $paid_bank_name = textShow($data[$group_k]->dp_bank);
+                    $paid_bank_number = textShow($data[$group_k]->bank_numbercard);
+
+                    $price_paid = $price_paid + floatval($paid_net);
+                }
+
+                $group[$group_k] = array(
+                    'bill_complete_id' => $data[$group_k]->COMPLETE_ID,
+                    'bill_complete' => $data[$group_k]->COMPLETE_ALIAS,
+                    'bill_payment_id' => $data[$group_k]->PAYMENT_ID,
+                    'bill_payment' => $data[$group_k]->PAYMENT_ALIAS,
+                    'bill_customer' => $data[$group_k]->CUSTOMER_NAME,
+                    'bill_customer_id' => $data[$group_k]->CUSTOMER_ID,
+                    'bill_user_starts' => $data[$group_k]->USER_STARTS,
+                    'bill_user_update' => $data[$group_k]->USER_UPDATE,
+                    'bill_date_starts' => $data[$group_k]->DATE_STARTS,
+                    'bill_date_update' => $data[$group_k]->DATE_UPDATE,
+                    'bill_id' => $data[$group_k]->ID,
+                    'bill_code' => $data[$group_k]->CODE,
+                    'bill_net' => $data[$group_k]->NET,
+                    'bill_date_order' => $data[$group_k]->DATE_ORDER,
+                    'bill_booking' => $data[$group_k]->BOOKING_DATE,
+                    'bill_status' => $data[$group_k]->STATUS_OFFVIEW,
+                    'bill_paid' => $price_paid,
+
+                    'deposit_id' => $deposit_id,
+                    'deposit_code' => $deposit_code,
+                    'deposit_bill_net' => $deposit_bill_net,
+                    'deposit_net' => $deposit_net,
+                    'deposit_total_unit' => $deposit_total_unit,
+                    'deposit_bank_id' => $deposit_bank_id,
+                    'deposit_bank_name' => $deposit_bank_name,
+                    'deposit_bank_number' => $deposit_bank_number,
+                    'deposit_date' => $deposit_date,
+                    'deposit_pos_date' => $deposit_pos_date,
+
+                    'paid_id' => $paid_id,
+                    'paid_code' => $paid_code,
+                    'paid_net' => $paid_net,
+                    'paid_total_unit' => $paid_total_unit,
+                    'paid_bank_id' => $paid_bank_id,
+                    'paid_bank_name' => $paid_bank_name,
+                    'paid_bank_number' => $paid_bank_number,
+                );
             }
+            // }
 
             $no = 1;
             foreach ($group as $key => $row) {
@@ -214,7 +238,7 @@ class Ctl_page extends MY_Controller
 
                 $sub_data = [];
 
-                $sub_data['ID'] = $row['ID'];
+                $sub_data['ID'] = $row['bill_id'];
                 $sub_data['NO'] = $no;
 
                 $sub_data['BILL'] = array(
@@ -261,6 +285,10 @@ class Ctl_page extends MY_Controller
                         'deposit_total_unit'    => $row['deposit_total_unit'],
                         'deposit_bank_name'    => $row['deposit_bank_name'],
                         'deposit_bank_number'    => $row['deposit_bank_number'],
+                        'deposit_date'    => array(
+                            "display"   => convertdate_fromDB($row['deposit_date'], 'datetime'),
+                            "timestamp" => date('Y-m-d H:i:s', strtotime($row['deposit_date']))
+                        )
                     ),
                 );
 

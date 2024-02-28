@@ -411,7 +411,7 @@ class Mdl_page extends CI_Model
 
         $sql = $this->db->from($this->table)
             ->join('deposit', $this->table . '.id=deposit.bill_id', 'left')
-            ->join('booking', $this->table . '.id=booking.bill_id', 'left')
+            // ->join('booking', $this->table . '.id=booking.bill_id', 'left')
             ->join('bank', 'deposit.bank_id=bank.id', 'left')
             // ->join('receipt',$this->table.'.id=receipt.bill_id','left');
             // ->where($this->table.'.complete_id',3)
@@ -471,7 +471,7 @@ class Mdl_page extends CI_Model
 
         if ($optionnal['group_by'] && count($optionnal['group_by'])) {
             foreach ($optionnal['group_by'] as $column) {
-                $sql->group_by($this->table . '.' . $column);
+                $sql->group_by($column);
             }
         }
 

@@ -92,7 +92,7 @@
                                         id: bill_item_id,
                                         name: bill_item_name,
                                         price: bill_item_price,
-                                        discount: formatMoney(bill_item_discount),
+                                        discount: bill_item_discount,
                                         total: bill_item_qty
                                     })
                                 )
@@ -574,6 +574,7 @@
 
                     $("[name=item_list]:last").val(item.ITEM_ID)
                     $("[name=item_qty]:last").val(item.QUANTITY)
+                    $("[name=item_discount]:last").val(item.DISCOUNT)
 
                     // from "form/form.php"
                     cal_item_list()

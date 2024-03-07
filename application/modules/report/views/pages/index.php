@@ -32,13 +32,14 @@
                             <th>ชื่อลูกค้า</th>
                             <th>นทท. (จอง) ท่าน</th>
                             <th>ราคาจอง(บาท)</th>
-                            <th>ว/ด/ป (POS)</th>
+                            <th>ว/ด/ป โอนเงินมัดจำ</th>
+                            <th>ว/ด/ป ลง POS</th>
                             <th>ใบเสร็จ/<br>ใบกำกับภาษี</th>
                             <th>ใบเสร็จ/<br>ใบกำกับภาษีอย่างย่อ</th>
                             <th>ธนาคาร</th>
                             <th>เลขที่บัญชี</th>
                             <th>รับเงินมัดจำ</th>
-                            <th>วันชำระเงิน</th>
+                            <th>วันชำระเงินหน้าฟาร์ม</th>
 
                             <th>นทท. เข้าชมฟาร์ม ท่าน</th>
                             <th>ใบเสร็จ/<br>ใบกำกับภาษี</th>
@@ -154,6 +155,11 @@
                     },
                     {
                         "data": {
+                            _: 'DEPOSIT.data.deposit_date.display', // default show
+                        },
+                    },
+                    {
+                        "data": {
                             _: "POS_DATE.display", // default show
                         }
                     },
@@ -174,8 +180,8 @@
                     },
                     {
                         "data": {
-                            _: 'DEPOSIT.data.deposit_date.display', // default show
-                        }
+                            _: 'PAID.data.paid_date.display', // default show
+                        },
                     },
 
 

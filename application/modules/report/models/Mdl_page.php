@@ -466,7 +466,8 @@ class Mdl_page extends CI_Model
                 $sql->order_by($this->table . '.' . $column, $value);
             }
         } else {
-            $sql->order_by($this->table . '.id', 'desc');
+            // $sql->order_by(array($this->table . '.id'=>'desc'));
+            $sql->order_by($this->table . '.id desc,deposit.id desc',null,false);
         }
 
         if ($optionnal['group_by'] && count($optionnal['group_by'])) {

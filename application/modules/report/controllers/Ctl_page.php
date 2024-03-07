@@ -68,6 +68,7 @@ class Ctl_page extends MY_Controller
         deposit.bill_net as dp_bill_net,
         deposit.bank_name as dp_bank,
         deposit.bill_complete as dp_complete,
+        deposit.cash as dp_cash,
         deposit.total_unit as dp_total_unit,
         deposit.deposit_date as deposit_date,
         deposit.pos_date as dp_pos_date,
@@ -127,6 +128,7 @@ class Ctl_page extends MY_Controller
                 $paid_bank_id = null;
                 $paid_bank_name = null;
                 $paid_bank_number = null;
+                $paid_date = null;
 
                 // $bill_array = (array)array_keys(array_column($data, "CODE"), $group_v);
                 // echo "group_v:" . $group_v->ID . " keys" . $group_k;
@@ -143,13 +145,11 @@ class Ctl_page extends MY_Controller
                         echo "==<br>";
                     // */
                 // deposit
-                $deposit_total_unit = textShow($data[$group_k]->dp_total_unit);
-                    $deposit_bill_net = textShow($data[$group_k]->dp_bill_net);
-                    $deposit_date = textShow($data[$group_k]->deposit_date);
-                    $deposit_pos_date = textShow($data[$group_k]->dp_pos_date);
-                if ($deposit_array && is_numeric(array_search($group_k, $deposit_array))) {
-
-                    
+                $deposit_total_unit = textShow($data[$group_k]->TOTAL_UNIT);
+                $deposit_bill_net = textShow($data[$group_k]->dp_bill_net);
+                $deposit_date = textShow($data[$group_k]->deposit_date);
+                $deposit_pos_date = textShow($data[$group_k]->dp_pos_date);
+                if ($deposit_array && is_numeric(array_search($group_k, $deposit_array)) && $data[$group_k]->dp_cash != 1) {
 
                     $deposit_id = textShow($data[$group_k]->dp_id);
                     $deposit_code = textShow($data[$group_k]->dp_codetext);
@@ -157,14 +157,25 @@ class Ctl_page extends MY_Controller
                     $deposit_bank_id = textShow($data[$group_k]->bank_id);
                     $deposit_bank_name = textShow($data[$group_k]->dp_bank);
                     $deposit_bank_number = textShow($data[$group_k]->bank_numbercard);
-
-
                     $price_paid = $price_paid + floatval($deposit_net);
+
+                    //
+                    // กรณีโอนเงินอีกยอดหนึ่ง โดยโอนไม่ครบยอดเต็ม และไม่ได้มาหน้างาน
+                    // จะถือเป็นการโอนเงินปกติ และยึดจากยอดคนเข้าชมที่กรอกจากฟอร์ม สร้างใบรับเงิน
+                    // แทน ใบเสนอราคา
+                    if(textShow($data[$group_k]->dp_total_unit) && textShow($data[$group_k]->dp_total_unit) != $deposit_total_unit){
+                        $deposit_total_unit = $data[$group_k]->dp_total_unit;
+                    }
                 }
 
                 // 
                 // deposit (last time)
-                if ($receipt_array && is_numeric(array_search($group_k, $receipt_array))) {
+                if ($receipt_array && is_numeric(array_search($group_k, $receipt_array)) || $data[$group_k]->dp_cash == 1) {
+
+                    //
+                    // if complete=1 will delete deposit_date  
+                    $paid_date = textShow($data[$group_k]->deposit_date);
+                    $deposit_date = null;
 
                     //
                     // if price follow last receipt (deposit:bill_complete=1)
@@ -218,6 +229,7 @@ class Ctl_page extends MY_Controller
                     'paid_bank_id' => $paid_bank_id,
                     'paid_bank_name' => $paid_bank_name,
                     'paid_bank_number' => $paid_bank_number,
+                    'paid_date' => $paid_date,
                 );
             }
             // }
@@ -286,8 +298,8 @@ class Ctl_page extends MY_Controller
                         'deposit_bank_name'    => $row['deposit_bank_name'],
                         'deposit_bank_number'    => $row['deposit_bank_number'],
                         'deposit_date'    => array(
-                            "display"   => convertdate_fromDB($row['deposit_date'], 'datetime'),
-                            "timestamp" => date('Y-m-d H:i:s', strtotime($row['deposit_date']))
+                            "display"   => $row['deposit_date'] ? convertdate_fromDB($row['deposit_date'], 'datetime') : null,
+                            "timestamp" => $row['deposit_date'] ? date('Y-m-d H:i:s', strtotime($row['deposit_date'])) : null
                         )
                     ),
                 );
@@ -301,8 +313,12 @@ class Ctl_page extends MY_Controller
                         'paid_bank_name'    => $row['paid_bank_name'],
                         'paid_bank_number'    => $row['paid_bank_number'],
                         'paid_pos_date'    => array(
-                            "display"   => toDateTimeString($row['paid_pos_date'], 'datetime'),
-                            "timestamp" => date('Y-m-d H:i:s', strtotime($row['paid_pos_date']))
+                            "display"   => $row['paid_pos_date'] ? toDateTimeString($row['paid_pos_date'], 'datetime') : null,
+                            "timestamp" => $row['paid_pos_date'] ? date('Y-m-d H:i:s', strtotime($row['paid_pos_date'])) : null
+                        ),
+                        'paid_date'    => array(
+                            "display"   => $row['paid_date'] ? convertdate_fromDB($row['paid_date'], 'datetime') : null,
+                            "timestamp" => $row['paid_date'] ? date('Y-m-d H:i:s', strtotime($row['paid_date'])) : null
                         )
                     ),
                 );

@@ -137,12 +137,15 @@ class Receipt
             $deposit_date = textNull($request['deposit_date']) ? textNull($request['deposit_date']) : date('Y-m-d');
             $pos_date = textNull($request['pos_date']) ? textNull($request['pos_date']) : null;
             $remark = textNull($request['deposit_remark']) ? textNull($request['deposit_remark']) : null;
-            $total_unit =  $bill['total_unit'];
+            $total_unit = textNull($request['total_unit']) ? textNull($request['total_unit']) : $bill['total_unit'];
+            $cash = textNull($request['cash']) ? 1 : null;
 
             $data_insert = array(
                 'bill_id'       => $bill_id,
                 'bill_code'     => $codebill,
                 'bill_net'      => $bill['net'],
+
+                'cash'      => $cash,
 
                 'bank_id'       => $bank_id,
                 'bank_name'     => $bank_name,

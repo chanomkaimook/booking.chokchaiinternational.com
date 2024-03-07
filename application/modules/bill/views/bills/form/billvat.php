@@ -1,8 +1,12 @@
 <div class="row">
-    <div class="form-group col-md-12">
+    <div class="form-group col-md-6">
         <span class="required"><i class="mdi mdi-svg"></i></span>
         <label class="text-capitalize">เลขที่ใบกำกับอย่างย่อ</label>
         <input type="text" class="form-control" name="codetext" placeholder="ระบุ" required>
+    </div>
+    <div class="form-group col-md-6">
+        <label class="text-capitalize">จำนวนคนเข้าชม</label>
+        <input type="text" class="form-control form-control-sm int_only" name="total_unit" placeholder="หากไม่ระบุจะเป็นจำนวนจากใบเสนอราคา">
     </div>
 </div>
 
@@ -38,12 +42,25 @@
     </div>
     <div class="form-group col-md-6">
         <span class="required"><i class="mdi mdi-svg"></i></span>
-        <label class="text-capitalize">วันโอน</label>
+        <label class="text-capitalize">วันโอน/ชำระเงิน</label>
         <input type="text" class="form-control" name="deposit_date" placeholder="ระบุ" required>
     </div>
     <div class="form-group col-md-6">
         <label class="text-capitalize">วันที่ลง POS</label>
         <input type="text" class="form-control" name="pos_date" placeholder="ระบุ">
+    </div>
+</div>
+
+<div class="row">
+    <div class="form-group col-md-12">
+        <div class="pl-1">
+            <div class="checkbox checkbox-primary">
+                <input id="cash" name="cash" type="checkbox">
+                <label for="cash">
+                    ชำระหน้าฟาร์ม
+                </label>
+            </div>
+        </div>
     </div>
 </div>
 

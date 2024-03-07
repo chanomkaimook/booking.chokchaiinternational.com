@@ -27,7 +27,6 @@
         <?php
         $this->load->model('mdl_settings');
         $q_setting = $this->mdl_settings->get_data();
-
         ?>
         <div class="">
             <div class="card-box">
@@ -201,7 +200,7 @@
                                             $item_name .= "<p>" . $bill_detail[$key_db]['DESCRIPTION'] . "</p>";
                                             $item_qty .= "<p>" . $bill_detail[$key_db]['QUANTITY'] . "</p>";
                                             $item_price .= "<p>" . textMoney($bill_detail[$key_db]['PRICE_UNIT']) . "</p>";
-                                            $item_net .= "<p>" . textMoney($bill_detail[$key_db]['NET']) . "</p>";
+                                            $item_net .= "<p>" . textMoney($bill_detail[$key_db]['PRICE']) . "</p>";
 
                                             $number_item++;
                                         }
@@ -748,7 +747,9 @@
                     if (resp) {
                         //
                         // update net
-                        $('.text_net').text(resp.NET_PURE)
+                        if(resp.NET_PURE) {
+                            $('.text_net').text(resp.NET_PURE)
+                        }
 
                         if (resp.COMPLETE_ID == 4) {
                             clear_tool()

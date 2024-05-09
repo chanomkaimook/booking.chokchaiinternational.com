@@ -18,6 +18,7 @@ class Auth extends API_Controller
 
     public function index()
     {
+        header("Access-Control-Allow-Origin: *");
         // API Configuration
         $this->_apiConfig([
             'methods' => ['GET'], // Request Execute Only POST and GET Method

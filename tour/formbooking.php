@@ -51,7 +51,7 @@
             <div class="d-none d-lg-block col-lg">
                 <div class="row align-items-center vh-100 text-center text-white">
                     <div class="col">
-                        <div class="titleside_hero">
+                        <div class="titleside_hero" style="display:none">
                             <p class="h2">ตะลอนฟาร์ม</p>
                             <p class="h2">Talon Farm</p>
                             <p class="fs-4">แบบฟอร์มจองเข้าชมออนไลน์</p>
@@ -65,7 +65,7 @@
             <div class="col">
                 <div class="container">
 
-                    <div class="title_hero text-center text-white">
+                    <div class="title_hero text-center text-white" style="display:none">
                         <p class="h2">ตะลอนฟาร์ม</p>
                         <p class="h2">Talon Farm</p>
                         <p class="fs-6">แบบฟอร์มจองเข้าชมออนไลน์</p>
@@ -77,7 +77,7 @@
                             <div class="col-md-9 offset-md-1">
 
                                 <form action="" method="post" id="frm_booking">
-                                    <div class="card border-0 shadow-lg">
+                                    <div class="card border-0 shadow-lg" style="display:none">
                                         <div class="card-body">
 
                                             <!-- Begin Data contact -->
@@ -246,6 +246,20 @@
 
     <script>
         $(function() {
+
+            // lg = >= 992
+            if($( document ).width() <= 991){
+                $(".title_hero").fadeIn('slow');
+            }else{
+                $(".titleside_hero").fadeIn('slow');
+            }
+            
+
+            setTimeout(() => {
+
+                $(".card").fadeIn('slow');
+            }, 200);
+
             let btnAddBooking = "#btn_add_booking"
             let customerBookingBlock = ".cus_booking"
 

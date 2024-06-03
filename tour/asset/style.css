@@ -12,24 +12,24 @@
       rgba(255, 44, 16, 0) 50%,
       rgba(255, 25, 25, 0) 100%
     );
-    background-size: auto 100vmax;
-    background-position:center;
+  background-size: auto 100vmax;
+  background-position: center;
   animation: gradient 15s ease infinite;
   background-blend-mode: luminosity;
-
 }
 
 .card {
   background-color: rgba(255, 255, 255, 0.5);
 }
 
-.titleside_hero .h1,.titleside_hero .h2 {
+.titleside_hero .h1,
+.titleside_hero .h2 {
   font-size: 4rem;
   font-weight: 800 !important;
 }
 
 .titleside_hero .head {
-    font-weight: 800 !important;
+  font-weight: 800 !important;
   line-height: 2.5rem;
 }
 
@@ -49,30 +49,29 @@
 
 /* Hero */
 .title_hero {
-    display:none;
+  display: none;
 }
 
 @media screen and (max-width: 991px) {
-    .title_hero {
-        display:block;
-        position:absolute;
-        top: 0%;
-        left: 50%;
-        transform: translate(-50%, 25%);
-        
-    }
-     
+  .title_hero {
+    display: block;
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, 25%);
+  }
 }
 
-.title_hero .h1, .title_hero .h2 {
-    font-weight: 800 !important;
-    margin-bottom: .1rem;
+.title_hero .h1,
+.title_hero .h2 {
+  font-weight: 800 !important;
+  margin-bottom: 0.1rem;
 }
 
 /* Begin Form */
 .input-group-append button {
-    background-color:#8bcb95;
-    color:#fff;
+  background-color: #8bcb95;
+  color: #fff;
 }
 
 /* .btn-success {

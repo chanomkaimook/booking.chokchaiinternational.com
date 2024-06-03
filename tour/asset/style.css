@@ -1,0 +1,82 @@
+.bg_hero {
+  /* background-image: url('images/background/bg_booking_hero.jpg');
+        background-position: center;
+        background-size: cover; */
+
+  background-image: url("images/background/bg_booking_hero.jpg"),
+    linear-gradient(
+      180deg,
+      rgba(255, 136, 24, 1) 0%,
+      rgba(255, 44, 16, 1) 10%,
+      rgba(255, 44, 16, 1) 15%,
+      rgba(255, 44, 16, 0) 50%,
+      rgba(255, 25, 25, 0) 100%
+    );
+    background-size: auto 100vmax;
+    background-position:center;
+  animation: gradient 15s ease infinite;
+  background-blend-mode: luminosity;
+
+}
+
+.card {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.titleside_hero .h1,.titleside_hero .h2 {
+  font-size: 4rem;
+  font-weight: 800 !important;
+}
+
+.titleside_hero .head {
+    font-weight: 800 !important;
+  line-height: 2.5rem;
+}
+
+/* Animate */
+@keyframes gradient {
+  0% {
+  }
+
+  50% {
+    /* background-position:left; */
+    background-size: auto 110vmax;
+  }
+
+  100% {
+  }
+}
+
+/* Hero */
+.title_hero {
+    display:none;
+}
+
+@media screen and (max-width: 991px) {
+    .title_hero {
+        display:block;
+        position:absolute;
+        top: 0%;
+        left: 50%;
+        transform: translate(-50%, 25%);
+        
+    }
+     
+}
+
+.title_hero .h1, .title_hero .h2 {
+    font-weight: 800 !important;
+    margin-bottom: .1rem;
+}
+
+/* Begin Form */
+.input-group-append button {
+    background-color:#8bcb95;
+    color:#fff;
+}
+
+/* .btn-success {
+    background-color:#8bcb95;
+    border-color:#7fb988;
+} */
+/* End Form */

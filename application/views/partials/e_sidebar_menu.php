@@ -46,7 +46,25 @@
                         </ul>
                     </li> -->
 
-                    <!-- Base data information -->
+                    <?php
+                        $menu_path_cscontact = array(
+                            "main_menu" => array("cscontact.view"),
+                            "sub_menu"  => array()
+                        );
+
+                    ?>
+                    <li class="<?= check_permit_groupmenu($menu_path_cscontact) ?>">
+                        <a href="javascript: void(0);">
+                            <i class="fas fa-phone"></i>
+                            <span> ลูกค้าสนใจ </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul class="nav-second-level" aria-expanded="false">
+                            <li><a href="<?= site_url('customer/ctl_page'); ?>" data-show="ติดต่อกลับ">ติดต่อกลับ</a></li>
+                        
+                        </ul>
+                    </li>
+
                     <?php
                         $menu_path_sale = array(
                             "main_menu" => array("calendar.view","bill.view","report.role","product.view"),
